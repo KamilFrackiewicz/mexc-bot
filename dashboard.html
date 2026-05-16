@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>46ent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
+:root {
+  --bg:#07090e;--s1:#0c1018;--s2:#111826;--s3:#16202e;
+  --b1:#1a2840;--b2:#243550;
+  --cyan:#00ddff;--cyan2:rgba(0,221,255,.1);
+  --green:#00ff9d;--green2:rgba(0,255,157,.1);
+  --red:#ff3355;--red2:rgba(255,51,85,.1);
+  --yellow:#ffcc00;--yellow2:rgba(255,204,0,.1);
+  --purple:#a78bfa;--purple2:rgba(167,139,250,.1);
+  --text:#c0d4e8;--text2:#4a6a85;
+  --mono:'JetBrains Mono',monospace;--sans:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;
+  background-image:radial-gradient(ellipse 70% 50% at 0 0,rgba(0,221,255,.03) 0,transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%,rgba(167,139,250,.03) 0,transparent 55%);}
+
+/* ── LOGIN ── */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--s1);border:1px solid var(--b1);border-radius:10px;
+  padding:40px 36px;width:360px;display:flex;flex-direction:column;gap:20px;}
+.login-logo{font-family:var(--mono);font-size:.8rem;font-weight:700;
+  letter-spacing:.22em;color:var(--cyan);text-align:center;}
+.login-sub{font-family:var(--mono);font-size:.6rem;color:var(--text2);
+  letter-spacing:.14em;text-align:center;margin-top:-10px;}
+.login-err{font-family:var(--mono);font-size:.68rem;color:var(--red);
+  background:var(--red2);border:1px solid rgba(255,51,85,.3);
+  padding:8px 12px;border-radius:3px;display:none;}
+.login-err.show{display:block}
+
+/* ── APP (hidden until logged in) ── */
+#app{display:none}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:54px;background:rgba(7,9,14,.97);
+  border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(20px);}
+.logo{font-family:var(--mono);font-size:.75rem;font-weight:700;
+  letter-spacing:.22em;color:var(--cyan);display:flex;align-items:center;gap:10px;}
+.logo-tag{font-size:.55rem;color:var(--text2);letter-spacing:.1em;
+  background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:10px;}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.pill{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+  padding:4px 14px;border-radius:20px;border:1px solid var(--b2);
+  display:flex;align-items:center;gap:6px;transition:all .3s;}
+.pill.on{border-color:var(--green);color:var(--green);background:var(--green2);}
+.pill.off{color:var(--text2);}
+.pip{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.pip.blink{animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--mono);font-size:.65rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:8px 18px;border-radius:3px;border:none;cursor:pointer;transition:all .15s;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.btn-go{background:var(--green);color:#000;box-shadow:0 0 16px rgba(0,255,157,.2);}
+.btn-go:not(:disabled):hover{box-shadow:0 0 26px rgba(0,255,157,.45);transform:translateY(-1px);}
+.btn-stop{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(255,51,85,.2);}
+.btn-outline{background:transparent;color:var(--cyan);border:1px solid var(--b2);}
+.btn-outline:hover{border-color:var(--cyan);background:var(--cyan2);}
+.btn-sm{padding:5px 12px;font-size:.58rem;}
+.btn-purple{background:var(--purple);color:#000;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(255,51,85,.3);font-size:.58rem;padding:4px 10px;}
+.btn-danger:hover{background:var(--red2);}
+.btn-add{background:var(--cyan2);color:var(--cyan);border:1px dashed var(--cyan);
+  width:100%;padding:10px;font-size:.65rem;letter-spacing:.12em;}
+.btn-add:hover{background:rgba(0,221,255,.18);}
+.btn-full{width:100%;padding:11px;}
+
+/* ── LAYOUT ── */
+.page{display:grid;grid-template-columns:340px 1fr;gap:16px;
+  padding:18px 20px;max-width:1600px;margin:0 auto;}
+.sidebar{display:flex;flex-direction:column;gap:14px;}
+.main{display:flex;flex-direction:column;gap:14px;}
+
+/* ── PANEL ── */
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:6px;overflow:hidden;}
+.ph{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--b1);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:var(--cyan);
+  text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+.pb{padding:16px;display:flex;flex-direction:column;gap:11px;}
+
+/* ── FORM ── */
+.field{display:flex;flex-direction:column;gap:4px;}
+label{font-family:var(--mono);font-size:.57rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text2);}
+input,select{background:var(--bg);border:1px solid var(--b1);border-radius:3px;
+  color:var(--text);font-family:var(--mono);font-size:.8rem;
+  padding:7px 10px;outline:none;transition:border-color .15s;width:100%;}
+input:focus,select:focus{border-color:var(--cyan);}
+input[type=password]{letter-spacing:.1em;}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.sec{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;
+  color:var(--purple);text-transform:uppercase;padding:4px 0 0;}
+.div{height:1px;background:var(--b1);}
+
+/* ── TOGGLE GROUP ── */
+.tg{display:flex;border:1px solid var(--b1);border-radius:3px;overflow:hidden;}
+.tg-b{flex:1;padding:7px 4px;background:var(--bg);cursor:pointer;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;
+  text-align:center;border:none;color:var(--text2);transition:all .15s;
+  border-right:1px solid var(--b1);}
+.tg-b:last-child{border-right:none;}
+.tg-b.on-long{background:var(--green2);color:var(--green);}
+.tg-b.on-short{background:var(--red2);color:var(--red);}
+.tg-b.on-both{background:var(--cyan2);color:var(--cyan);}
+.tg-b.on-close{background:var(--yellow2);color:var(--yellow);}
+.tg-b.on-inside{background:var(--cyan2);color:var(--cyan);}
+.tg-b.on-avg{background:var(--purple2);color:var(--purple);}
+.tg-b.on-entry{background:var(--cyan2);color:var(--cyan);}
+
+/* ── SWITCH ── */
+.sw-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.sw-lbl{font-family:var(--mono);font-size:.65rem;color:var(--text);}
+.sw{width:36px;height:20px;background:var(--b1);border-radius:10px;
+  position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;
+  border-radius:50%;background:var(--text2);transition:all .2s;}
+.sw.on{background:var(--cyan);}
+.sw.on::after{left:19px;background:#000;}
+
+/* ── PYRAMID CONFIG ── */
+.pyr-row{display:grid;grid-template-columns:22px 30px 1fr 1fr;gap:8px;align-items:center;
+  background:var(--s2);border:1px solid var(--b1);border-radius:3px;padding:9px 12px;}
+.pyr-n{font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--text2);text-align:center;}
+.pi{background:var(--bg);border:1px solid var(--b1);border-radius:2px;
+  color:var(--text);font-family:var(--mono);font-size:.75rem;
+  padding:5px 8px;width:100%;outline:none;}
+.pi:focus{border-color:var(--cyan);}
+.pi:disabled,.pi-lbl.disabled{opacity:.35;}
+.pi-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text2);margin-bottom:2px;letter-spacing:.08em;}
+
+/* ── PAIR CARDS ── */
+.pair-card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;transition:border-color .3s;}
+.pair-card.long-active{border-color:rgba(0,255,157,.4);}
+.pair-card.short-active{border-color:rgba(255,51,85,.4);}
+.pair-header{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;background:var(--s2);border-bottom:1px solid var(--b1);cursor:pointer;}
+.pair-hdr-l{display:flex;align-items:center;gap:12px;}
+.pair-name{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--text);letter-spacing:.06em;}
+.pair-price{font-family:var(--mono);font-size:.82rem;color:var(--cyan);}
+.pair-hdr-r{display:flex;align-items:center;gap:6px;}
+
+/* ── SIGNAL CHIP ── */
+.schip{font-family:var(--mono);font-size:.68rem;font-weight:700;
+  padding:3px 10px;border-radius:3px;letter-spacing:.08em;
+  display:inline-flex;align-items:center;gap:5px;}
+.schip::before{content:'';width:6px;height:6px;border-radius:50%;}
+.schip.LONG{background:var(--green2);color:var(--green);border:1px solid rgba(0,255,157,.3);}
+.schip.LONG::before{background:var(--green);box-shadow:0 0 6px var(--green);}
+.schip.SHORT{background:var(--red2);color:var(--red);border:1px solid rgba(255,51,85,.3);}
+.schip.SHORT::before{background:var(--red);box-shadow:0 0 6px var(--red);}
+.schip.WAIT,.schip.NONE{background:transparent;color:var(--text2);border:1px solid var(--b1);}
+.schip.WAIT::before,.schip.NONE::before{background:var(--text2);}
+
+/* ── DIV BADGES ── */
+.div-badge{font-family:var(--mono);font-size:.58rem;padding:2px 7px;border-radius:2px;letter-spacing:.06em;}
+.div-badge.bull{background:var(--green2);color:var(--green);border:1px solid rgba(0,255,157,.3);}
+.div-badge.bear{background:var(--red2);color:var(--red);border:1px solid rgba(255,51,85,.3);}
+
+/* ── PAIR BODY ── */
+.pair-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.pair-stats{display:grid;grid-template-columns:repeat(8,1fr);gap:1px;
+  background:var(--b1);border-radius:4px;overflow:hidden;}
+.psc{background:var(--s2);padding:10px 12px;}
+.psc-l{font-family:var(--mono);font-size:.52rem;color:var(--text2);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.psc-v{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--text);}
+.psc-v.c{color:var(--cyan);}.psc-v.g{color:var(--green);}
+.psc-v.r{color:var(--red);}.psc-v.y{color:var(--yellow);}
+.psc-v.p{color:var(--purple);}
+
+/* ── INDICATORS ── */
+.ind-row{display:flex;align-items:center;gap:10px;}
+.ind-l{font-family:var(--mono);font-size:.6rem;color:var(--text2);min-width:68px;}
+.ind-track{flex:1;height:4px;background:var(--b1);border-radius:2px;position:relative;overflow:hidden;}
+.ind-fill{height:100%;border-radius:2px;transition:width .5s ease;}
+.iz{position:absolute;top:0;left:0;width:20%;height:100%;background:rgba(0,255,157,.2);}
+.izr{position:absolute;top:0;right:0;width:20%;height:100%;background:rgba(255,51,85,.2);}
+.ind-v{font-family:var(--mono);font-size:.72rem;color:var(--text);min-width:40px;text-align:right;}
+
+/* ── PYRAMID STATUS ── */
+.pyr-status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pec{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:10px 12px;transition:all .3s;}
+.pec.fl{border-color:rgba(0,255,157,.4);background:rgba(0,255,157,.05);}
+.pec.fs{border-color:rgba(255,51,85,.4);background:rgba(255,51,85,.05);}
+.pec-n{font-family:var(--mono);font-size:.55rem;color:var(--text2);margin-bottom:4px;}
+.pec-p{font-family:var(--mono);font-size:.82rem;font-weight:700;}
+.pec-p.g{color:var(--green);}.pec-p.r{color:var(--red);}
+.pec-info{font-family:var(--mono);font-size:.62rem;color:var(--text2);margin-top:2px;}
+.pec-empty{font-family:var(--mono);font-size:.7rem;color:var(--b2);text-align:center;padding:6px 0;}
+
+/* ── POSITIONS ── */
+.pos-table{width:100%;border-collapse:collapse;}
+.pos-table th{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text2);padding:7px 12px;text-align:left;border-bottom:1px solid var(--b1);background:var(--s2);}
+.pos-table td{padding:8px 12px;border-bottom:1px solid rgba(26,40,64,.5);font-family:var(--mono);font-size:.72rem;}
+.no-pos{font-family:var(--mono);font-size:.68rem;color:var(--text2);text-align:center;padding:14px;}
+
+/* ── LOGS ── */
+.log-box{max-height:200px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:3px;}
+.le{display:grid;grid-template-columns:50px 48px 1fr;gap:6px;padding:2px 0;
+  border-bottom:1px solid rgba(26,40,64,.4);font-family:var(--mono);font-size:.63rem;line-height:1.5;}
+.lt{color:var(--text2);}
+.ll{font-size:.55rem;font-weight:700;letter-spacing:.06em;padding:1px 4px;border-radius:2px;height:fit-content;}
+.ll.INFO{color:var(--text2);}
+.ll.WARN{color:var(--yellow);background:var(--yellow2);}
+.ll.ERROR{color:var(--red);background:var(--red2);}
+.ll.SUCCESS{color:var(--green);background:var(--green2);}
+.ll.SIGNAL{color:var(--cyan);background:var(--cyan2);}
+.lm{color:var(--text);word-break:break-word;}
+
+/* ── GLOBAL LOGS ── */
+.glog-box{max-height:110px;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:3px;}
+
+/* ── COLLAPSE ── */
+.collapsible{display:block;}
+.collapsed .collapsible{display:none;}
+.chevron{font-size:.7rem;color:var(--text2);transition:transform .2s;}
+.collapsed .chevron{transform:rotate(-90deg);}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
+  z-index:300;backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:8px;
+  padding:24px;width:360px;display:flex;flex-direction:column;gap:14px;}
+.modal-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase;}
+.modal-btns{display:flex;gap:8px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:66px;right:18px;background:var(--s2);
+  border:1px solid var(--b1);border-left:3px solid var(--cyan);
+  padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:.72rem;
+  color:var(--cyan);z-index:400;
+  transform:translateX(130%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.toast.show{transform:translateX(0);}
+
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">▣ 46ent</div>
+    <div class="login-sub">TRADING BOT — ZALOGUJ SIĘ</div>
+    <div class="login-err" id="login-err">Nieprawidłowe hasło</div>
+    <div class="field">
+      <label>Hasło</label>
+      <input type="password" id="login-pw" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn btn-go btn-full" onclick="doLogin()">ZALOGUJ</button>
+    
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+<header>
+  <div class="logo">▣ 46ent <span class="logo-tag">TRADING BOT</span></div>
+  <div class="hdr-r">
+    <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
+    <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
+    <button class="btn btn-outline btn-sm" onclick="showModal('pw-modal')">🔒 HASŁO</button>
+    <button class="btn btn-outline btn-sm" onclick="doLogout()">WYLOGUJ</button>
+    <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
+    <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+  <div class="panel">
+    <div class="ph">🔑 API MEXC</div>
+    <div class="pb">
+      <div class="field"><label>API Key</label><input type="text" id="api_key" placeholder="mx0v..."></div>
+      <div class="field"><label>API Secret</label><input type="password" id="api_secret" placeholder="••••••••"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">⚙️ Domyślna konfiguracja</div>
+    <div class="pb">
+      <div class="sec">Para & Interwał</div>
+      <div class="f2">
+        <div class="field"><label>Interwał</label>
+          <select id="def-interval">
+            <option value="Min1">1 min</option><option value="Min5" selected>5 min</option>
+            <option value="Min15">15 min</option><option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
+          </select>
+        </div>
+        <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
+      </div>
+
+      <div class="sec">Bollinger Bands</div>
+      <div class="f2">
+        <div class="field"><label>Okres</label><input type="number" id="def-bb-p" value="20" min="5"></div>
+        <div class="field"><label>Std</label><input type="number" id="def-bb-s" value="2.0" min="0.5" step="0.1"></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Próg wybicia %</label>
+          <input type="number" id="def-bb-break" value="0" min="0" max="5" step="0.1"
+            title="O ile % świeca musi wybić poza BB. 0=samo wyjście poza BB, 0.5=0.5% poza BB">
+        </div>
+        <div class="field"><label>Blisk. % (wewnątrz)</label>
+          <input type="number" id="def-bb-prox" value="0" min="0" max="50" step="1"
+            title="0=tylko poza BB, 30=w górnych/dolnych 30% wstęgi">
+        </div>
+      </div>
+
+      <div class="sec">Stochastic RSI</div>
+      <div class="f3">
+        <div class="field"><label>Okres</label><input type="number" id="def-stoch" value="14"></div>
+        <div class="field"><label>OB</label><input type="number" id="def-ob" value="80"></div>
+        <div class="field"><label>OS</label><input type="number" id="def-os" value="20"></div>
+      </div>
+
+      <div class="sec">MA200 Filtr trendu</div>
+      <div class="sw-row">
+        <span class="sw-lbl">Włącz filtr MA200</span>
+        <button class="sw" id="def-ma200-sw" onclick="toggleSw('def-ma200-sw','def-ma200-en')"></button>
+        <input type="hidden" id="def-ma200-en" value="0">
+      </div>
+      <div class="f2">
+        <div class="field"><label>Timeframe MA200</label>
+          <select id="def-ma200-tf">
+            <option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sec">TP / SL</div>
+      <div class="f2">
+        <div class="field"><label>TP %</label><input type="number" id="def-tp" value="1.0" step="0.1"></div>
+        <div class="field"><label>SL %</label><input type="number" id="def-sl" value="1.5" step="0.1"></div>
+      </div>
+
+      <div class="sec">Piramida wejść</div>
+      <div id="def-pyr" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">📋 Logi globalne</div>
+    <div class="glog-box" id="glog"></div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">💰 Saldo Futures MEXC <span style="cursor:pointer" onclick="fetchBalance()">↻</span></div>
+    <div id="balance-box" style="padding:8px 14px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">— kliknij ↻ aby odświeżyć —</div>
+  </div>
+
+  <button class="btn btn-purple btn-full" onclick="saveAndApply()">ZAPISZ I ZASTOSUJ</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div id="pairs-grid">
+    <div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">
+      Kliknij <strong style="color:var(--cyan)">+ DODAJ PARĘ</strong> aby zacząć
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+</div><!-- /app -->
+
+<!-- ADD PAIR MODAL -->
+<div class="modal-bg" id="add-pair-modal">
+  <div class="modal">
+    <div class="modal-title">+ Dodaj parę</div>
+    <div class="field"><label>Symbol</label>
+      <select id="modal-sym">
+        <option>BTC_USDT</option><option>ETH_USDT</option><option>SOL_USDT</option>
+        <option>SUI_USDT</option><option>XRP_USDT</option><option>TRX_USDT</option>
+        <option>DOGE_USDT</option><option>BNB_USDT</option>
+      </select>
+    </div>
+    <div class="field"><label>Kierunek</label>
+      <select id="modal-dir">
+        <option value="BOTH">▲▼ Oba kierunki</option>
+        <option value="LONG">▲ Tylko LONG</option>
+        <option value="SHORT">▼ Tylko SHORT</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-go" style="flex:1" onclick="addPair()">DODAJ</button>
+      <button class="btn btn-outline" style="flex:1" onclick="hideModal('add-pair-modal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-bg" id="pw-modal">
+  <div class="modal">
+    <div class="modal-title">🔒 Zmień hasło</div>
+    <div class="field"><label>Stare hasło</label><input type="password" id="pw-old"></div>
+    <div class="field"><label>Nowe hasło</label><input type="password" id="pw-new"></div>
+    <div class="field"><label>Powtórz nowe hasło</label><input type="password" id="pw-new2"></div>
+    <div class="login-err" id="pw-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-go" style="flex:1" onclick="changePassword()">ZMIEŃ</button>
+      <button class="btn btn-outline" style="flex:1" onclick="hideModal('pw-modal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api';
+let TOKEN = localStorage.getItem('mexc_token') || '';
+let pairs = {}; // symbol -> config
+const pyrEnabled = {def:[true,true,false]};
+
+// ── AUTH ──
+async function doLogin() {
+  const pw = document.getElementById('login-pw').value;
+  try {
+    const r = await fetch(API+'/login',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({password:pw})});
+    if(r.ok){
+      const d = await r.json();
+      TOKEN = d.token;
+      localStorage.setItem('mexc_token', TOKEN);
+      showApp();
+    } else {
+      document.getElementById('login-err').classList.add('show');
+    }
+  } catch { document.getElementById('login-err').classList.add('show'); }
+}
+
+async function doLogout() {
+  // NIE zatrzymujemy bota - tylko kasujemy token w przeglądarce
+  localStorage.removeItem('mexc_token');
+  TOKEN = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-screen').style.alignItems = 'center';
+  document.getElementById('login-screen').style.justifyContent = 'center';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initDefPyr();
+  loadConfig();
+  fetchStatus();
+  setInterval(fetchStatus, 5000);
+}
+
+async function apiFetch(path, opts={}) {
+  opts.headers = {...(opts.headers||{}), 'Authorization': `Bearer ${TOKEN}`};
+  const r = await fetch(API+path, opts);
+  if(r.status===401){ doLogout(); throw new Error('Unauthorized'); }
+  return r;
+}
+
+async function changePassword() {
+  const oldPw = document.getElementById('pw-old').value;
+  const newPw = document.getElementById('pw-new').value;
+  const newPw2 = document.getElementById('pw-new2').value;
+  const errEl = document.getElementById('pw-err');
+  if(newPw !== newPw2){ errEl.textContent='Hasła nie są identyczne'; errEl.classList.add('show'); return; }
+  if(newPw.length < 6){ errEl.textContent='Hasło musi mieć min. 6 znaków'; errEl.classList.add('show'); return; }
+  try {
+    const r = await apiFetch('/change_password',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({old_password:oldPw, new_password:newPw})});
+    if(r.ok){ hideModal('pw-modal'); toast('✅ Hasło zmienione','var(--green)');
+      document.getElementById('pw-old').value='';
+      document.getElementById('pw-new').value='';
+      document.getElementById('pw-new2').value=''; }
+    else { errEl.textContent='Stare hasło nieprawidłowe'; errEl.classList.add('show'); }
+  } catch { errEl.textContent='Błąd połączenia'; errEl.classList.add('show'); }
+}
+
+// Check existing token on load
+(async function() {
+  if(!TOKEN){ return; }
+  try {
+    const r = await fetch(API+'/status',{headers:{'Authorization':`Bearer ${TOKEN}`}});
+    if(r.ok){ showApp(); }
+  } catch {}
+})();
+
+// ── SWITCHES ──
+function toggleSw(swId, hiddenId) {
+  const sw = document.getElementById(swId);
+  const hd = document.getElementById(hiddenId);
+  const on = sw.classList.toggle('on');
+  hd.value = on ? '1' : '0';
+}
+
+// ── DEF PYRAMID ──
+function initDefPyr() {
+  const c = document.getElementById('def-pyr'); c.innerHTML='';
+  for(let i=0;i<3;i++){
+    const on = pyrEnabled.def[i];
+    c.innerHTML += `<div class="pyr-row">
+      <div class="pyr-n">${i+1}</div>
+      <button class="sw ${on?'on':''}" id="def-sw-${i}" onclick="toggleDefPyr(${i})"></button>
+      <div><div class="pi-lbl">Kwota USD</div>
+        <input class="pi" type="number" id="def-pamt-${i}" value="33" min="1" ${on?'':'disabled'}></div>
+      <div><div class="pi-lbl">Offset %</div>
+        <input class="pi" type="number" id="def-poff-${i}" value="${i===0?0:1.0}" min="0" step="0.1" ${i===0||!on?'disabled':''}></div>
+    </div>`;
+  }
+}
+function toggleDefPyr(i) { pyrEnabled.def[i]=!pyrEnabled.def[i]; initDefPyr(); }
+
+// ── MODAL ──
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+// ── ADD PAIR ──
+function addPair(){
+  const sym = document.getElementById('modal-sym').value;
+  const dir = document.getElementById('modal-dir').value;
+  const amt = null;
+  if(pairs[sym]){ toast(`${sym} już dodana`,'var(--yellow)'); hideModal('add-pair-modal'); return; }
+  pairs[sym] = buildCfg(sym, dir, amt);
+  renderCard(sym);
+  hideModal('add-pair-modal');
+  toast(`✅ Dodano ${sym}`,'var(--green)');
+}
+
+function buildCfg(sym, dir='BOTH', amt=33){
+  return {
+    symbol:sym, enabled:true,
+    interval: document.getElementById('def-interval').value,
+    direction:dir, entry_timing:'CLOSE',
+    bb_period: parseInt(document.getElementById('def-bb-p').value),
+    bb_std: parseFloat(document.getElementById('def-bb-s').value),
+    bb_breakout_pct: parseFloat(document.getElementById('def-bb-break').value)||0,
+    bb_proximity: parseFloat(document.getElementById('def-bb-prox').value)/100,
+    stoch_period: parseInt(document.getElementById('def-stoch').value),
+    stoch_smooth_k:3, stoch_smooth_d:3,
+    stoch_overbought: parseInt(document.getElementById('def-ob').value),
+    stoch_oversold: parseInt(document.getElementById('def-os').value),
+    ma200_enabled: document.getElementById('def-ma200-en').value==='1',
+    ma200_tf: document.getElementById('def-ma200-tf').value,
+    leverage: parseInt(document.getElementById('def-leverage').value),
+    pyramid_levels:[0,1,2].map(i=>({
+      enabled: pyrEnabled.def[i],
+      amount_usd: parseFloat(document.getElementById(`def-pamt-${i}`)?.value)||amt,
+      offset_pct: i===0?0:(parseFloat(document.getElementById(`def-poff-${i}`)?.value)||1.0)
+    })),
+    tp_mode:'FROM_AVG',
+    tp_pct: parseFloat(document.getElementById('def-tp').value),
+    sl_pct: parseFloat(document.getElementById('def-sl').value),
+  };
+}
+
+async function removePair(sym){
+  if(!confirm(`Usunąć ${sym}?`)) return;
+  try { await apiFetch(`/pair/${sym}`,{method:'DELETE'}); } catch {}
+  delete pairs[sym];
+  const el=document.getElementById(`card-${sym}`); if(el) el.remove();
+  if(!Object.keys(pairs).length)
+    document.getElementById('pairs-grid').innerHTML=
+      '<div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">Kliknij <strong style="color:var(--cyan)">+ DODAJ PARĘ</strong> aby zacząć</div>';
+  toast(`Usunięto ${sym}`,'var(--yellow)');
+}
+
+// ── RENDER CARD ──
+function renderCard(sym){
+  const grid = document.getElementById('pairs-grid');
+  const ph = grid.querySelector('div[style*="padding:50px"]'); if(ph) ph.remove();
+  const div=document.createElement('div');
+  div.className='pair-card'; div.id=`card-${sym}`;
+  div.innerHTML=cardHTML(sym);
+  grid.appendChild(div);
+}
+
+function cardHTML(sym){ return `
+  <div class="pair-header" onclick="toggleCard('${sym}')">
+    <div class="pair-hdr-l">
+      <div class="pair-name">${sym}</div>
+      <div class="pair-price" id="pp-${sym}">—</div>
+      <span id="pair-meta-${sym}" style="font-family:var(--mono);font-size:.6rem;color:var(--text2);background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:3px">—</span>
+      <span class="schip NONE" id="sc-${sym}">— CZEKAM</span>
+      <span id="div-${sym}"></span>
+    </div>
+    <div class="pair-hdr-r">
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();testPair('${sym}')">TEST</button>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();resetPyramid('${sym}')">RESET PYR</button>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removePair('${sym}')">USUŃ</button>
+      <span class="chevron">▼</span>
+    </div>
+  </div>
+  <div class="collapsible pair-body">
+    <div class="pair-stats">
+      <div class="psc"><div class="psc-l">BB Górna</div><div class="psc-v" id="bbu-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">BB Dolna</div><div class="psc-v" id="bbl-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Stoch K</div><div class="psc-v c" id="sk-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Stoch D</div><div class="psc-v p" id="sd-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">MA200</div><div class="psc-v y" id="ma-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Śr. wejście</div><div class="psc-v y" id="avg-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">TP</div><div class="psc-v g" id="tp-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">SL</div><div class="psc-v r" id="sl-${sym}">—</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="ind-row">
+        <div class="ind-l">Stoch K</div>
+        <div class="ind-track"><div class="iz"></div><div class="izr"></div>
+          <div class="ind-fill" id="ik-${sym}" style="width:50%;background:var(--cyan)"></div></div>
+        <div class="ind-v" id="ikv-${sym}">—</div>
+      </div>
+      <div class="ind-row">
+        <div class="ind-l">Stoch D</div>
+        <div class="ind-track"><div class="iz"></div><div class="izr"></div>
+          <div class="ind-fill" id="id-${sym}" style="width:50%;background:var(--purple)"></div></div>
+        <div class="ind-v" id="idv-${sym}">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:var(--text2)">
+        <span>◀ OS (${pairs[sym]?.stoch_oversold||20})</span>
+        <span>OB (${pairs[sym]?.stoch_overbought||80}) ▶</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">🔺 Piramida wejść</div>
+      <div class="pyr-status" id="pyrs-${sym}">
+        ${[1,2,3].map(i=>`<div class="pec"><div class="pec-n">Poziom ${i}</div><div class="pec-empty">—</div></div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">📂 Otwarte pozycje</div>
+      <div id="pos-${sym}"><div class="no-pos">Brak pozycji</div></div>
+    </div>
+    <div class="panel" style="border-radius:4px">
+      <div class="ph" style="font-size:.55rem">LOGI — ${sym}</div>
+      <div class="log-box" id="log-${sym}"></div>
+    </div>
+  </div>`; }
+
+function toggleCard(sym){
+  document.getElementById(`card-${sym}`).classList.toggle('collapsed');
+}
+
+// ── API ──
+async function saveAndApply(){
+  const cfg = {
+    api_key: document.getElementById('api_key').value.trim(),
+    api_secret: document.getElementById('api_secret').value.trim(),
+    pairs: Object.values(pairs).map(p => ({
+      ...p,
+      interval: document.getElementById('def-interval').value,
+      leverage: parseInt(document.getElementById('def-leverage').value),
+      bb_period: parseInt(document.getElementById('def-bb-p').value),
+      bb_std: parseFloat(document.getElementById('def-bb-s').value),
+      bb_breakout_pct: parseFloat(document.getElementById('def-bb-break').value) || 0.0,
+      bb_proximity: parseFloat(document.getElementById('def-bb-prox').value)/100,
+      stoch_period: parseInt(document.getElementById('def-stoch').value),
+      stoch_overbought: parseInt(document.getElementById('def-ob').value),
+      stoch_oversold: parseInt(document.getElementById('def-os').value),
+      ma200_enabled: document.getElementById('def-ma200-en').value==='1',
+      ma200_tf: document.getElementById('def-ma200-tf').value,
+      tp_pct: parseFloat(document.getElementById('def-tp').value),
+      sl_pct: parseFloat(document.getElementById('def-sl').value),
+      pyramid_levels: [0,1,2].map(i=>({
+        enabled: i===0 ? true : (document.getElementById('def-sw-'+i)?.classList.contains('on') ?? true),
+        amount_usd: parseFloat(document.getElementById('def-pamt-'+i)?.value) || 10.0,
+        offset_pct: i===0 ? 0.0 : (parseFloat(document.getElementById('def-poff-'+i)?.value) || 0.0)
+      }))
+    }))
+  };
+  if(!cfg.api_key||!cfg.api_secret){ toast('Uzupełnij API Key i Secret!','var(--red)'); return; }
+  if(!cfg.pairs.length){ toast('Dodaj przynajmniej jedną parę!','var(--yellow)'); return; }
+  try {
+    const r = await apiFetch('/config',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
+    if(r.ok){
+      toast('✅ Zapisano konfigurację','var(--green)');
+      // Zaktualizuj lokalny stan par z zapisanej konfiguracji
+      cfg.pairs.forEach(p => { if(pairs[p.symbol]) pairs[p.symbol] = {...pairs[p.symbol], ...p}; });
+      // Od razu pobierz status żeby odświeżyć nagłówki
+      await fetchStatus();
+    } else toast('❌ Błąd zapisu','var(--red)');
+  } catch(e){ if(e.message!=='Unauthorized') toast('❌ Brak połączenia','var(--red)'); }
+}
+
+async function loadConfig(){
+  try {
+    const r = await apiFetch('/config');
+    if(!r.ok) return;
+    const d = await r.json();
+    if(d.api_key)    document.getElementById('api_key').value    = d.api_key;
+    if(d.api_secret) document.getElementById('api_secret').value = d.api_secret;
+    if(d.pairs && d.pairs.length){
+      d.pairs.forEach(ps => {
+        pairs[ps.symbol] = ps;
+        if(!document.getElementById(`card-${ps.symbol}`)) renderCard(ps.symbol);
+      });
+    }
+  } catch {}
+}
+
+async function startBot(){
+  await saveAndApply();
+  try {
+    const r = await apiFetch('/start',{method:'POST'});
+    const d = await r.json();
+    if(d.ok) toast('🚀 Bot uruchomiony','var(--green)');
+    else toast(d.msg||'Błąd','var(--red)');
+  } catch {}
+}
+async function stopBot(){
+  try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {}
+}
+async function testPair(sym){
+  toast(`▶ Test ${sym}…`,'var(--cyan)');
+  try {
+    const r = await apiFetch(`/test/${sym}`,{method:'POST'});
+    if(r.ok) toast(`✅ ${sym} przetestowany`);
+    else toast('❌ Błąd','var(--red)');
+  } catch {}
+}
+async function resetPyramid(sym){
+  try { await apiFetch(`/reset_pyramid/${sym}`,{method:'POST'}); toast(`🔄 ${sym} piramida zresetowana`,'var(--yellow)'); } catch {}
+}
+
+// ── RENDER STATUS ──
+function applyStatus(data){
+  const running = data.running;
+  const pill=document.getElementById('status-pill');
+  const pip=document.getElementById('pip');
+  pill.className=`pill ${running?'on':'off'}`;
+  document.getElementById('status-txt').textContent=running?'AKTYWNY':'ZATRZYMANY';
+  if(running) pip.classList.add('blink'); else pip.classList.remove('blink');
+  document.getElementById('btn-start').disabled=running;
+  document.getElementById('btn-stop').disabled=!running;
+  renderGlobalLogs(data.global_logs);
+
+  (data.pairs||[]).forEach(ps=>{
+    const sym=ps.symbol;
+    if(pairs[sym]===undefined && !document.getElementById(`card-${sym}`)) return;
+    if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
+    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    // Informacje o konfiguracji pary
+    const ivMap2={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    const lvls = ps.pyramid_levels || [];
+    const activeLvls = lvls.filter(l=>l.enabled);
+    const pyrInfo = activeLvls.map((l,i) => i===0 ? `${l.amount_usd}$` : `+${l.amount_usd}$(${l.offset_pct}%)`).join(' ');
+    const metaStr = `${ivMap2[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction} • BB:${ps.bb_breakout_pct||0}% • TP:${ps.tp_pct}% SL:${ps.sl_pct}% • ${pyrInfo}`;
+    setText(`pair-meta-${sym}`, metaStr);
+    if(pairs[sym]) { pairs[sym].leverage=ps.leverage; pairs[sym].interval=ps.interval; pairs[sym].direction=ps.direction; }
+
+    // Header
+    setText(`pp-${sym}`, ps.last_price?Number(ps.last_price).toLocaleString():'—');
+    const labels={LONG:'▲ LONG',SHORT:'▼ SHORT',WAIT:'◆ CZEKAM',NONE:'— CZEKAM'};
+    const sc=document.getElementById(`sc-${sym}`);
+    if(sc){ sc.className=`schip ${ps.last_signal||'NONE'}`; sc.textContent=labels[ps.last_signal]||'—'; }
+
+    // Divergences
+    const divel=document.getElementById(`div-${sym}`);
+    if(divel){
+      let divHtml='';
+      if(ps.divergence_bull) divHtml+=`<span class="div-badge bull" style="margin-left:6px">📈 DIV BULL</span>`;
+      if(ps.divergence_bear) divHtml+=`<span class="div-badge bear" style="margin-left:6px">📉 DIV BEAR</span>`;
+      divel.innerHTML=divHtml;
+    }
+
+    // Card border
+    const card=document.getElementById(`card-${sym}`);
+    if(card){
+      card.classList.remove('long-active','short-active');
+      if(ps.pyramid?.active) card.classList.add(ps.pyramid.side==='LONG'?'long-active':'short-active');
+    }
+
+    // Stats
+    setText(`bbu-${sym}`, ps.last_bb_upper??'—');
+    setText(`bbl-${sym}`, ps.last_bb_lower??'—');
+    setText(`sk-${sym}`,  ps.last_stoch_k!=null?ps.last_stoch_k.toFixed(1):'—');
+    setText(`sd-${sym}`,  ps.last_stoch_d!=null?ps.last_stoch_d.toFixed(1):'—');
+    setText(`ma-${sym}`,  ps.last_ma200?ps.last_ma200.toFixed(0):'off');
+    setText(`avg-${sym}`, ps.pyramid?.avg_entry?ps.pyramid.avg_entry.toFixed(4):'—');
+    setText(`tp-${sym}`,  ps.current_tp ? ps.current_tp.toFixed(4) : '—');
+    setText(`sl-${sym}`,  ps.current_sl ? ps.current_sl.toFixed(4) : '—');
+
+    // Indicators
+    if(ps.last_stoch_k!=null){
+      const k=ps.last_stoch_k;
+      const el=document.getElementById(`ik-${sym}`);
+      if(el){ el.style.width=k+'%'; el.style.background=k>80?'var(--red)':k<20?'var(--green)':'var(--cyan)'; }
+      setText(`ikv-${sym}`,k.toFixed(1));
+    }
+    if(ps.last_stoch_d!=null){
+      const el=document.getElementById(`id-${sym}`);
+      if(el) el.style.width=ps.last_stoch_d+'%';
+      setText(`idv-${sym}`,ps.last_stoch_d.toFixed(1));
+    }
+
+    // Pyramid
+    const pyrEl=document.getElementById(`pyrs-${sym}`);
+    if(pyrEl&&ps.pyramid){
+      pyrEl.innerHTML=[0,1,2].map(i=>{
+        const e=ps.pyramid.entries?.[i];
+        if(e){
+          const cls=e.side==='LONG'?'fl':'fs';
+          const pc=e.side==='LONG'?'g':'r';
+          return `<div class="pec ${cls}"><div class="pec-n">Poziom ${i+1} • ${e.time}</div>
+            <div class="pec-p ${pc}">${e.price}</div>
+            <div class="pec-info">Vol:${e.vol} • ${e.side}</div></div>`;
+        }
+        return `<div class="pec"><div class="pec-n">Poziom ${i+1}</div><div class="pec-empty">—</div></div>`;
+      }).join('');
+    }
+
+    // Positions
+    renderPositions(sym, ps.open_positions);
+    renderLogs(`log-${sym}`, ps.logs);
+  });
+}
+
+function renderPositions(sym,pos){
+  const wrap=document.getElementById(`pos-${sym}`); if(!wrap) return;
+  if(!pos||!pos.length){ wrap.innerHTML='<div class="no-pos">Brak otwartych pozycji</div>'; return; }
+  const rows=pos.map(p=>{
+    const s=p.positionType==1?`<span style="color:var(--green)">LONG</span>`:`<span style="color:var(--red)">SHORT</span>`;
+    const pnl=parseFloat(p.unrealizedProfit||p.unrealizedValue||0);
+    return `<tr><td>${p.symbol}</td><td>${s}</td><td>${p.holdVol}</td>
+      <td>${p.openAvgPrice}</td>
+      <td style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl.toFixed(4)}</td>
+      <td>${p.leverage}x</td></tr>`;
+  }).join('');
+  wrap.innerHTML=`<table class="pos-table">
+    <thead><tr><th>Symbol</th><th>Strona</th><th>Vol</th><th>Cena</th><th>PnL</th><th>Dźwig.</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function renderLogs(elId,logs){
+  const el=document.getElementById(elId); if(!el||!logs||!logs.length) return;
+  el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span>
+    <span class="ll ${l.level}">${l.level}</span>
+    <span class="lm">${l.msg}</span></div>`).join('');
+}
+
+function renderGlobalLogs(logs){
+  const el=document.getElementById('glog'); if(!el||!logs||!logs.length) return;
+  el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span>
+    <span class="ll ${l.level}">${l.level}</span>
+    <span class="lm">${l.msg}</span></div>`).join('');
+}
+
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+function toast(msg,color='var(--cyan)'){
+  const t=document.getElementById('toast');
+  t.style.borderLeftColor=color;t.style.color=color;
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+async function fetchStatus(){
+  try {
+    const r=await apiFetch('/status');
+    if(!r.ok) return;
+    applyStatus(await r.json());
+  } catch {}
+}
+
+async function fetchBalance(){
+  try {
+    const r=await apiFetch('/balance');
+    if(!r.ok) return;
+    const d=await r.json();
+    renderBalance(d.balance||[]);
+  } catch {}
+}
+
+function renderBalance(bal){
+  const el=document.getElementById('balance-box'); if(!el) return;
+  if(!bal.length){
+    el.innerHTML='<div style="padding:8px 0;color:var(--text2)">Brak środków lub błąd API</div>';
+    return;
+  }
+  el.innerHTML=bal.map(b=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 0;border-bottom:1px solid var(--b1)">
+      <div>
+        <div style="font-size:.52rem;color:var(--text2);letter-spacing:.1em">WALUTA</div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--cyan)">${b.currency}</div>
+      </div>
+      <div>
+        <div style="font-size:.52rem;color:var(--text2);letter-spacing:.1em">EQUITY</div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--text)">${b.equity}</div>
+      </div>
+      <div>
+        <div style="font-size:.52rem;color:var(--text2);letter-spacing:.1em">DOSTĘPNE</div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--green)">${b.available}</div>
+      </div>
+      <div>
+        <div style="font-size:.52rem;color:var(--text2);letter-spacing:.1em">NIEZREAL. PNL</div>
+        <div style="font-size:.82rem;font-weight:700;color:${b.unrealized_pnl>=0?'var(--green)':'var(--red)'}">${b.unrealized_pnl}</div>
+      </div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
