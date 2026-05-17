@@ -171,14 +171,28 @@ class MEXCClient:
                                tp, sl, leverage: int) -> bool:
         """Ustaw TP/SL na pozycji przez dedykowany endpoint"""
         try:
-            # Najpierw anuluj stare zlecenia TP/SL
+            # Pobierz pozycje
+            positions = self.get_positions(symbol)
+            if not positions: return False
+            pos = positions[0]
+            pos_id = pos.get("positionId") or pos.get("id", "")
+            if not pos_id: return False
+            vol = pos.get("holdVol", 0)
+            if not vol: return False
+            # Anuluj stare TP/SL
             self.cancel_all_tpsl_orders(symbol)
-            # Postaw nowe TP/SL przez place_tpsl endpoint
-            pos_type = 1 if side == "LONG" else 2
-            body = {"symbol": symbol, "positionType": pos_type}
+            # Postaw nowe przez stoporder/place
+            body = {
+                "positionId": pos_id,
+                "symbol": symbol,
+                "vol": vol,
+                "lossTrend": 1,
+                "profitTrend": 1
+            }
             if tp: body["takeProfitPrice"] = tp
-            if sl: body["stopLossPrice"]   = sl
-            result = self._post("/api/v1/private/planorder/place/tpsl", body)
+            if sl: body["stopLossPrice"] = sl
+            result = self._post("/api/v1/private/stoporder/place", body)
+            logger.info(f"stoporder/place response: {result}")
             return result.get("success", False)
         except Exception as e:
             logger.error(f"update_position_tp_sl error: {e}")
