@@ -160,7 +160,7 @@ class MEXCClient:
     def cancel_all_tpsl_orders(self, symbol: str) -> bool:
         """Anuluj wszystkie zlecenia TP/SL dla symbolu"""
         try:
-            result = self._post("/api/v1/private/planorder/cancel/tpsl/all",
+            result = self._post("/api/v1/private/stoporder/cancel/all",
                                 {"symbol": symbol})
             return result.get("success", False)
         except Exception as e:
@@ -177,7 +177,7 @@ class MEXCClient:
             pos = positions[0]
             pos_id = pos.get("positionId") or pos.get("id", "")
             if not pos_id: return False
-            vol = pos.get("holdVol", 0)
+            vol = pos.get("holdVol", 0) - pos.get("frozenVol", 0)
             if not vol: return False
             # Anuluj stare TP/SL
             self.cancel_all_tpsl_orders(symbol)
