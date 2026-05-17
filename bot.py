@@ -168,7 +168,7 @@ class MEXCClient:
             if not active:
                 return True
             cancel = self._post("/api/v1/private/stoporder/cancel",
-                                {"orderIdList": active, "symbol": symbol})
+                    {"orderIdList": ",".join(str(i) for i in active), "symbol": symbol})
             logger.info(f"cancel_tpsl: {cancel}")
             return cancel.get("success", False)
         except Exception as e:
