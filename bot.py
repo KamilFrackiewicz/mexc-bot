@@ -177,23 +177,23 @@ class MEXCClient:
 
     def update_position_tp_sl(self, symbol: str, side: str,
                                tp, sl, leverage: int) -> bool:
-        """Ustaw TP/SL na pozycji przez dedykowany endpoint"""
+        """Ustaw TP/SL - uzywa dostepnego vol"""
         try:
-            # Pobierz pozycje
             positions = self.get_positions(symbol)
             if not positions: return False
             pos = positions[0]
             pos_id = pos.get("positionId") or pos.get("id", "")
             if not pos_id: return False
-            vol = pos.get("holdVol", 0) - pos.get("frozenVol", 0)
-            if not vol: return False
-            # Anuluj stare TP/SL
-            self.cancel_all_tpsl_orders(symbol)
-            # Postaw nowe przez stoporder/place
+            hold_vol   = pos.get("holdVol", 0)
+            frozen_vol = pos.get("frozenVol", 0)
+            avail_vol  = hold_vol - frozen_vol
+            if avail_vol <= 0:
+                logger.info(f"Brak dostepnego vol: hold={hold_vol} frozen={frozen_vol}")
+                return False
             body = {
                 "positionId": pos_id,
                 "symbol": symbol,
-                "vol": vol,
+                "vol": avail_vol,
                 "lossTrend": 1,
                 "profitTrend": 1
             }
@@ -205,7 +205,6 @@ class MEXCClient:
         except Exception as e:
             logger.error(f"update_position_tp_sl error: {e}")
             return False
-
 # ─── INDICATORS ──────────────────────────────────────────────────────────────
 
 def bollinger_bands(closes, period=20, std_dev=2.0):
