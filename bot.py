@@ -177,31 +177,24 @@ class MEXCClient:
 
     def update_position_tp_sl(self, symbol: str, side: str,
                                tp, sl, leverage: int) -> bool:
-        """Ustaw TP/SL - uzywa dostepnego vol"""
+        """Modyfikuj istniejace zlecenie TP/SL zamiast tworzyc nowe"""
         try:
-            positions = self.get_positions(symbol)
-            if not positions: return False
-            pos = positions[0]
-            pos_id = pos.get("positionId") or pos.get("id", "")
-            if not pos_id: return False
-            hold_vol   = pos.get("holdVol", 0)
-            frozen_vol = pos.get("frozenVol", 0)
-            avail_vol  = hold_vol - frozen_vol
-            if avail_vol <= 0:
-                logger.info(f"Brak dostepnego vol: hold={hold_vol} frozen={frozen_vol}")
+            result = self._get("/api/v1/private/stoporder/list/orders",
+                               {"symbol": symbol})
+            orders = result.get("data", [])
+            active = [o for o in orders
+                      if o.get("state") in [1, 2] and o.get("isFinished") == 0]
+            if not active:
+                logger.info(f"Brak aktywnych zlecen TP/SL dla {symbol}")
                 return False
-            body = {
-                "positionId": pos_id,
-                "symbol": symbol,
-                "vol": avail_vol,
-                "lossTrend": 1,
-                "profitTrend": 1
-            }
+            o = active[0]
+            order_id = o.get("orderId")
+            body = {"orderId": order_id, "symbol": symbol}
             if tp: body["takeProfitPrice"] = tp
             if sl: body["stopLossPrice"] = sl
-            result = self._post("/api/v1/private/stoporder/place", body)
-            logger.info(f"stoporder/place response: {result}")
-            return result.get("success", False)
+            r = self._post("/api/v1/private/stoporder/change_price", body)
+            logger.info(f"change_price response: {r}")
+            return r.get("success", False)
         except Exception as e:
             logger.error(f"update_position_tp_sl error: {e}")
             return False
