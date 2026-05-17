@@ -158,11 +158,19 @@ class MEXCClient:
             return {}
 
     def cancel_all_tpsl_orders(self, symbol: str) -> bool:
-        """Anuluj wszystkie zlecenia TP/SL dla symbolu"""
+        """Anuluj wszystkie aktywne zlecenia TP/SL dla symbolu"""
         try:
-            result = self._post("/api/v1/private/stoporder/cancel/all",
-                                {"symbol": symbol})
-            return result.get("success", False)
+            result = self._get("/api/v1/private/stoporder/list/orders",
+                               {"symbol": symbol})
+            orders = result.get("data", [])
+            active = [o["id"] for o in orders 
+                      if o.get("state") in [1, 2] and o.get("isFinished") == 0]
+            if not active:
+                return True
+            cancel = self._post("/api/v1/private/stoporder/cancel",
+                                {"orderIdList": active, "symbol": symbol})
+            logger.info(f"cancel_tpsl: {cancel}")
+            return cancel.get("success", False)
         except Exception as e:
             logger.error(f"cancel_all_tpsl error: {e}")
             return False
