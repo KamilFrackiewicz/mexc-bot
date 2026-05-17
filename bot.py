@@ -624,7 +624,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         # Aktualizuj TP/SL na calej pozycji w MEXC
         if level_idx > 0 and ps.current_tp and ps.current_sl:
             try:
-                client.cancel_all_orders(ps.symbol)
+                client.cancel_all_tpsl_orders(ps.symbol)
                 updated = client.update_position_tp_sl(
                     ps.symbol, side, ps.current_tp, ps.current_sl, ps.leverage
                 )
