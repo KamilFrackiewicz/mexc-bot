@@ -620,7 +620,8 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                                         vol, ps.leverage, None, None)
         else:
             # Nie ostatnia - awaryjny SL = 2x normalny, bez TP
-            emergency_sl = _calc_sl(exec_price, side, ps.sl_pct * 2)
+            total_offset = sum(l.get("offset_pct", 0) for l in active)
+            emergency_sl = _calc_sl(exec_price, side, ps.sl_pct + total_offset + 0.1)
             result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
                                         vol, ps.leverage, emergency_sl, None)
 
