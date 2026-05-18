@@ -591,67 +591,72 @@ def _calc_tp(avg_price: float, first_price: float, side: str,
 
 def _open_pyramid_level(client, ps, side, price, level_idx):
     """
-    Opcja C: SL od bieżącego (najdalszego) wejścia, aktualizowany po każdej dokładce.
-    Dokładki wchodzą gdy cena idzie PRZECIWKO pozycji.
+    Nowa logika TP/SL:
+    - Wejscia 1..N-1: awaryjny SL (2x normalny) w MEXC, TP tylko w pamieci bota
+    - Po ostatniej dokladce: stoporder/place z wlasciwym TP i SL od sredniej
+    - Monitor co 15s sprawdza TP/SL z pamieci i zamyka pozycje
     """
     active = [l for l in ps.pyramid_levels if l.get("enabled", True)]
     if level_idx >= len(active): return
     lvl = active[level_idx]
+    is_last = level_idx == len(active) - 1
     try:
         client.set_leverage(ps.symbol, ps.leverage)
         ticker     = client.get_ticker(ps.symbol)
         exec_price = float(ticker.get("lastPrice", price))
 
-        # Wolumen jako liczba całkowita kontraktów
         contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01}.get(ps.symbol, 1.0)
         raw_vol = lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)
         vol = max(1, round(raw_vol))
 
-        # SL od BIEŻĄCEGO wejścia (najdalszego od pierwszego)
-        # Opcja C: SL aktualizowany po każdej dokładce
-        sl = _calc_sl(exec_price, side, ps.sl_pct)
-
-        # Oblicz TP przed zleceniem
-        avg_tmp = (sum(e.price*e.vol for e in ps.pyramid_entries) + exec_price*vol) /                   (sum(e.vol for e in ps.pyramid_entries) + vol) if ps.pyramid_entries else exec_price
-        base_tmp = avg_tmp if ps.tp_mode == "FROM_AVG" else (ps.pyramid_entries[0].price if ps.pyramid_entries else exec_price)
-        tp = (round(base_tmp*(1+ps.tp_pct/100),4) if side=="LONG"
-              else round(base_tmp*(1-ps.tp_pct/100),4))
-        result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
-                                    vol, ps.leverage, sl, tp)
+        if is_last:
+            # Ostatnia dokladka - oblicz srednia z nowym wejsciem
+            if ps.pyramid_entries:
+                avg_tmp = (sum(e.price*e.vol for e in ps.pyramid_entries) + exec_price*vol) /                           (sum(e.vol for e in ps.pyramid_entries) + vol)
+            else:
+                avg_tmp = exec_price
+            # Zlecenie bez TP/SL (ustawimy przez stoporder/place)
+            result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
+                                        vol, ps.leverage, None, None)
+        else:
+            # Nie ostatnia - awaryjny SL = 2x normalny, bez TP
+            emergency_sl = _calc_sl(exec_price, side, ps.sl_pct * 2)
+            result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
+                                        vol, ps.leverage, emergency_sl, None)
 
         if not result.get("success", False):
-            ps.log(f"❌ MEXC odrzucił zlecenie: {result.get('message','')}", "ERROR")
+            ps.log(f"MEXC odrzucil zlecenie: {result.get('message','')}", "ERROR")
             return
 
         ps.pyramid_entries.append(PyramidEntry(exec_price, vol, side))
         if level_idx == 0:
             ps.pyramid_active = True
             ps.pyramid_side   = side
-        # SL od ostatniego wejscia, TP od sredniej wazonej
+
+        # Zaktualizuj TP/SL w pamieci bota (zawsze od sredniej)
         avg = ps.pyramid_avg_entry
         if avg:
-            ps.current_sl = _calc_sl(exec_price, side, ps.sl_pct)
-            ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price, side, ps.tp_pct, ps.tp_mode)
+            ps.current_sl = _calc_sl(avg, side, ps.sl_pct)
+            ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price,
+                                     side, ps.tp_pct, ps.tp_mode)
         else:
             ps.current_sl = _calc_sl(exec_price, side, ps.sl_pct)
             ps.current_tp = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode)
-        # Aktualizuj TP/SL na calej pozycji w MEXC
-        if level_idx > 0 and ps.current_tp and ps.current_sl:
+
+        if is_last:
+            # Ustaw wlasciwy TP/SL w MEXC przez stoporder/place
             try:
-                client.cancel_all_tpsl_orders(ps.symbol)
-                updated = client.update_position_tp_sl(
+                ok = client.update_position_tp_sl(
                     ps.symbol, side, ps.current_tp, ps.current_sl, ps.leverage
                 )
-                if updated:
-                    ps.log(f"TP/SL od sr.{round(avg,2) if avg else exec_price}: TP:{ps.current_tp} SL:{ps.current_sl}")
+                if ok:
+                    ps.log(f"TP/SL ustawiony w MEXC: TP:{ps.current_tp} SL:{ps.current_sl}")
                 else:
-                    ps.log("Nie udalo sie zaktualizowac TP/SL", "WARN")
+                    ps.log("Nie udalo sie ustawic TP/SL w MEXC - bot monitoruje", "WARN")
             except Exception as e:
-                ps.log(f"Blad aktualizacji TP/SL: {e}", "WARN")
-
-        # Info o następnej dokładce
-        is_last = level_idx == len(active) - 1
-        if not is_last:
+                ps.log(f"Blad TP/SL MEXC: {e} - bot monitoruje", "WARN")
+            next_info = " | Ostatnia dokladka"
+        else:
             next_lvl    = active[level_idx + 1]
             next_offset = next_lvl["offset_pct"]
             next_amt    = next_lvl["amount_usd"]
@@ -660,18 +665,15 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
             else:
                 next_price = round(exec_price * (1 + next_offset / 100), 4)
             next_info = f" | Dok.{level_idx+2} @ {next_price} ({next_offset}%, {next_amt}$)"
-        else:
-            next_info = " | Ostatnia dokładka"
 
         ps.log(
-            f"📌 Poz.{level_idx+1}/{len(active)} {side} | Cena:{exec_price} | "
-            f"Vol:{vol} | SL:{sl} | TP:{ps.current_tp}{next_info}",
+            f"Poz.{level_idx+1}/{len(active)} {side} | Cena:{exec_price} | "
+            f"Vol:{vol} | SL(mem):{ps.current_sl} | TP(mem):{ps.current_tp}{next_info}",
             "SUCCESS"
         )
 
     except Exception as e:
-        ps.log(f"❌ Poz.{level_idx+1}: {e}", "ERROR")
-
+        ps.log(f"Poz.{level_idx+1}: {e}", "ERROR")
 
 def _check_pyramid_continuation(client, ps, price):
     """
@@ -709,9 +711,14 @@ def _check_pyramid_continuation(client, ps, price):
 # ─── BOT LOOP ────────────────────────────────────────────────────────────────
 
 async def pyramid_monitor_loop():
-    """Osobna petla sprawdzajaca dokladki co 30 sekund."""
+    """
+    Monitor co 15 sekund:
+    1. Sprawdza dokladki
+    2. Sprawdza TP/SL z pamieci i zamyka pozycje jesli osiagniete
+    3. Sprawdza czy pozycja nadal otwarta
+    """
     while gstate.running:
-        await asyncio.sleep(30)
+        await asyncio.sleep(15)
         if not gstate.api_key or not gstate.running: continue
         try:
             client  = MEXCClient(gstate.api_key, gstate.api_secret)
@@ -723,22 +730,51 @@ async def pyramid_monitor_loop():
                     price  = float(ticker.get("lastPrice", 0))
                     if price <= 0: continue
                     ps.last_price = price
+
+                    # Sprawdz dokladki
                     _check_pyramid_continuation(client, ps, price)
+
+                    # Sprawdz TP/SL z pamieci bota
+                    if ps.current_tp and ps.current_sl and ps.pyramid_side:
+                        tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG"
+                                  else price <= ps.current_tp)
+                        sl_hit = (price <= ps.current_sl if ps.pyramid_side == "LONG"
+                                  else price >= ps.current_sl)
+
+                        if tp_hit or sl_hit:
+                            reason = "TP" if tp_hit else "SL"
+                            ps.log(f"{reason} osiagniety @ {price} "
+                                   f"(TP:{ps.current_tp} SL:{ps.current_sl}) - zamykam",
+                                   "SUCCESS")
+                            all_pos = client.get_positions()
+                            for pos in all_pos:
+                                if pos.get("symbol") == ps.symbol:
+                                    pos_type = pos.get("positionType", 1)
+                                    hold_vol = pos.get("holdVol", 0)
+                                    if hold_vol > 0:
+                                        client.close_position(
+                                            ps.symbol, pos_type, hold_vol, ps.leverage
+                                        )
+                            ps.reset_pyramid()
+                            ps.current_tp = None
+                            ps.current_sl = None
+                            continue
+
+                    # Sprawdz czy pozycja nadal otwarta
                     all_pos = client.get_positions()
                     current = [p for p in all_pos if p.get("symbol") == ps.symbol]
                     if not current and ps.pyramid_active:
-                        ps.log("Pozycja zamknieta (TP/SL) - resetuje piramide", "SUCCESS")
+                        ps.log("Pozycja zamknieta (MEXC TP/SL) - resetuje piramide", "SUCCESS")
                         ps.reset_pyramid()
                         ps.current_tp = None
                         ps.current_sl = None
                     else:
                         ps.open_positions = current
                 except Exception as e:
-                    ps.log(f"Monitor dokladek blad: {e}", "ERROR")
+                    ps.log(f"Monitor blad: {e}", "ERROR")
                 await asyncio.sleep(0.3)
         except Exception as e:
             gstate.log(f"Pyramid monitor error: {e}", "ERROR")
-
 
 async def bot_loop():
     iv_map = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,"Hour1":3600,"Hour4":14400}
