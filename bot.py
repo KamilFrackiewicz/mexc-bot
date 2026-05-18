@@ -718,7 +718,7 @@ async def pyramid_monitor_loop():
     3. Sprawdza czy pozycja nadal otwarta
     """
     while gstate.running:
-        await asyncio.sleep(15)
+        await asyncio.sleep(5)
         if not gstate.api_key or not gstate.running: continue
         try:
             client  = MEXCClient(gstate.api_key, gstate.api_secret)
