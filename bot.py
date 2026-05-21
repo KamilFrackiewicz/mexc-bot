@@ -630,12 +630,14 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         last_dok_price  = exec_price
         last_dok_vol    = vol0
 
+        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4}.get(ps.symbol, 4)
+
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
-                dok_price = round(exec_price * (1 - dok_lvl["offset_pct"] / 100), 4)
+                dok_price = round(exec_price * (1 - dok_lvl["offset_pct"] / 100), price_precision)
                 dok_side  = 1  # Buy Long
             else:
-                dok_price = round(exec_price * (1 + dok_lvl["offset_pct"] / 100), 4)
+                dok_price = round(exec_price * (1 + dok_lvl["offset_pct"] / 100), price_precision)
                 dok_side  = 3  # Sell Short
 
             dok_vol = max(1, round(dok_lvl["amount_usd"] / (dok_price * contract_size / ps.leverage)))
@@ -657,6 +659,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 last_dok_vol   = dok_vol
             else:
                 ps.log(f"Blad dokladki {i+1}: {dok_result.get('message','')}", "WARN")
+            time.sleep(0.5)
 
         ps.pyramid_limit_order_ids = limit_order_ids
 
