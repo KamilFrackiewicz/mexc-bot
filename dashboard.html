@@ -691,6 +691,31 @@ async function loadConfig(){
         pairs[ps.symbol] = ps;
         if(!document.getElementById(`card-${ps.symbol}`)) renderCard(ps.symbol);
       });
+      // Wczytaj ustawienia pierwszej pary do formularza
+      const p = d.pairs[0];
+      if(p) {
+        document.getElementById('def-interval').value = p.interval || 'Min5';
+        document.getElementById('def-leverage').value = p.leverage || 10;
+        document.getElementById('def-bb-p').value = p.bb_period || 20;
+        document.getElementById('def-bb-s').value = p.bb_std || 2.0;
+        document.getElementById('def-bb-break').value = p.bb_breakout_pct || 0;
+        document.getElementById('def-bb-prox').value = (p.bb_proximity || 0) * 100;
+        document.getElementById('def-stoch').value = p.stoch_period || 14;
+        document.getElementById('def-ob').value = p.stoch_overbought || 80;
+        document.getElementById('def-os').value = p.stoch_oversold || 20;
+        document.getElementById('def-tp').value = p.tp_pct || 1.0;
+        document.getElementById('def-sl').value = p.sl_pct || 1.5;
+        if(p.pyramid_levels) {
+          p.pyramid_levels.forEach((lvl,i) => {
+            pyrEnabled.def[i] = lvl.enabled;
+            const amt = document.getElementById(`def-pamt-${i}`);
+            const off = document.getElementById(`def-poff-${i}`);
+            if(amt) amt.value = lvl.amount_usd;
+            if(off) off.value = lvl.offset_pct;
+          });
+          initDefPyr();
+        }
+      }
     }
   } catch {}
 }
