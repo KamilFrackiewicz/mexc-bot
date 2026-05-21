@@ -467,7 +467,6 @@ async function doLogout() {
 function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  initDefPyr();
   loadConfig();
   fetchStatus();
   setInterval(fetchStatus, 5000);
