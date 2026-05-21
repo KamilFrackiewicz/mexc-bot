@@ -736,7 +736,13 @@ function applyStatus(data){
     if(pairs[sym]===undefined && !document.getElementById(`card-${sym}`)) return;
     if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
     const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
-    setText(`pair-meta-${sym}`, `${ivMap[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction}`);
+    const ivMap2={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    const lvls = ps.pyramid_levels || [];
+    const activeLvls = lvls.filter(l=>l.enabled);
+    const pyrInfo = activeLvls.map((l,i) => i===0 ? `${l.amount_usd}$` : `+${l.amount_usd}$(${l.offset_pct}%)`).join(' ');
+    const metaStr = `${ivMap2[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction} • BB:${ps.bb_breakout_pct||0}% • TP:${ps.tp_pct}% SL:${ps.sl_pct}% • ${pyrInfo}`;
+    setText(`pair-meta-${sym}`, metaStr);
+    if(pairs[sym]) { pairs[sym].leverage=ps.leverage; pairs[sym].interval=ps.interval; pairs[sym].direction=ps.direction; }
 
     // Header
     setText(`pp-${sym}`, ps.last_price?Number(ps.last_price).toLocaleString():'—');
