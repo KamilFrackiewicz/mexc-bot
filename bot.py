@@ -284,9 +284,10 @@ class PairState:
         self.stoch_overbought = 80; self.stoch_oversold = 20
         self.ma200_enabled = False; self.ma200_tf = "Hour1"
         self.pyramid_levels = [
-            {"enabled": True,  "amount_usd": 33.0, "offset_pct": 0.0},
-            {"enabled": True,  "amount_usd": 33.0, "offset_pct": 1.0},
-            {"enabled": False, "amount_usd": 33.0, "offset_pct": 1.0},
+            {"enabled": True,  "amount_usd": 10.0, "offset_pct": 0.0},
+            {"enabled": True,  "amount_usd": 20.0, "offset_pct": 0.3},
+            {"enabled": True,  "amount_usd": 30.0, "offset_pct": 0.6},
+            {"enabled": False, "amount_usd": 40.0, "offset_pct": 1.0},
         ]
         self.leverage = 10; self.tp_mode = "FROM_AVG"
         self.tp_pct = 1.0; self.sl_pct = 1.5
@@ -298,6 +299,7 @@ class PairState:
         self.pyramid_active = False; self.pyramid_side = None
         self.current_tp: Optional[float] = None
         self.current_sl: Optional[float] = None
+        self.pyramid_limit_order_ids: List = []
         self.open_positions = []; self.logs: List[dict] = []
 
     def log(self, msg, level="INFO"):
@@ -325,6 +327,7 @@ class PairState:
 
     def reset_pyramid(self):
         self.pyramid_entries = []; self.pyramid_active = False; self.pyramid_side = None
+        self.pyramid_limit_order_ids = []
 
     def to_dict(self):
         return {
@@ -591,122 +594,138 @@ def _calc_tp(avg_price: float, first_price: float, side: str,
 
 def _open_pyramid_level(client, ps, side, price, level_idx):
     """
-    Nowa logika TP/SL:
-    - Wejscia 1..N-1: awaryjny SL (2x normalny) w MEXC, TP tylko w pamieci bota
-    - Po ostatniej dokladce: stoporder/place z wlasciwym TP i SL od sredniej
-    - Monitor co 15s sprawdza TP/SL z pamieci i zamyka pozycje
+    Nowa logika:
+    - Wejscie 1: market order + od razu limit orders na dokładki + SL od ostatniej dokładki
+    - Dokładki wchodza automatycznie w MEXC bez monitora bota
+    - TP tylko w pamieci bota (monitor co 5s)
     """
     active = [l for l in ps.pyramid_levels if l.get("enabled", True)]
     if level_idx >= len(active): return
     lvl = active[level_idx]
-    is_last = level_idx == len(active) - 1
+
+    # Wywolujemy tylko dla pierwszego wejscia - dokładki sa od razu ustawiane
+    if level_idx != 0: return
+
     try:
         client.set_leverage(ps.symbol, ps.leverage)
         ticker     = client.get_ticker(ps.symbol)
         exec_price = float(ticker.get("lastPrice", price))
 
         contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01}.get(ps.symbol, 1.0)
-        raw_vol = lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)
-        vol = max(1, round(raw_vol))
 
-        if is_last:
-            # Ostatnia dokladka - oblicz srednia z nowym wejsciem
-            if ps.pyramid_entries:
-                avg_tmp = (sum(e.price*e.vol for e in ps.pyramid_entries) + exec_price*vol) /                           (sum(e.vol for e in ps.pyramid_entries) + vol)
-            else:
-                avg_tmp = exec_price
-            # Zlecenie bez TP/SL (ustawimy przez stoporder/place)
-            result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
-                                        vol, ps.leverage, None, None)
-        else:
-            # Nie ostatnia - awaryjny SL = 2x normalny, bez TP
-            total_offset = sum(l.get("offset_pct", 0) for l in active)
-            emergency_sl = _calc_sl(exec_price, side, ps.sl_pct + total_offset + 0.1)
-            result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
-                                        vol, ps.leverage, emergency_sl, None)
-
+        # ── Wejście 1 (market order) ──────────────────────────────────────────
+        vol0 = max(1, round(lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)))
+        result = client.place_order(ps.symbol, 1 if side == "LONG" else 3,
+                                    vol0, ps.leverage, None, None)
         if not result.get("success", False):
-            ps.log(f"MEXC odrzucil zlecenie: {result.get('message','')}", "ERROR")
+            ps.log(f"MEXC odrzucil wejscie: {result.get('message','')}", "ERROR")
             return
 
-        ps.pyramid_entries.append(PyramidEntry(exec_price, vol, side))
-        if level_idx == 0:
-            ps.pyramid_active = True
-            ps.pyramid_side   = side
+        ps.pyramid_entries.append(PyramidEntry(exec_price, vol0, side))
+        ps.pyramid_active = True
+        ps.pyramid_side   = side
 
-        # Zaktualizuj TP/SL w pamieci bota (zawsze od sredniej)
-        avg = ps.pyramid_avg_entry
-        if avg:
-            ps.current_sl = _calc_sl(avg, side, ps.sl_pct)
-            ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price,
-                                     side, ps.tp_pct, ps.tp_mode)
-        else:
-            ps.current_sl = _calc_sl(exec_price, side, ps.sl_pct)
-            ps.current_tp = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode)
+        # ── Dokładki jako limit orders ────────────────────────────────────────
+        limit_order_ids = []
+        last_dok_price  = exec_price
+        last_dok_vol    = vol0
 
-        if is_last:
-            # Ustaw wlasciwy TP/SL w MEXC przez stoporder/place
-            try:
-                ok = client.update_position_tp_sl(
-                    ps.symbol, side, ps.current_tp, ps.current_sl, ps.leverage
-                )
-                if ok:
-                    ps.log(f"TP/SL ustawiony w MEXC: TP:{ps.current_tp} SL:{ps.current_sl}")
-                else:
-                    ps.log("Nie udalo sie ustawic TP/SL w MEXC - bot monitoruje", "WARN")
-            except Exception as e:
-                ps.log(f"Blad TP/SL MEXC: {e} - bot monitoruje", "WARN")
-            next_info = " | Ostatnia dokladka"
-        else:
-            next_lvl    = active[level_idx + 1]
-            next_offset = next_lvl["offset_pct"]
-            next_amt    = next_lvl["amount_usd"]
+        for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
-                next_price = round(exec_price * (1 - next_offset / 100), 4)
+                dok_price = round(exec_price * (1 - dok_lvl["offset_pct"] / 100), 4)
+                dok_side  = 1  # Buy Long
             else:
-                next_price = round(exec_price * (1 + next_offset / 100), 4)
-            next_info = f" | Dok.{level_idx+2} @ {next_price} ({next_offset}%, {next_amt}$)"
+                dok_price = round(exec_price * (1 + dok_lvl["offset_pct"] / 100), 4)
+                dok_side  = 3  # Sell Short
+
+            dok_vol = max(1, round(dok_lvl["amount_usd"] / (dok_price * contract_size / ps.leverage)))
+
+            dok_result = client._post("/api/v1/private/order/submit", {
+                "symbol":   ps.symbol,
+                "side":     dok_side,
+                "openType": 1,
+                "type":     1,  # limit order
+                "vol":      dok_vol,
+                "leverage": ps.leverage,
+                "price":    dok_price
+            })
+
+            if dok_result.get("success", False):
+                limit_order_ids.append(dok_result.get("data"))
+                ps.log(f"Dokladka {i+1} limit @ {dok_price} ({dok_lvl['offset_pct']}%, {dok_lvl['amount_usd']}$) — ID:{dok_result.get('data')}")
+                last_dok_price = dok_price
+                last_dok_vol   = dok_vol
+            else:
+                ps.log(f"Blad dokladki {i+1}: {dok_result.get('message','')}", "WARN")
+
+        ps.pyramid_limit_order_ids = limit_order_ids
+
+        # ── SL od ostatniej dokładki ──────────────────────────────────────────
+        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct)
+
+        # Oblicz srednia (wejscie + wszystkie dokładki)
+        all_vols   = [vol0] + [max(1, round(l["amount_usd"] / (round(exec_price * (1 - l["offset_pct"]/100), 4) * contract_size / ps.leverage))) for l in active[1:]]
+        all_prices = [exec_price] + [round(exec_price * (1 - l["offset_pct"]/100), 4) if side == "LONG"
+                                     else round(exec_price * (1 + l["offset_pct"]/100), 4) for l in active[1:]]
+        total_vol  = sum(all_vols)
+        avg_price  = sum(p*v for p,v in zip(all_prices, all_vols)) / total_vol if total_vol else exec_price
+
+        # TP od sredniej wszystkich wejsc
+        tp_price = _calc_tp(avg_price, exec_price, side, ps.tp_pct, ps.tp_mode)
+        ps.current_tp = tp_price
+        ps.current_sl = sl_price
+
+        # Ustaw SL w MEXC
+        try:
+            sl_ok = client.update_position_tp_sl(ps.symbol, side, None, sl_price, ps.leverage)
+            if sl_ok:
+                ps.log(f"SL ustawiony w MEXC @ {sl_price}")
+            else:
+                ps.log(f"Nie udalo sie ustawic SL w MEXC — bot monitoruje SL @ {sl_price}", "WARN")
+        except Exception as e:
+            ps.log(f"Blad SL MEXC: {e}", "WARN")
 
         ps.log(
-            f"Poz.{level_idx+1}/{len(active)} {side} | Cena:{exec_price} | "
-            f"Vol:{vol} | SL(mem):{ps.current_sl} | TP(mem):{ps.current_tp}{next_info}",
+            f"Poz.1/{len(active)} {side} | Cena:{exec_price} | Vol:{vol0} | "
+            f"TP(mem):{tp_price} | SL:{sl_price} | Dokladki:{len(limit_order_ids)} ustawione",
             "SUCCESS"
         )
 
     except Exception as e:
-        ps.log(f"Poz.{level_idx+1}: {e}", "ERROR")
+        ps.log(f"Blad wejscia: {e}", "ERROR")
 
 def _check_pyramid_continuation(client, ps, price):
     """
-    Sprawdź czy należy otworzyć kolejną dokładkę.
-    Dokładka wchodzi gdy cena idzie PRZECIWKO pozycji o offset_pct od ostatniego wejścia.
-    LONG: cena spada o offset% od ostatniego wejścia
-    SHORT: cena rośnie o offset% od ostatniego wejścia
+    Dokładki sa teraz limit orders w MEXC - wchodza automatycznie.
+    Ta funkcja tylko aktualizuje stan piramidy gdy MEXC wykona limit order.
     """
-    active   = [l for l in ps.pyramid_levels if l.get("enabled", True)]
-    next_idx = ps.pyramid_count
-    if next_idx >= len(active): return
+    # Sprawdz czy weszly nowe dokładki (holdVol wzrosl)
+    try:
+        positions = client.get_positions(ps.symbol)
+        if not positions: return
+        pos = positions[0]
+        hold_vol = pos.get("holdVol", 0)
 
-    lvl = active[next_idx]
-    lp  = ps.pyramid_last_price
-    if not lp or lvl.get("offset_pct", 0) <= 0: return
+        # Policz oczekiwany vol po wszystkich wejsciach
+        expected_entries = len(ps.pyramid_entries)
+        active = [l for l in ps.pyramid_levels if l.get("enabled", True)]
 
-    if ps.pyramid_side == "LONG":
-        # Dokładka gdy cena spada (przeciwko long)
-        target    = round(lp * (1 - lvl["offset_pct"] / 100), 4)
-        triggered = price <= target
-    else:
-        # Dokładka gdy cena rośnie (przeciwko short)
-        target    = round(lp * (1 + lvl["offset_pct"] / 100), 4)
-        triggered = price >= target
+        # Jesli holdVol wiekszy niz suma znanych wejsc - weszla dokładka
+        known_vol = sum(e.vol for e in ps.pyramid_entries)
+        if hold_vol > known_vol and expected_entries < len(active):
+            new_vol = hold_vol - known_vol
+            exec_price = float(pos.get("openAvgPrice", price))
+            ps.pyramid_entries.append(PyramidEntry(exec_price, new_vol, ps.pyramid_side))
+            ps.log(f"Dokladka {len(ps.pyramid_entries)}/{len(active)} wykryta @ {exec_price} | Vol:{new_vol}", "SUCCESS")
 
-    if triggered:
-        ps.log(
-            f"🔄 Dokładka {next_idx+1} wyzwolona @ {price} "
-            f"(target:{target}, offset:{lvl['offset_pct']}%)",
-            "SIGNAL"
-        )
-        _open_pyramid_level(client, ps, ps.pyramid_side, price, next_idx)
+            # Zaktualizuj TP w pamieci od nowej sredniej
+            avg = ps.pyramid_avg_entry
+            if avg:
+                ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price,
+                                         ps.pyramid_side, ps.tp_pct, ps.tp_mode)
+                ps.log(f"TP zaktualizowany: {ps.current_tp}")
+    except Exception as e:
+        ps.log(f"check_continuation blad: {e}", "ERROR")
 
 
 # ─── BOT LOOP ────────────────────────────────────────────────────────────────

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>46ent</title>
+<title>MEXC BOT v3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
 :root {
@@ -255,8 +255,8 @@ input[type=password]{letter-spacing:.1em;}
 <!-- ══ LOGIN SCREEN ══ -->
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
-    <div class="login-logo">▣ 46ent</div>
-    <div class="login-sub">TRADING BOT — ZALOGUJ SIĘ</div>
+    <div class="login-logo">▣ MEXC FUTURES BOT</div>
+    <div class="login-sub">MULTI-PARA v3 — ZALOGUJ SIĘ</div>
     <div class="login-err" id="login-err">Nieprawidłowe hasło</div>
     <div class="field">
       <label>Hasło</label>
@@ -264,7 +264,9 @@ input[type=password]{letter-spacing:.1em;}
              onkeydown="if(event.key==='Enter') doLogin()">
     </div>
     <button class="btn btn-go btn-full" onclick="doLogin()">ZALOGUJ</button>
-    
+    <div style="font-family:var(--mono);font-size:.58rem;color:var(--text2);text-align:center">
+      Domyślne hasło: admin123
+    </div>
   </div>
 </div>
 
@@ -272,7 +274,7 @@ input[type=password]{letter-spacing:.1em;}
 <div id="app">
 
 <header>
-  <div class="logo">▣ 46ent <span class="logo-tag">TRADING BOT</span></div>
+  <div class="logo">▣ MEXC FUTURES BOT <span class="logo-tag">MULTI-PARA v3</span></div>
   <div class="hdr-r">
     <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
     <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
@@ -304,7 +306,7 @@ input[type=password]{letter-spacing:.1em;}
         <div class="field"><label>Interwał</label>
           <select id="def-interval">
             <option value="Min1">1 min</option><option value="Min5" selected>5 min</option>
-            <option value="Min15">15 min</option><option value="Min60">1 godz</option><option value="Hour4">4 godz</option>
+            <option value="Min15">15 min</option><option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
           </select>
         </div>
         <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
@@ -342,7 +344,7 @@ input[type=password]{letter-spacing:.1em;}
       <div class="f2">
         <div class="field"><label>Timeframe MA200</label>
           <select id="def-ma200-tf">
-            <option value="Min60">1 godz</option><option value="Hour4">4 godz</option>
+            <option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
           </select>
         </div>
       </div>
@@ -400,6 +402,9 @@ input[type=password]{letter-spacing:.1em;}
         <option value="LONG">▲ Tylko LONG</option>
         <option value="SHORT">▼ Tylko SHORT</option>
       </select>
+    </div>
+    <div class="field"><label>Kwota per poziom (USD)</label>
+      <input type="number" id="modal-amt" value="33" min="1">
     </div>
     <div class="modal-btns">
       <button class="btn btn-go" style="flex:1" onclick="addPair()">DODAJ</button>
@@ -536,7 +541,7 @@ function hideModal(id){ document.getElementById(id).classList.remove('show'); }
 function addPair(){
   const sym = document.getElementById('modal-sym').value;
   const dir = document.getElementById('modal-dir').value;
-  const amt = null;
+  const amt = parseFloat(document.getElementById('modal-amt').value)||33;
   if(pairs[sym]){ toast(`${sym} już dodana`,'var(--yellow)'); hideModal('add-pair-modal'); return; }
   pairs[sym] = buildCfg(sym, dir, amt);
   renderCard(sym);
@@ -560,7 +565,7 @@ function buildCfg(sym, dir='BOTH', amt=33){
     ma200_enabled: document.getElementById('def-ma200-en').value==='1',
     ma200_tf: document.getElementById('def-ma200-tf').value,
     leverage: parseInt(document.getElementById('def-leverage').value),
-    pyramid_levels:[0,1,2].map(i=>({
+    pyramid_levels:[0,1,2,3].map(i=>({
       enabled: pyrEnabled.def[i],
       amount_usd: parseFloat(document.getElementById(`def-pamt-${i}`)?.value)||amt,
       offset_pct: i===0?0:(parseFloat(document.getElementById(`def-poff-${i}`)?.value)||1.0)
@@ -662,40 +667,15 @@ async function saveAndApply(){
   const cfg = {
     api_key: document.getElementById('api_key').value.trim(),
     api_secret: document.getElementById('api_secret').value.trim(),
-    pairs: Object.values(pairs).map(p => ({
-      ...p,
-      interval: document.getElementById('def-interval').value,
-      leverage: parseInt(document.getElementById('def-leverage').value),
-      bb_period: parseInt(document.getElementById('def-bb-p').value),
-      bb_std: parseFloat(document.getElementById('def-bb-s').value),
-      bb_breakout_pct: parseFloat(document.getElementById('def-bb-break').value) || 0.0,
-      bb_proximity: parseFloat(document.getElementById('def-bb-prox').value)/100,
-      stoch_period: parseInt(document.getElementById('def-stoch').value),
-      stoch_overbought: parseInt(document.getElementById('def-ob').value),
-      stoch_oversold: parseInt(document.getElementById('def-os').value),
-      ma200_enabled: document.getElementById('def-ma200-en').value==='1',
-      ma200_tf: document.getElementById('def-ma200-tf').value,
-      tp_pct: parseFloat(document.getElementById('def-tp').value),
-      sl_pct: parseFloat(document.getElementById('def-sl').value),
-      pyramid_levels: [0,1,2].map(i=>({
-        enabled: i===0 ? true : (document.getElementById('def-sw-'+i)?.classList.contains('on') ?? true),
-        amount_usd: parseFloat(document.getElementById('def-pamt-'+i)?.value) || 10.0,
-        offset_pct: i===0 ? 0.0 : (parseFloat(document.getElementById('def-poff-'+i)?.value) || 0.0)
-      }))
-    }))
+    pairs: Object.values(pairs)
   };
   if(!cfg.api_key||!cfg.api_secret){ toast('Uzupełnij API Key i Secret!','var(--red)'); return; }
   if(!cfg.pairs.length){ toast('Dodaj przynajmniej jedną parę!','var(--yellow)'); return; }
   try {
     const r = await apiFetch('/config',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
-    if(r.ok){
-      toast('✅ Zapisano konfigurację','var(--green)');
-      // Zaktualizuj lokalny stan par z zapisanej konfiguracji
-      cfg.pairs.forEach(p => { if(pairs[p.symbol]) pairs[p.symbol] = {...pairs[p.symbol], ...p}; });
-      // Od razu pobierz status żeby odświeżyć nagłówki
-      await fetchStatus();
-    } else toast('❌ Błąd zapisu','var(--red)');
+    if(r.ok) toast('✅ Zapisano konfigurację','var(--green)');
+    else toast('❌ Błąd zapisu','var(--red)');
   } catch(e){ if(e.message!=='Unauthorized') toast('❌ Brak połączenia','var(--red)'); }
 }
 
@@ -756,14 +736,7 @@ function applyStatus(data){
     if(pairs[sym]===undefined && !document.getElementById(`card-${sym}`)) return;
     if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
     const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
-    // Informacje o konfiguracji pary
-    const ivMap2={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
-    const lvls = ps.pyramid_levels || [];
-    const activeLvls = lvls.filter(l=>l.enabled);
-    const pyrInfo = activeLvls.map((l,i) => i===0 ? `${l.amount_usd}$` : `+${l.amount_usd}$(${l.offset_pct}%)`).join(' ');
-    const metaStr = `${ivMap2[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction} • BB:${ps.bb_breakout_pct||0}% • TP:${ps.tp_pct}% SL:${ps.sl_pct}% • ${pyrInfo}`;
-    setText(`pair-meta-${sym}`, metaStr);
-    if(pairs[sym]) { pairs[sym].leverage=ps.leverage; pairs[sym].interval=ps.interval; pairs[sym].direction=ps.direction; }
+    setText(`pair-meta-${sym}`, `${ivMap[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction}`);
 
     // Header
     setText(`pp-${sym}`, ps.last_price?Number(ps.last_price).toLocaleString():'—');
@@ -813,7 +786,7 @@ function applyStatus(data){
     // Pyramid
     const pyrEl=document.getElementById(`pyrs-${sym}`);
     if(pyrEl&&ps.pyramid){
-      pyrEl.innerHTML=[0,1,2].map(i=>{
+      pyrEl.innerHTML=[0,1,2,3].map(i=>{
         const e=ps.pyramid.entries?.[i];
         if(e){
           const cls=e.side==='LONG'?'fl':'fs';
