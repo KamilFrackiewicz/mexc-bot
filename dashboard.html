@@ -727,12 +727,14 @@ async function loadConfig(){
         if(p.pyramid_levels) {
           p.pyramid_levels.forEach((lvl,i) => {
             pyrEnabled.def[i] = lvl.enabled;
+          });
+          initDefPyr();
+          p.pyramid_levels.forEach((lvl,i) => {
             const amt = document.getElementById(`def-pamt-${i}`);
             const off = document.getElementById(`def-poff-${i}`);
             if(amt) amt.value = lvl.amount_usd;
             if(off) off.value = lvl.offset_pct;
           });
-          initDefPyr();
         }
       }
     }
