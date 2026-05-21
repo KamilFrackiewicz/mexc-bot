@@ -667,7 +667,27 @@ async function saveAndApply(){
   const cfg = {
     api_key: document.getElementById('api_key').value.trim(),
     api_secret: document.getElementById('api_secret').value.trim(),
-    pairs: Object.values(pairs)
+    pairs: Object.values(pairs).map(p => ({
+      ...p,
+      interval: document.getElementById('def-interval').value,
+      leverage: parseInt(document.getElementById('def-leverage').value),
+      bb_period: parseInt(document.getElementById('def-bb-p').value),
+      bb_std: parseFloat(document.getElementById('def-bb-s').value),
+      bb_breakout_pct: parseFloat(document.getElementById('def-bb-break').value)||0,
+      bb_proximity: parseFloat(document.getElementById('def-bb-prox').value)/100,
+      stoch_period: parseInt(document.getElementById('def-stoch').value),
+      stoch_overbought: parseInt(document.getElementById('def-ob').value),
+      stoch_oversold: parseInt(document.getElementById('def-os').value),
+      ma200_enabled: document.getElementById('def-ma200-sw').classList.contains('on'),
+      ma200_tf: document.getElementById('def-ma200-tf').value,
+      tp_pct: parseFloat(document.getElementById('def-tp').value),
+      sl_pct: parseFloat(document.getElementById('def-sl').value),
+      pyramid_levels: [0,1,2,3].map(i=>({
+        enabled: i===0 ? true : (document.getElementById('def-sw-'+i)?.classList.contains('on') ?? true),
+        amount_usd: parseFloat(document.getElementById('def-pamt-'+i)?.value)||10,
+        offset_pct: i===0 ? 0 : (parseFloat(document.getElementById('def-poff-'+i)?.value)||0)
+      }))
+    }))
   };
   if(!cfg.api_key||!cfg.api_secret){ toast('Uzupełnij API Key i Secret!','var(--red)'); return; }
   if(!cfg.pairs.length){ toast('Dodaj przynajmniej jedną parę!','var(--yellow)'); return; }
