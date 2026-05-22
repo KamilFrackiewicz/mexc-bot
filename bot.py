@@ -750,7 +750,8 @@ def _check_pyramid_continuation(client, ps, price):
                     orders = result.get("data", [])
                     active_tp = [o for o in orders if o.get("state") in [1,2] and o.get("isFinished")==0 and o.get("takeProfitPrice")]
                     if active_tp:
-                        r = client._post("/api/v1/private/stoporder/change_price", {"orderId": active_tp[0].get("orderId"), "symbol": ps.symbol, "takeProfitPrice": ps.current_tp})
+                        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4}.get(ps.symbol, 4)
+                        r = client._post("/api/v1/private/stoporder/change_price", {"orderId": str(active_tp[0].get("id")), "symbol": ps.symbol, "takeProfitPrice": round(ps.current_tp, price_prec)})
                         ps.log(f"TP MEXC zmieniony na {ps.current_tp}: {r.get('success')}")
                 except Exception as e:
                     ps.log(f"Blad aktualizacji TP: {e}", "WARN")
