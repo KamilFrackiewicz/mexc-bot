@@ -634,10 +634,10 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
 
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
-                dok_price = round(exec_price * (1 - dok_lvl["offset_pct"] / 100), price_precision)
+                dok_price = round(last_dok_price * (1 - dok_lvl["offset_pct"] / 100), price_precision)
                 dok_side  = 1  # Buy Long
             else:
-                dok_price = round(exec_price * (1 + dok_lvl["offset_pct"] / 100), price_precision)
+                dok_price = round(last_dok_price * (1 + dok_lvl["offset_pct"] / 100), price_precision)
                 dok_side  = 3  # Sell Short
 
             dok_vol = max(1, round(dok_lvl["amount_usd"] / (dok_price * contract_size / ps.leverage)))
