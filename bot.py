@@ -659,7 +659,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 last_dok_vol   = dok_vol
             else:
                 ps.log(f"Blad dokladki {i+1}: {dok_result.get('message','')}", "WARN")
-            time.sleep(0.5)
+            time.sleep(1.0)
 
         ps.pyramid_limit_order_ids = limit_order_ids
 
@@ -673,8 +673,8 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         total_vol  = sum(all_vols)
         avg_price  = sum(p*v for p,v in zip(all_prices, all_vols)) / total_vol if total_vol else exec_price
 
-        # TP od sredniej wszystkich wejsc
-        tp_price = _calc_tp(avg_price, exec_price, side, ps.tp_pct, ps.tp_mode)
+        # TP od wejscia 1 (bez dokładek)
+        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode)
         ps.current_tp = tp_price
         ps.current_sl = sl_price
 
