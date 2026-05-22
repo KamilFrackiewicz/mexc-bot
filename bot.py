@@ -727,6 +727,15 @@ def _check_pyramid_continuation(client, ps, price):
                 ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price,
                                          ps.pyramid_side, ps.tp_pct, ps.tp_mode)
                 ps.log(f"TP zaktualizowany: {ps.current_tp}")
+                try:
+                    result = client._get("/api/v1/private/stoporder/list/orders", {"symbol": ps.symbol})
+                    orders = result.get("data", [])
+                    active_tp = [o for o in orders if o.get("state") in [1,2] and o.get("isFinished")==0 and o.get("takeProfitPrice")]
+                    if active_tp:
+                        r = client._post("/api/v1/private/stoporder/change_price", {"orderId": active_tp[0].get("orderId"), "symbol": ps.symbol, "takeProfitPrice": ps.current_tp})
+                        ps.log(f"TP MEXC zmieniony na {ps.current_tp}: {r.get('success')}")
+                except Exception as e:
+                    ps.log(f"Blad aktualizacji TP: {e}", "WARN")
     except Exception as e:
         ps.log(f"check_continuation blad: {e}", "ERROR")
 
