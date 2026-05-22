@@ -659,7 +659,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 last_dok_vol   = dok_vol
             else:
                 ps.log(f"Blad dokladki {i+1}: {dok_result.get('message','')}", "WARN")
-            time.sleep(1.0)
+            time.sleep(2.0)
 
         ps.pyramid_limit_order_ids = limit_order_ids
 
@@ -678,13 +678,30 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ps.current_tp = tp_price
         ps.current_sl = sl_price
 
-        # Ustaw SL w MEXC
+        # Ustaw SL w MEXC przez stoporder/place z positionId
         try:
-            sl_ok = client.update_position_tp_sl(ps.symbol, side, None, sl_price, ps.leverage)
-            if sl_ok:
-                ps.log(f"SL ustawiony w MEXC @ {sl_price}")
+            import time as _time
+            _time.sleep(1.0)
+            positions = client.get_positions(ps.symbol)
+            if positions:
+                pos_id = positions[0].get("positionId")
+                hold_vol = positions[0].get("holdVol", 0)
+                pos_type = positions[0].get("positionType", 1)
+                sl_result = client._post("/api/v1/private/stoporder/place", {
+                    "positionId": pos_id,
+                    "symbol": ps.symbol,
+                    "vol": hold_vol,
+                    "lossTrend": 1,
+                    "profitTrend": 1,
+                    "stopLossPrice": sl_price,
+                    "takeProfitPrice": tp_price
+                })
+                if sl_result.get("success"):
+                    ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
+                else:
+                    ps.log(f"Blad SL/TP MEXC: {sl_result.get('message')} — bot monitoruje", "WARN")
             else:
-                ps.log(f"Nie udalo sie ustawic SL w MEXC — bot monitoruje SL @ {sl_price}", "WARN")
+                ps.log(f"Brak pozycji — bot monitoruje SL @ {sl_price}", "WARN")
         except Exception as e:
             ps.log(f"Blad SL MEXC: {e}", "WARN")
 
