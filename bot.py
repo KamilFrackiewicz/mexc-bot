@@ -694,8 +694,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                     "vol": hold_vol,
                     "lossTrend": 1,
                     "profitTrend": 1,
-                    "stopLossPrice": round(sl_price, price_prec),
-                    "takeProfitPrice": round(tp_price, price_prec)
+                    "stopLossPrice": round(sl_price, price_prec)
                 })
                 if sl_result.get("success"):
                     ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
