@@ -795,6 +795,14 @@ async def pyramid_monitor_loop():
                                         client.close_position(
                                             ps.symbol, pos_type, hold_vol, ps.leverage
                                         )
+                            # Anuluj otwarte limit orders (dokładki)
+                            if ps.pyramid_limit_order_ids:
+                                try:
+                                    for oid in ps.pyramid_limit_order_ids:
+                                        client._post("/api/v1/private/order/cancel", {"orderId": oid, "symbol": ps.symbol})
+                                    ps.log(f"Anulowano {len(ps.pyramid_limit_order_ids)} limit orders")
+                                except Exception as e:
+                                    ps.log(f"Blad anulowania orders: {e}", "WARN")
                             ps.reset_pyramid()
                             ps.current_tp = None
                             ps.current_sl = None
