@@ -693,8 +693,10 @@ async function saveAndApply(){
   try {
     const r = await apiFetch('/config',{method:'POST',
       headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
-    if(r.ok) toast('✅ Zapisano konfigurację','var(--green)');
-    else toast('❌ Błąd zapisu','var(--red)');
+    if(r.ok){
+      toast('✅ Zapisano konfigurację','var(--green)');
+      await fetchStatus();
+    } else toast('❌ Błąd zapisu','var(--red)');
   } catch(e){ if(e.message!=='Unauthorized') toast('❌ Brak połączenia','var(--red)'); }
 }
 
