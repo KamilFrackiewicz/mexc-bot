@@ -482,8 +482,15 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Bliskość BB (TradingView: close < lowerBB + dev*proximity)
         breakout_margin = upper * ps.bb_breakout_pct / 100
-        near_lower = price < (lower - breakout_margin + dev * ps.bb_proximity)
-        near_upper = price > (upper + breakout_margin - dev * ps.bb_proximity)
+        # Sprawdz czy cena wybiła BB w ostatnich 3 świecach
+        near_lower = any(
+            closes[-(i+1)] < (lower - breakout_margin + dev * ps.bb_proximity)
+            for i in range(3) if len(closes) > i
+        )
+        near_upper = any(
+            closes[-(i+1)] > (upper + breakout_margin - dev * ps.bb_proximity)
+            for i in range(3) if len(closes) > i
+        )
 
         # Stochastic K & D
         k_series = calc_stoch_k_series(closes, highs, lows,
