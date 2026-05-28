@@ -554,7 +554,16 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Piramida
         if signal in ("LONG","SHORT") and not ps.pyramid_active:
-            _open_pyramid_level(client, ps, signal, price, 0)
+            # Sprawdz czy jest juz aktywna pozycja na innej parze
+            other_active = any(
+                other_ps.pyramid_active
+                for sym, other_ps in gstate.pairs.items()
+                if sym != ps.symbol
+            )
+            if other_active:
+                ps.log("Blokada: inna para ma aktywna pozycje", "WARN")
+            else:
+                _open_pyramid_level(client, ps, signal, price, 0)
         elif ps.pyramid_active and ps.pyramid_side == signal:
             _check_pyramid_continuation(client, ps, price)
 
