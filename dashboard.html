@@ -280,10 +280,15 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
     <button class="btn btn-outline btn-sm" onclick="showModal('pw-modal')">🔒 HASŁO</button>
     <button class="btn btn-outline btn-sm" onclick="doLogout()">WYLOGUJ</button>
+    <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">
+      Max: <input type="number" id="max-positions" value="1" min="1" max="10" 
+      style="width:45px;background:var(--bg);border:1px solid var(--b1);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:.75rem;padding:4px 6px;outline:none"
+      onchange="setMaxPositions(this.value)">
+    </div>
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
-  </div>
+    </div>
 </header>
 
 <div class="page">
