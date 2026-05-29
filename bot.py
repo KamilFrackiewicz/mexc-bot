@@ -420,6 +420,7 @@ def save_config():
                     "leverage","tp_mode","tp_pct","sl_pct"
                 ]
             })
+        data["signals_only"] = gstate.signals_only
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -431,6 +432,7 @@ def load_config():
         data = json.load(open(CONFIG_FILE))
         gstate.api_key    = data.get("api_key", "")
         gstate.api_secret = data.get("api_secret", "")
+        gstate.signals_only = data.get("signals_only", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -984,11 +986,13 @@ async def set_signals_only(enabled: int, _=Depends(require_auth)):
     mode = "📡 Tryb sygnałów" if gstate.signals_only else "🚀 Tryb tradingu"
     gstate.log(f"{mode} aktywny")
     tg(f"{mode} aktywny")
+    save_config()
     return {"ok": True, "signals_only": gstate.signals_only}
 
 @app.get("/api/status")
 def get_status(_=Depends(require_auth)):
     return {"running": gstate.running,
+            "signals_only": gstate.signals_only,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
