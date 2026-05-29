@@ -984,6 +984,13 @@ async def stop_bot(_=Depends(require_auth)):
     gstate.running = False; gstate.log("🛑 Bot zatrzymany")
     return {"ok": True}
 
+@app.post("/api/max_positions/{val}")
+async def set_max_positions(val: int, _=Depends(require_auth)):
+    gstate.max_positions = max(1, val)
+    save_config()
+    gstate.log(f"Maks. pozycji: {gstate.max_positions}")
+    return {"ok": True, "max_positions": gstate.max_positions}
+
 @app.post("/api/signals_only/{enabled}")
 async def set_signals_only(enabled: int, _=Depends(require_auth)):
     gstate.signals_only = bool(enabled)
