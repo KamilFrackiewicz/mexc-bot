@@ -26,6 +26,21 @@ AUTH_FILE    = "auth.json"
 LOG_FILE     = "logs.json"
 security     = HTTPBearer(auto_error=False)
 
+# ─── TELEGRAM ─────────────────────────────────────────────────────────────────
+TELEGRAM_TOKEN   = "8828080533:AAFrSbgunu3LJ8IhKMmjnvesNl6rD5j9tKk"
+TELEGRAM_CHAT_ID = "5137354808"
+
+def tg(msg: str):
+    """Wyslij wiadomosc na Telegram"""
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "HTML"},
+            timeout=5
+        )
+    except Exception as e:
+        logger.error(f"Telegram error: {e}")
+
 # ─── AUTH ────────────────────────────────────────────────────────────────────
 
 class AuthManager:
@@ -726,6 +741,10 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
             f"TP(mem):{tp_price} | SL:{sl_price} | Dokladki:{len(limit_order_ids)} ustawione",
             "SUCCESS"
         )
+        tg(f"🚀 <b>{ps.symbol}</b> {side}\n"
+           f"Cena: {exec_price}\n"
+           f"TP: {tp_price} | SL: {sl_price}\n"
+           f"Dokładki: {len(limit_order_ids)}")
 
     except Exception as e:
         ps.log(f"Blad wejscia: {e}", "ERROR")
@@ -753,6 +772,9 @@ def _check_pyramid_continuation(client, ps, price):
             exec_price = float(pos.get("openAvgPrice", price))
             ps.pyramid_entries.append(PyramidEntry(exec_price, new_vol, ps.pyramid_side))
             ps.log(f"Dokladka {len(ps.pyramid_entries)}/{len(active)} wykryta @ {exec_price} | Vol:{new_vol}", "SUCCESS")
+            tg(f"📌 <b>{ps.symbol}</b> Dokładka {len(ps.pyramid_entries)}/{len(active)}\n"
+               f"Cena: {exec_price} | Vol: {new_vol}\n"
+               f"TP: {ps.current_tp}")
 
             # Zaktualizuj TP w pamieci od nowej sredniej
             avg = ps.pyramid_avg_entry
@@ -802,6 +824,9 @@ async def pyramid_monitor_loop():
                             ps.log(f"{reason} osiagniety @ {price} "
                                    f"(TP:{ps.current_tp} SL:{ps.current_sl}) - zamykam",
                                    "SUCCESS")
+                            tg(f"{'✅' if reason=='TP' else '❌'} <b>{ps.symbol}</b> {reason} osiągnięty\n"
+                               f"Cena: {price}\n"
+                               f"TP: {ps.current_tp} | SL: {ps.current_sl}")
                             all_pos = client.get_positions()
                             for pos in all_pos:
                                 if pos.get("symbol") == ps.symbol:
