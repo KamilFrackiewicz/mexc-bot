@@ -757,6 +757,16 @@ async function startBot(){
 async function stopBot(){
   try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {}
 }
+async function toggleSignalsOnly(){
+  const btn = document.getElementById('btn-signals');
+  const isActive = btn.classList.contains('btn-go');
+  const enabled = isActive ? 0 : 1;
+  try {
+    await apiFetch(`/signals_only/${enabled}`,{method:'POST'});
+    if(enabled){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='📡 SYGNAŁY ON'; toast('📡 Tryb sygnałów aktywny','var(--yellow)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='📡 SYGNAŁY'; toast('🚀 Tryb tradingu aktywny','var(--green)'); }
+  } catch {}
+}
 async function testPair(sym){
   toast(`▶ Test ${sym}…`,'var(--cyan)');
   try {
