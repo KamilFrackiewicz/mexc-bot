@@ -580,10 +580,13 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                 ps.log("Blokada: inna para ma aktywna pozycje", "WARN")
             elif gstate.signals_only:
                 ps.log(f"📡 SYGNAŁ {signal} @ {price} (tryb sygnałów — brak wejścia)")
+                iv_label = {"Min1":"1min","Min5":"5min","Min15":"15min","Min30":"30min","Hour1":"1h","Hour4":"4h"}.get(ps.interval, ps.interval)
                 tg(f"📡 <b>{ps.symbol}</b> SYGNAŁ {signal}\n"
+                   f"🕐 {datetime.now().strftime('%H:%M:%S')} ({iv_label})\n"
                    f"Cena: {price}\n"
                    f"BB: [{round(ps.last_bb_lower,2)}-{round(ps.last_bb_upper,2)}]\n"
-                   f"StochK: {ps.last_stoch_k} D: {ps.last_stoch_d}")
+                   f"StochK: {ps.last_stoch_k} D: {ps.last_stoch_d}\n"
+                   f"MA200: {round(ps.last_ma200,0) if ps.last_ma200 else 'off'}")
             else:
                 _open_pyramid_level(client, ps, signal, price, 0)
         elif ps.pyramid_active and ps.pyramid_side == signal:
