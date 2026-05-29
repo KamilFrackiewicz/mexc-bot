@@ -388,6 +388,7 @@ class PairState:
 class GlobalState:
     def __init__(self):
         self.running = False; self.api_key = ""; self.api_secret = ""
+        self.signals_only = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -577,6 +578,12 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             )
             if other_active:
                 ps.log("Blokada: inna para ma aktywna pozycje", "WARN")
+            elif gstate.signals_only:
+                ps.log(f"📡 SYGNAŁ {signal} @ {price} (tryb sygnałów — brak wejścia)")
+                tg(f"📡 <b>{ps.symbol}</b> SYGNAŁ {signal}\n"
+                   f"Cena: {price}\n"
+                   f"BB: [{round(ps.last_bb_lower,2)}-{round(ps.last_bb_upper,2)}]\n"
+                   f"StochK: {ps.last_stoch_k} D: {ps.last_stoch_d}")
             else:
                 _open_pyramid_level(client, ps, signal, price, 0)
         elif ps.pyramid_active and ps.pyramid_side == signal:
@@ -967,6 +974,14 @@ async def start_bot(_=Depends(require_auth)):
 async def stop_bot(_=Depends(require_auth)):
     gstate.running = False; gstate.log("🛑 Bot zatrzymany")
     return {"ok": True}
+
+@app.post("/api/signals_only/{enabled}")
+async def set_signals_only(enabled: int, _=Depends(require_auth)):
+    gstate.signals_only = bool(enabled)
+    mode = "📡 Tryb sygnałów" if gstate.signals_only else "🚀 Tryb tradingu"
+    gstate.log(f"{mode} aktywny")
+    tg(f"{mode} aktywny")
+    return {"ok": True, "signals_only": gstate.signals_only}
 
 @app.get("/api/status")
 def get_status(_=Depends(require_auth)):
