@@ -677,7 +677,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         last_dok_price  = exec_price
         last_dok_vol    = vol0
 
-        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3}.get(ps.symbol, 4)
+        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 2, "SP500_USDT": 2}.get(ps.symbol, 4)
 
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
