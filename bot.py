@@ -658,7 +658,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ticker     = client.get_ticker(ps.symbol)
         exec_price = float(ticker.get("lastPrice", price))
 
-        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01}.get(ps.symbol, 1.0)
+        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0}.get(ps.symbol, 1.0)
 
         # ── Wejście 1 (market order) ──────────────────────────────────────────
         vol0 = max(1, round(lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)))
