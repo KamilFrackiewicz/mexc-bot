@@ -389,6 +389,7 @@ class GlobalState:
     def __init__(self):
         self.running = False; self.api_key = ""; self.api_secret = ""
         self.signals_only = False
+        self.max_positions = 1
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -421,6 +422,7 @@ def save_config():
                 ]
             })
         data["signals_only"] = gstate.signals_only
+        data["max_positions"] = gstate.max_positions
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -433,6 +435,7 @@ def load_config():
         gstate.api_key    = data.get("api_key", "")
         gstate.api_secret = data.get("api_secret", "")
         gstate.signals_only = data.get("signals_only", False)
+        gstate.max_positions = data.get("max_positions", 1)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -578,8 +581,9 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                 for sym, other_ps in gstate.pairs.items()
                 if sym != ps.symbol
             )
-            if other_active:
-                ps.log("Blokada: inna para ma aktywna pozycje", "WARN")
+            active_count = sum(1 for other_ps in gstate.pairs.values() if other_ps.pyramid_active)
+            if active_count >= gstate.max_positions:
+                ps.log(f"Blokada: {active_count}/{gstate.max_positions} aktywnych pozycji", "WARN")
             elif gstate.signals_only:
                 ps.log(f"📡 SYGNAŁ {signal} @ {price} (tryb sygnałów — brak wejścia)")
                 iv_label = {"Min1":"1min","Min5":"5min","Min15":"15min","Min30":"30min","Hour1":"1h","Hour4":"4h"}.get(ps.interval, ps.interval)
@@ -993,6 +997,7 @@ async def set_signals_only(enabled: int, _=Depends(require_auth)):
 def get_status(_=Depends(require_auth)):
     return {"running": gstate.running,
             "signals_only": gstate.signals_only,
+            "max_positions": gstate.max_positions,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
