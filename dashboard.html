@@ -274,7 +274,7 @@ input[type=password]{letter-spacing:.1em;}
 <div id="app">
 
 <header>
-  <div class="logo">▣ MEXC FUTURES BOT <span class="logo-tag">MULTI-PARA v3</span></div>
+  <div class="logo">▣ Trading 46ent Bot<span class="logo-tag">MULTI-PARA v3</span></div>
   <div class="hdr-r">
     <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
     <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
@@ -790,6 +790,14 @@ function applyStatus(data){
   document.getElementById('btn-start').disabled=running;
   document.getElementById('btn-stop').disabled=!running;
   renderGlobalLogs(data.global_logs);
+  const sigBtn = document.getElementById('btn-signals');
+  if(sigBtn){
+    if(data.signals_only){
+      sigBtn.classList.remove('btn-outline'); sigBtn.classList.add('btn-go'); sigBtn.textContent='📡 SYGNAŁY ON';
+    } else {
+      sigBtn.classList.remove('btn-go'); sigBtn.classList.add('btn-outline'); sigBtn.textContent='📡 SYGNAŁY';
+    }
+  }
 
   (data.pairs||[]).forEach(ps=>{
     const sym=ps.symbol;
