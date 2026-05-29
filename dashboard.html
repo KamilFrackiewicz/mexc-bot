@@ -762,6 +762,12 @@ async function startBot(){
 async function stopBot(){
   try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {}
 }
+async function setMaxPositions(val){
+  try {
+    await apiFetch('/max_positions/'+parseInt(val), {method:'POST'});
+    toast(`Maks. pozycji: ${val}`,'var(--cyan)');
+  } catch {}
+}
 async function toggleSignalsOnly(){
   const btn = document.getElementById('btn-signals');
   const isActive = btn.classList.contains('btn-go');
