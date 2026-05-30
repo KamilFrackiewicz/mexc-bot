@@ -144,7 +144,7 @@ class MEXCClient:
 
     def place_order(self, symbol: str, side: int, vol: float, leverage: int,
                     sl: Optional[float] = None, tp: Optional[float] = None) -> dict:
-        body = {"symbol": symbol, "side": side, "openType": 1,
+        body = {"symbol": symbol, "side": side, "openType": gstate.margin_mode,
                 "type": 5, "vol": vol, "leverage": leverage}
         if sl: body["stopLossPrice"]   = sl
         if tp: body["takeProfitPrice"] = tp
@@ -158,7 +158,7 @@ class MEXCClient:
     def close_position(self, symbol: str, pos_type: int, vol: int, leverage: int) -> dict:
         """Zamknij pozycję: pos_type 1=long(close side=4), 2=short(close side=2)"""
         close_side = 4 if pos_type == 1 else 2
-        body = {"symbol": symbol, "side": close_side, "openType": 1,
+        body = {"symbol": symbol, "side": close_side, "openType": gstate.margin_mode,
                 "type": 5, "vol": vol, "leverage": leverage}
         return self._post("/api/v1/private/order/submit", body)
 
@@ -390,6 +390,7 @@ class GlobalState:
         self.running = False; self.api_key = ""; self.api_secret = ""
         self.signals_only = False
         self.max_positions = 1
+        self.margin_mode = 1  # 1=Isolated, 2=Cross
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -423,6 +424,7 @@ def save_config():
             })
         data["signals_only"] = gstate.signals_only
         data["max_positions"] = gstate.max_positions
+        data["margin_mode"] = gstate.margin_mode
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -436,6 +438,7 @@ def load_config():
         gstate.api_secret = data.get("api_secret", "")
         gstate.signals_only = data.get("signals_only", False)
         gstate.max_positions = data.get("max_positions", 1)
+        gstate.margin_mode = data.get("margin_mode", 1)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -984,6 +987,14 @@ async def stop_bot(_=Depends(require_auth)):
     gstate.running = False; gstate.log("🛑 Bot zatrzymany")
     return {"ok": True}
 
+@app.post("/api/margin_mode/{val}")
+async def set_margin_mode(val: int, _=Depends(require_auth)):
+    gstate.margin_mode = 1 if val == 1 else 2
+    mode = "Isolated" if gstate.margin_mode == 1 else "Cross"
+    save_config()
+    gstate.log(f"Tryb marginu: {mode}")
+    return {"ok": True, "margin_mode": gstate.margin_mode}
+
 @app.post("/api/max_positions/{val}")
 async def set_max_positions(val: int, _=Depends(require_auth)):
     gstate.max_positions = max(1, val)
@@ -1005,6 +1016,7 @@ def get_status(_=Depends(require_auth)):
     return {"running": gstate.running,
             "signals_only": gstate.signals_only,
             "max_positions": gstate.max_positions,
+            "margin_mode": gstate.margin_mode,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
