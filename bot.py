@@ -737,7 +737,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 pos_id = positions[0].get("positionId")
                 hold_vol = positions[0].get("holdVol", 0)
                 pos_type = positions[0].get("positionType", 1)
-                price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4}.get(ps.symbol, 4)
+                price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 3, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 2, "SP500_USDT": 2}.get(ps.symbol, 4)
                 sl_result = client._post("/api/v1/private/stoporder/place", {
                     "positionId": pos_id,
                     "symbol": ps.symbol,
