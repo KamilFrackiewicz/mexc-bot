@@ -695,7 +695,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
             dok_result = client._post("/api/v1/private/order/submit", {
                 "symbol":   ps.symbol,
                 "side":     dok_side,
-                "openType": 1,
+                "openType": gstate.margin_mode,
                 "type":     1,  # limit order
                 "vol":      dok_vol,
                 "leverage": ps.leverage,
