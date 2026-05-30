@@ -288,6 +288,7 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
     </div>
 </header>
 
@@ -769,6 +770,16 @@ async function setMaxPositions(val){
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
   } catch {}
 }
+async function toggleMarginMode(){
+  const btn = document.getElementById('btn-margin');
+  const isCross = btn.textContent.includes('CROSS');
+  const val = isCross ? 1 : 2;
+  try {
+    await apiFetch('/margin_mode/'+val, {method:'POST'});
+    btn.textContent = val===1 ? '🔒 ISOLATED' : '🔓 CROSS';
+    toast(`Tryb marginu: ${val===1?'Isolated':'Cross'}`,'var(--cyan)');
+  } catch {}
+}
 async function toggleSignalsOnly(){
   const btn = document.getElementById('btn-signals');
   const isActive = btn.classList.contains('btn-go');
@@ -802,6 +813,8 @@ function applyStatus(data){
   document.getElementById('btn-start').disabled=running;
   document.getElementById('btn-stop').disabled=!running;
   renderGlobalLogs(data.global_logs);
+  const marginBtn = document.getElementById('btn-margin');
+  if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
   const sigBtn = document.getElementById('btn-signals');
   if(sigBtn){
     if(data.signals_only){
