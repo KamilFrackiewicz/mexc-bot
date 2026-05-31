@@ -815,6 +815,8 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const maxPosEl = document.getElementById('max-positions');
+  if(maxPosEl && data.max_positions) maxPosEl.value = data.max_positions;
   const sigBtn = document.getElementById('btn-signals');
   if(sigBtn){
     if(data.signals_only){
