@@ -795,12 +795,11 @@ def _check_pyramid_continuation(client, ps, price):
                f"Cena: {exec_price} | Vol: {new_vol}\n"
                f"TP: {ps.current_tp}")
 
-            # Zaktualizuj TP w pamieci od nowej sredniej
-            avg = ps.pyramid_avg_entry
-            if avg:
-                ps.current_tp = _calc_tp(avg, ps.pyramid_entries[0].price,
-                                         ps.pyramid_side, ps.tp_pct, ps.tp_mode)
-                ps.log(f"TP zaktualizowany: {ps.current_tp}")
+            # Zaktualizuj TP od ostatniej dokładki
+            last_price = ps.pyramid_entries[-1].price
+            ps.current_tp = _calc_tp(last_price, last_price,
+                                     ps.pyramid_side, ps.tp_pct, ps.tp_mode)
+            ps.log(f"TP zaktualizowany: {ps.current_tp}")
     except Exception as e:
         ps.log(f"check_continuation blad: {e}", "ERROR")
 
