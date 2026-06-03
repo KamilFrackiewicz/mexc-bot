@@ -680,7 +680,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         last_dok_price  = exec_price
         last_dok_vol    = vol0
 
-        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 2, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2}.get(ps.symbol, 4)
+        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2}.get(ps.symbol, 4)
 
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
@@ -737,7 +737,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 pos_id = positions[0].get("positionId")
                 hold_vol = positions[0].get("holdVol", 0)
                 pos_type = positions[0].get("positionType", 1)
-                price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 2, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2}.get(ps.symbol, 4)
+                price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2}.get(ps.symbol, 4)
                 sl_result = client._post("/api/v1/private/stoporder/place", {
                     "positionId": pos_id,
                     "symbol": ps.symbol,
