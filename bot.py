@@ -626,21 +626,21 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
     except: pass
 
 
-def _calc_sl(exec_price: float, side: str, sl_pct: float) -> float:
+def _calc_sl(exec_price: float, side: str, sl_pct: float, prec: int = 4) -> float:
     """SL od podanej ceny wejścia"""
     if side == "LONG":
-        return round(exec_price * (1 - sl_pct / 100), 4)
+        return round(exec_price * (1 - sl_pct / 100), prec)
     else:
-        return round(exec_price * (1 + sl_pct / 100), 4)
+        return round(exec_price * (1 + sl_pct / 100), prec)
 
 def _calc_tp(avg_price: float, first_price: float, side: str,
-             tp_pct: float, tp_mode: str) -> float:
+             tp_pct: float, tp_mode: str, prec: int = 4) -> float:
     """TP od średniej lub pierwszego wejścia"""
     base = avg_price if tp_mode == "FROM_AVG" else first_price
     if side == "LONG":
-        return round(base * (1 + tp_pct / 100), 4)
+        return round(base * (1 + tp_pct / 100), prec)
     else:
-        return round(base * (1 - tp_pct / 100), 4)
+        return round(base * (1 - tp_pct / 100), prec)
 
 def _open_pyramid_level(client, ps, side, price, level_idx):
     """
@@ -714,7 +714,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ps.pyramid_limit_order_ids = limit_order_ids
 
         # ── SL od ostatniej dokładki ──────────────────────────────────────────
-        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct)
+        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct, price_prec)
 
         # Oblicz srednia (wejscie + wszystkie dokładki)
         all_vols   = [vol0] + [max(1, round(l["amount_usd"] / (round(exec_price * (1 - l["offset_pct"]/100), 4) * contract_size / ps.leverage))) for l in active[1:]]
@@ -724,7 +724,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         avg_price  = sum(p*v for p,v in zip(all_prices, all_vols)) / total_vol if total_vol else exec_price
 
         # TP od wejscia 1 (bez dokładek)
-        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode)
+        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode, price_prec)
         ps.current_tp = tp_price
         ps.current_sl = sl_price
 
@@ -797,8 +797,9 @@ def _check_pyramid_continuation(client, ps, price):
 
             # Zaktualizuj TP od ostatniej dokładki
             last_price = ps.pyramid_entries[-1].price
+            p_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
             ps.current_tp = _calc_tp(last_price, last_price,
-                                     ps.pyramid_side, ps.tp_pct, ps.tp_mode)
+                                     ps.pyramid_side, ps.tp_pct, ps.tp_mode, p_prec)
             ps.log(f"TP zaktualizowany: {ps.current_tp}")
     except Exception as e:
         ps.log(f"check_continuation blad: {e}", "ERROR")
