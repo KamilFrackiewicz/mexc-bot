@@ -436,10 +436,13 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Zapisz numer świecy gdy nastąpił crossover MACD (do filtra EMA)
         candle_idx = len(closes) - 1
-        if macd_cross_long and ps.macd_cross_candle != candle_idx:
-            if macd_cross_long: ps.macd_cross_candle = candle_idx
-        if macd_cross_short and ps.macd_cross_candle != candle_idx:
-            if macd_cross_short: ps.macd_cross_candle = candle_idx
+        # Blokuj wielokrotne wejscia na tej samej swiece
+        if ps.macd_cross_candle == candle_idx:
+            macd_cross_long = False
+            macd_cross_short = False
+        else:
+            if macd_cross_long or macd_cross_short:
+                ps.macd_cross_candle = candle_idx
 
         # ── EMA 10/30 (opcjonalny filtr) ──────────────────────────────────────
         ema_ok_long = ema_ok_short = True
