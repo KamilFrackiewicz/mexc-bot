@@ -417,20 +417,18 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         ps.last_macd   = round(macd_line[-1], 6)
         ps.last_signal = round(signal_line[-1], 6)
 
-        # Crossover MACD z linią sygnałową — sprawdz ostatnie 3 świece
+        # Crossover MACD z linią sygnałową — tylko bieżąca świeca
         # LONG: MACD przecina sygnał od dołu PONIŻEJ zera
         # SHORT: MACD przecina sygnał od góry POWYŻEJ zera
-        macd_cross_long = any(
-            macd_line[-(i+2)] <= signal_line[-(i+2)] and
-            macd_line[-(i+1)] > signal_line[-(i+1)] and
-            macd_line[-(i+1)] < 0
-            for i in range(3) if len(macd_line) > i+2 and len(signal_line) > i+2
+        macd_cross_long = (
+            macd_line[-2] <= signal_line[-2] and
+            macd_line[-1] > signal_line[-1] and
+            macd_line[-1] < 0
         )
-        macd_cross_short = any(
-            macd_line[-(i+2)] >= signal_line[-(i+2)] and
-            macd_line[-(i+1)] < signal_line[-(i+1)] and
-            macd_line[-(i+1)] > 0
-            for i in range(3) if len(macd_line) > i+2 and len(signal_line) > i+2
+        macd_cross_short = (
+            macd_line[-2] >= signal_line[-2] and
+            macd_line[-1] < signal_line[-1] and
+            macd_line[-1] > 0
         )
 
         # Zapisz numer świecy gdy nastąpił crossover MACD (do filtra EMA)
