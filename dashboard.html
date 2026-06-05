@@ -288,6 +288,8 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
+    <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
     <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
     </div>
 </header>
@@ -777,6 +779,27 @@ async function setMaxPositions(val){
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
   } catch {}
 }
+async function toggleTpSl(){
+  const btn = document.getElementById('btn-tpsl');
+  const isOn = btn.textContent.includes('ON');
+  const val = isOn ? 0 : 1;
+  try {
+    await apiFetch('/tp_sl/'+val, {method:'POST'});
+    btn.textContent = val ? '🛡️ TP/SL ON' : '🛡️ TP/SL OFF';
+    if(!val) btn.style.color='var(--red)'; else btn.style.color='';
+    toast(val ? '🛡️ TP/SL włączone' : '⛔ TP/SL wyłączone', val ? 'var(--green)' : 'var(--red)');
+  } catch {}
+}
+async function toggleHedging(){
+  const btn = document.getElementById('btn-hedge');
+  const isOn = btn.classList.contains('btn-go');
+  const val = isOn ? 0 : 1;
+  try {
+    await apiFetch('/hedging/'+val, {method:'POST'});
+    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚡ HEDGE ON'; toast('⚡ Hedging włączony','var(--yellow)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚡ HEDGE'; toast('⚡ Hedging wyłączony','var(--cyan)'); }
+  } catch {}
+}
 async function toggleMarginMode(){
   const btn = document.getElementById('btn-margin');
   const isCross = btn.textContent.includes('CROSS');
@@ -822,6 +845,10 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const tpslBtn = document.getElementById('btn-tpsl');
+  if(tpslBtn){ tpslBtn.textContent = data.tp_sl_enabled===false ? '🛡️ TP/SL OFF' : '🛡️ TP/SL ON'; tpslBtn.style.color = data.tp_sl_enabled===false ? 'var(--red)' : ''; }
+  const hedgeBtn = document.getElementById('btn-hedge');
+  if(hedgeBtn){ if(data.hedging_enabled){ hedgeBtn.classList.remove('btn-outline'); hedgeBtn.classList.add('btn-go'); hedgeBtn.textContent='⚡ HEDGE ON'; } else { hedgeBtn.classList.remove('btn-go'); hedgeBtn.classList.add('btn-outline'); hedgeBtn.textContent='⚡ HEDGE'; } }
   const maxPosEl = document.getElementById('max-positions');
   if(maxPosEl && data.max_positions) maxPosEl.value = data.max_positions;
   const sigBtn = document.getElementById('btn-signals');
