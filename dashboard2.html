@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTak Bot — 46ent</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
+:root {
+  --bg:#07090e;--s1:#0c1018;--s2:#111826;
+  --b1:#1a2840;--b2:#243550;
+  --cyan:#00ddff;--cyan2:rgba(0,221,255,.1);
+  --green:#00ff9d;--green2:rgba(0,255,157,.1);
+  --red:#ff3355;--red2:rgba(255,51,85,.1);
+  --yellow:#ffcc00;--yellow2:rgba(255,204,0,.1);
+  --purple:#a78bfa;--purple2:rgba(167,139,250,.1);
+  --orange:#ff9500;--orange2:rgba(255,149,0,.1);
+  --text:#c0d4e8;--text2:#4a6a85;
+  --mono:'JetBrains Mono',monospace;--sans:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;
+  background-image:radial-gradient(ellipse 70% 50% at 0 0,rgba(255,149,0,.03) 0,transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%,rgba(167,139,250,.03) 0,transparent 55%);}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:40px 36px;width:360px;display:flex;flex-direction:column;gap:20px;}
+.login-logo{font-family:var(--mono);font-size:.8rem;font-weight:700;letter-spacing:.22em;color:var(--orange);text-align:center;}
+.login-sub{font-family:var(--mono);font-size:.6rem;color:var(--text2);letter-spacing:.14em;text-align:center;margin-top:-10px;}
+.login-err{font-family:var(--mono);font-size:.68rem;color:var(--red);background:var(--red2);border:1px solid rgba(255,51,85,.3);padding:8px 12px;border-radius:3px;display:none;}
+.login-err.show{display:block}
+#app{display:none}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(7,9,14,.97);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);}
+.logo{font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.22em;color:var(--orange);display:flex;align-items:center;gap:10px;}
+.logo-tag{font-size:.55rem;color:var(--text2);letter-spacing:.1em;background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:10px;}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.pill{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;padding:4px 14px;border-radius:20px;border:1px solid var(--b2);display:flex;align-items:center;gap:6px;transition:all .3s;}
+.pill.on{border-color:var(--green);color:var(--green);background:var(--green2);}
+.pill.off{color:var(--text2);}
+.pip{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.pip.blink{animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.btn{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;cursor:pointer;transition:all .15s;}
+.btn:disabled{opacity:.3;cursor:not-allowed;}
+.btn-go{background:var(--green);color:#000;box-shadow:0 0 16px rgba(0,255,157,.2);}
+.btn-go:not(:disabled):hover{box-shadow:0 0 26px rgba(0,255,157,.45);transform:translateY(-1px);}
+.btn-stop{background:var(--red);color:#fff;}
+.btn-outline{background:transparent;color:var(--cyan);border:1px solid var(--b2);}
+.btn-outline:hover{border-color:var(--cyan);background:var(--cyan2);}
+.btn-sm{padding:5px 12px;font-size:.58rem;}
+.btn-orange{background:var(--orange);color:#000;}
+.btn-purple{background:var(--purple);color:#000;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(255,51,85,.3);font-size:.58rem;padding:4px 10px;}
+.btn-danger:hover{background:var(--red2);}
+.btn-full{width:100%;padding:11px;}
+.nav-link{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--text2);text-decoration:none;padding:4px 10px;border:1px solid var(--b1);border-radius:3px;transition:all .2s;}
+.nav-link:hover{color:var(--cyan);border-color:var(--cyan);}
+.page{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:18px 20px;max-width:1600px;margin:0 auto;}
+.sidebar{display:flex;flex-direction:column;gap:14px;}
+.main{display:flex;flex-direction:column;gap:14px;}
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:6px;overflow:hidden;}
+.ph{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:var(--orange);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+.pb{padding:16px;display:flex;flex-direction:column;gap:11px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+label{font-family:var(--mono);font-size:.57rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);}
+input,select{background:var(--bg);border:1px solid var(--b1);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:.8rem;padding:7px 10px;outline:none;transition:border-color .15s;width:100%;}
+input:focus,select:focus{border-color:var(--orange);}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.sec{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;color:var(--purple);text-transform:uppercase;padding:4px 0 0;}
+.sw-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.sw-lbl{font-family:var(--mono);font-size:.65rem;color:var(--text);}
+.sw{width:36px;height:20px;background:var(--b1);border-radius:10px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--text2);transition:all .2s;}
+.sw.on{background:var(--orange);}
+.sw.on::after{left:19px;background:#000;}
+.pyr-row{display:grid;grid-template-columns:22px 30px 1fr 1fr;gap:8px;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:3px;padding:9px 12px;}
+.pyr-n{font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--text2);text-align:center;}
+.pi{background:var(--bg);border:1px solid var(--b1);border-radius:2px;color:var(--text);font-family:var(--mono);font-size:.75rem;padding:5px 8px;width:100%;outline:none;}
+.pi:focus{border-color:var(--orange);}
+.pi:disabled{opacity:.35;}
+.pi-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text2);margin-bottom:2px;letter-spacing:.08em;}
+.pair-card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;transition:border-color .3s;}
+.pair-card.long-active{border-color:rgba(0,255,157,.4);}
+.pair-card.short-active{border-color:rgba(255,51,85,.4);}
+.pair-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--s2);border-bottom:1px solid var(--b1);cursor:pointer;}
+.pair-hdr-l{display:flex;align-items:center;gap:12px;}
+.pair-name{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--text);letter-spacing:.06em;}
+.pair-price{font-family:var(--mono);font-size:.82rem;color:var(--orange);}
+.pair-hdr-r{display:flex;align-items:center;gap:6px;}
+.schip{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:.08em;display:inline-flex;align-items:center;gap:5px;}
+.schip::before{content:'';width:6px;height:6px;border-radius:50%;}
+.schip.LONG{background:var(--green2);color:var(--green);border:1px solid rgba(0,255,157,.3);}
+.schip.LONG::before{background:var(--green);box-shadow:0 0 6px var(--green);}
+.schip.SHORT{background:var(--red2);color:var(--red);border:1px solid rgba(255,51,85,.3);}
+.schip.SHORT::before{background:var(--red);box-shadow:0 0 6px var(--red);}
+.schip.WAIT,.schip.NONE{background:transparent;color:var(--text2);border:1px solid var(--b1);}
+.schip.WAIT::before,.schip.NONE::before{background:var(--text2);}
+.pair-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.pair-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--b1);border-radius:4px;overflow:hidden;}
+.psc{background:var(--s2);padding:10px 12px;}
+.psc-l{font-family:var(--mono);font-size:.52rem;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;}
+.psc-v{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--text);}
+.psc-v.c{color:var(--cyan);}.psc-v.g{color:var(--green);}
+.psc-v.r{color:var(--red);}.psc-v.y{color:var(--yellow);}
+.psc-v.o{color:var(--orange);}.psc-v.p{color:var(--purple);}
+.macd-bar{display:flex;align-items:center;gap:10px;}
+.macd-lbl{font-family:var(--mono);font-size:.6rem;color:var(--text2);min-width:80px;}
+.macd-val{font-family:var(--mono);font-size:.75rem;font-weight:700;}
+.macd-val.pos{color:var(--green);}.macd-val.neg{color:var(--red);}
+.pyr-status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pec{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:10px 12px;transition:all .3s;}
+.pec.fl{border-color:rgba(0,255,157,.4);background:rgba(0,255,157,.05);}
+.pec.fs{border-color:rgba(255,51,85,.4);background:rgba(255,51,85,.05);}
+.pec-n{font-family:var(--mono);font-size:.55rem;color:var(--text2);margin-bottom:4px;}
+.pec-p{font-family:var(--mono);font-size:.82rem;font-weight:700;}
+.pec-p.g{color:var(--green);}.pec-p.r{color:var(--red);}
+.pec-info{font-family:var(--mono);font-size:.62rem;color:var(--text2);margin-top:2px;}
+.pec-empty{font-family:var(--mono);font-size:.7rem;color:var(--b2);text-align:center;padding:6px 0;}
+.pos-table{width:100%;border-collapse:collapse;}
+.pos-table th{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);padding:7px 12px;text-align:left;border-bottom:1px solid var(--b1);background:var(--s2);}
+.pos-table td{padding:8px 12px;border-bottom:1px solid rgba(26,40,64,.5);font-family:var(--mono);font-size:.72rem;}
+.no-pos{font-family:var(--mono);font-size:.68rem;color:var(--text2);text-align:center;padding:14px;}
+.log-box{max-height:200px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:3px;}
+.le{display:grid;grid-template-columns:50px 48px 1fr;gap:6px;padding:2px 0;border-bottom:1px solid rgba(26,40,64,.4);font-family:var(--mono);font-size:.63rem;line-height:1.5;}
+.lt{color:var(--text2);}
+.ll{font-size:.55rem;font-weight:700;letter-spacing:.06em;padding:1px 4px;border-radius:2px;height:fit-content;}
+.ll.INFO{color:var(--text2);}.ll.WARN{color:var(--yellow);background:var(--yellow2);}
+.ll.ERROR{color:var(--red);background:var(--red2);}.ll.SUCCESS{color:var(--green);background:var(--green2);}
+.lm{color:var(--text);word-break:break-word;}
+.glog-box{max-height:110px;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:3px;}
+.collapsible{display:block;}
+.collapsed .collapsible{display:none;}
+.chevron{font-size:.7rem;color:var(--text2);transition:transform .2s;}
+.collapsed .chevron{transform:rotate(-90deg);}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;backdrop-filter:blur(4px);align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:24px;width:360px;display:flex;flex-direction:column;gap:14px;}
+.modal-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;}
+.modal-btns{display:flex;gap:8px;}
+.toast{position:fixed;top:66px;right:18px;background:var(--s2);border:1px solid var(--b1);border-left:3px solid var(--orange);padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:.72rem;color:var(--orange);z-index:400;transform:translateX(130%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.toast.show{transform:translateX(0);}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">▣ TikTak Bot</div>
+    <div class="login-sub">STRATEGIA MACD + EMA — ZALOGUJ SIĘ</div>
+    <div class="login-err" id="login-err">Nieprawidłowe hasło</div>
+    <div class="field"><label>Hasło</label>
+      <input type="password" id="login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn btn-go btn-full" onclick="doLogin()">ZALOGUJ</button>
+  </div>
+</div>
+
+<div id="app">
+<header>
+  <div class="logo">▣ TikTak Bot<span class="logo-tag">MACD + EMA</span></div>
+  <div class="hdr-r">
+    <a href="/" class="nav-link">◀ BB+StochRSI</a>
+    <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
+    <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
+    <button class="btn btn-outline btn-sm" onclick="showModal('pw-modal')">🔒 HASŁO</button>
+    <button class="btn btn-outline btn-sm" onclick="doLogout()">WYLOGUJ</button>
+    <div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">
+      Max: <input type="number" id="max-positions" value="1" min="1" max="10"
+      style="width:45px;background:var(--bg);border:1px solid var(--b1);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:.75rem;padding:4px 6px;outline:none"
+      onchange="setMaxPositions(this.value)">
+    </div>
+    <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
+    <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
+    <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
+    <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
+    <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
+  </div>
+</header>
+
+<div class="page">
+<div class="sidebar">
+  <div class="panel">
+    <div class="ph">🔑 API MEXC</div>
+    <div class="pb">
+      <div class="field"><label>API Key</label><input type="text" id="api_key" placeholder="mx0v..."></div>
+      <div class="field"><label>API Secret</label><input type="password" id="api_secret" placeholder="••••••••"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">⚙️ Konfiguracja TikTak</div>
+    <div class="pb">
+      <div class="sec">Para & Interwał</div>
+      <div class="f2">
+        <div class="field"><label>Interwał</label>
+          <select id="def-interval">
+            <option value="Min1">1 min</option><option value="Min5">5 min</option>
+            <option value="Min15" selected>15 min</option><option value="Min30">30 min</option>
+            <option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
+          </select>
+        </div>
+        <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
+      </div>
+
+      <div class="sec">MACD (12/26/9)</div>
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--text2);padding:4px 0">
+        Standardowe ustawienia — crossover linii MACD z sygnałem.<br>
+        LONG: przecięcie od dołu poniżej zera<br>
+        SHORT: przecięcie od góry powyżej zera
+      </div>
+
+      <div class="sec">Filtr EMA 10/30</div>
+      <div class="sw-row">
+        <span class="sw-lbl">Włącz filtr EMA 10/30</span>
+        <button class="sw" id="def-ema-sw" onclick="toggleSw('def-ema-sw','def-ema-en')"></button>
+        <input type="hidden" id="def-ema-en" value="0">
+      </div>
+      <div class="f2">
+        <div class="field"><label>Okno EMA (świece)</label>
+          <input type="number" id="def-ema-window" value="5" min="1" max="20"
+            title="Max ile świec wstecz sprawdzamy crossover EMA po sygnale MACD">
+        </div>
+      </div>
+
+      <div class="sec">Filtr MA200</div>
+      <div class="sw-row">
+        <span class="sw-lbl">Włącz filtr MA200</span>
+        <button class="sw" id="def-ma200-sw" onclick="toggleSw('def-ma200-sw','def-ma200-en')"></button>
+        <input type="hidden" id="def-ma200-en" value="0">
+      </div>
+      <div class="f2">
+        <div class="field"><label>Timeframe MA200</label>
+          <select id="def-ma200-tf">
+            <option value="Hour1">1 godz</option><option value="Hour4">4 godz</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sec">TP / SL</div>
+      <div class="f2">
+        <div class="field"><label>TP %</label><input type="number" id="def-tp" value="0.8" step="0.1"></div>
+        <div class="field"><label>SL %</label><input type="number" id="def-sl" value="0.4" step="0.1"></div>
+      </div>
+
+      <div class="sec">Piramida wejść</div>
+      <div id="def-pyr" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">📋 Logi globalne</div>
+    <div class="glog-box" id="glog"></div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">💰 Saldo <span style="cursor:pointer" onclick="fetchBalance()">↻</span></div>
+    <div id="balance-box" style="padding:8px 14px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">— kliknij ↻ —</div>
+  </div>
+
+  <button class="btn btn-orange btn-full" onclick="saveAndApply()">ZAPISZ I ZASTOSUJ</button>
+</div>
+
+<div class="main">
+  <div id="pairs-grid">
+    <div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">
+      Kliknij <strong style="color:var(--orange)">+ DODAJ PARĘ</strong> aby zacząć
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ADD PAIR MODAL -->
+<div class="modal-bg" id="add-pair-modal">
+  <div class="modal">
+    <div class="modal-title">+ Dodaj parę</div>
+    <div class="field"><label>Symbol</label>
+      <select id="modal-sym">
+        <option>BTC_USDT</option><option>ETH_USDT</option><option>SOL_USDT</option>
+        <option>SUI_USDT</option><option>XRP_USDT</option><option>TRX_USDT</option>
+        <option>DOGE_USDT</option><option>BNB_USDT</option><option>HYPE_USDT</option>
+        <option>ADA_USDT</option><option>LINK_USDT</option><option>NAS100_USDT</option>
+        <option>SP500_USDT</option><option>LTC_USDT</option><option>AVAX_USDT</option>
+        <option>ONDO_USDT</option><option>UNI_USDT</option><option>TAO_USDT</option>
+        <option>XAU_USDT</option><option>ARB_USDT</option><option>GALA_USDT</option>
+        <option>ATOM_USDT</option><option>DOT_USDT</option><option>ALGO_USDT</option>
+        <option>JUP_USDT</option><option>KAITO_USDT</option><option>PENGU_USDT</option>
+        <option>WLFI_USDT</option><option>BCH_USDT</option>
+      </select>
+    </div>
+    <div class="field"><label>Kierunek</label>
+      <select id="modal-dir">
+        <option value="BOTH">▲▼ Oba</option>
+        <option value="LONG">▲ Tylko LONG</option>
+        <option value="SHORT">▼ Tylko SHORT</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-go" style="flex:1" onclick="addPair()">DODAJ</button>
+      <button class="btn btn-outline" style="flex:1" onclick="hideModal('add-pair-modal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-bg" id="pw-modal">
+  <div class="modal">
+    <div class="modal-title">🔒 Zmień hasło</div>
+    <div class="field"><label>Stare hasło</label><input type="password" id="pw-old"></div>
+    <div class="field"><label>Nowe hasło</label><input type="password" id="pw-new"></div>
+    <div class="field"><label>Powtórz</label><input type="password" id="pw-new2"></div>
+    <div class="login-err" id="pw-err"></div>
+    <div class="modal-btns">
+      <button class="btn btn-go" style="flex:1" onclick="changePassword()">ZMIEŃ</button>
+      <button class="btn btn-outline" style="flex:1" onclick="hideModal('pw-modal')">ANULUJ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/tiktok/api';
+let TOKEN = localStorage.getItem('tiktok_token') || '';
+let pairs = {};
+const pyrEnabled = {def:[true,false,false,false]};
+
+async function doLogin() {
+  const pw = document.getElementById('login-pw').value;
+  try {
+    const r = await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+    if(r.ok){ const d=await r.json(); TOKEN=d.token; localStorage.setItem('tiktok_token',TOKEN); showApp(); }
+    else document.getElementById('login-err').classList.add('show');
+  } catch { document.getElementById('login-err').classList.add('show'); }
+}
+
+async function doLogout() {
+  localStorage.removeItem('tiktok_token'); TOKEN='';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  initDefPyr(); loadConfig(); fetchStatus();
+  setInterval(fetchStatus, 5000);
+}
+
+async function apiFetch(path, opts={}) {
+  opts.headers = {...(opts.headers||{}), 'Authorization': `Bearer ${TOKEN}`};
+  const r = await fetch(API+path, opts);
+  if(r.status===401){ doLogout(); throw new Error('Unauthorized'); }
+  return r;
+}
+
+async function changePassword() {
+  const oldPw=document.getElementById('pw-old').value;
+  const newPw=document.getElementById('pw-new').value;
+  const newPw2=document.getElementById('pw-new2').value;
+  const errEl=document.getElementById('pw-err');
+  if(newPw!==newPw2){ errEl.textContent='Hasła nie są identyczne'; errEl.classList.add('show'); return; }
+  if(newPw.length<6){ errEl.textContent='Min. 6 znaków'; errEl.classList.add('show'); return; }
+  try {
+    const r=await apiFetch('/change_password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({old_password:oldPw,new_password:newPw})});
+    if(r.ok){ hideModal('pw-modal'); toast('✅ Hasło zmienione','var(--green)'); }
+    else { errEl.textContent='Stare hasło nieprawidłowe'; errEl.classList.add('show'); }
+  } catch { errEl.textContent='Błąd'; errEl.classList.add('show'); }
+}
+
+(async function() {
+  if(!TOKEN) return;
+  try { const r=await fetch(API+'/status',{headers:{'Authorization':`Bearer ${TOKEN}`}}); if(r.ok) showApp(); } catch {}
+})();
+
+function toggleSw(swId, hiddenId) {
+  const sw=document.getElementById(swId); const hd=document.getElementById(hiddenId);
+  const on=sw.classList.toggle('on'); hd.value=on?'1':'0';
+}
+
+function initDefPyr() {
+  const c=document.getElementById('def-pyr'); if(!c) return; c.innerHTML='';
+  const defaults=[{amt:5,off:0},{amt:5,off:0.4},{amt:10,off:0.4},{amt:20,off:0.4}];
+  for(let i=0;i<4;i++){
+    const on=pyrEnabled.def[i];
+    c.innerHTML+=`<div class="pyr-row">
+      <div class="pyr-n">${i+1}</div>
+      <button class="sw ${on?'on':''}" id="def-sw-${i}" onclick="toggleDefPyr(${i})"></button>
+      <div><div class="pi-lbl">Kwota USD</div>
+        <input class="pi" type="number" id="def-pamt-${i}" value="${defaults[i].amt}" min="1" ${on?'':'disabled'}></div>
+      <div><div class="pi-lbl">Offset %</div>
+        <input class="pi" type="number" id="def-poff-${i}" value="${defaults[i].off}" min="0" step="0.1" ${i===0||!on?'disabled':''}></div>
+    </div>`;
+  }
+}
+function toggleDefPyr(i){ pyrEnabled.def[i]=!pyrEnabled.def[i]; initDefPyr(); }
+
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function hideModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function addPair(){
+  const sym=document.getElementById('modal-sym').value;
+  const dir=document.getElementById('modal-dir').value;
+  if(pairs[sym]){ toast(`${sym} już dodana`,'var(--yellow)'); hideModal('add-pair-modal'); return; }
+  pairs[sym]=buildCfg(sym,dir);
+  renderCard(sym); hideModal('add-pair-modal');
+  toast(`✅ Dodano ${sym}`,'var(--green)');
+}
+
+function buildCfg(sym, dir='BOTH'){
+  return {
+    symbol:sym, enabled:true,
+    interval: document.getElementById('def-interval').value,
+    direction:dir,
+    ema_filter_enabled: document.getElementById('def-ema-en').value==='1',
+    ema_window: parseInt(document.getElementById('def-ema-window').value)||5,
+    ma200_enabled: document.getElementById('def-ma200-en').value==='1',
+    ma200_tf: document.getElementById('def-ma200-tf').value,
+    leverage: parseInt(document.getElementById('def-leverage').value),
+    pyramid_levels:[0,1,2,3].map(i=>({
+      enabled: pyrEnabled.def[i],
+      amount_usd: parseFloat(document.getElementById(`def-pamt-${i}`)?.value)||5,
+      offset_pct: i===0?0:(parseFloat(document.getElementById(`def-poff-${i}`)?.value)||0.4)
+    })),
+    tp_pct: parseFloat(document.getElementById('def-tp').value),
+    sl_pct: parseFloat(document.getElementById('def-sl').value),
+  };
+}
+
+async function removePair(sym){
+  if(!confirm(`Usunąć ${sym}?`)) return;
+  try { await apiFetch(`/pair/${sym}`,{method:'DELETE'}); } catch {}
+  delete pairs[sym];
+  const el=document.getElementById(`card-${sym}`); if(el) el.remove();
+  if(!Object.keys(pairs).length)
+    document.getElementById('pairs-grid').innerHTML='<div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">Kliknij <strong style="color:var(--orange)">+ DODAJ PARĘ</strong> aby zacząć</div>';
+  toast(`Usunięto ${sym}`,'var(--yellow)');
+}
+
+function renderCard(sym){
+  const grid=document.getElementById('pairs-grid');
+  const ph=grid.querySelector('div[style*="padding:50px"]'); if(ph) ph.remove();
+  const div=document.createElement('div'); div.className='pair-card'; div.id=`card-${sym}`;
+  div.innerHTML=cardHTML(sym); grid.appendChild(div);
+}
+
+function cardHTML(sym){ return `
+  <div class="pair-header" onclick="toggleCard('${sym}')">
+    <div class="pair-hdr-l">
+      <div class="pair-name">${sym}</div>
+      <div class="pair-price" id="pp-${sym}">—</div>
+      <span id="pair-meta-${sym}" style="font-family:var(--mono);font-size:.6rem;color:var(--text2);background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:3px">—</span>
+      <span class="schip NONE" id="sc-${sym}">— CZEKAM</span>
+    </div>
+    <div class="pair-hdr-r">
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();testPair('${sym}')">TEST</button>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();resetPyramid('${sym}')">RESET</button>
+      <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removePair('${sym}')">USUŃ</button>
+      <span class="chevron">▼</span>
+    </div>
+  </div>
+  <div class="collapsible pair-body">
+    <div class="pair-stats">
+      <div class="psc"><div class="psc-l">MACD</div><div class="psc-v o" id="macd-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Signal</div><div class="psc-v p" id="msig-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">EMA10</div><div class="psc-v c" id="ema10-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">EMA30</div><div class="psc-v y" id="ema30-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">TP</div><div class="psc-v g" id="tp-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">SL</div><div class="psc-v r" id="sl-${sym}">—</div></div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">🔺 Piramida wejść</div>
+      <div class="pyr-status" id="pyrs-${sym}">
+        ${[1,2,3].map(i=>`<div class="pec"><div class="pec-n">Poziom ${i}</div><div class="pec-empty">—</div></div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.58rem;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">📂 Otwarte pozycje</div>
+      <div id="pos-${sym}"><div class="no-pos">Brak pozycji</div></div>
+    </div>
+    <div class="panel" style="border-radius:4px">
+      <div class="ph" style="font-size:.55rem">LOGI — ${sym}</div>
+      <div class="log-box" id="log-${sym}"></div>
+    </div>
+  </div>`; }
+
+function toggleCard(sym){ document.getElementById(`card-${sym}`).classList.toggle('collapsed'); }
+
+async function saveAndApply(){
+  const cfg={
+    api_key: document.getElementById('api_key').value.trim(),
+    api_secret: document.getElementById('api_secret').value.trim(),
+    pairs: Object.values(pairs).map(p=>({
+      ...p,
+      interval: document.getElementById('def-interval').value,
+      leverage: parseInt(document.getElementById('def-leverage').value),
+      ema_filter_enabled: document.getElementById('def-ema-sw').classList.contains('on'),
+      ema_window: parseInt(document.getElementById('def-ema-window').value)||5,
+      ma200_enabled: document.getElementById('def-ma200-sw').classList.contains('on'),
+      ma200_tf: document.getElementById('def-ma200-tf').value,
+      tp_pct: parseFloat(document.getElementById('def-tp').value),
+      sl_pct: parseFloat(document.getElementById('def-sl').value),
+      pyramid_levels:[0,1,2,3].map(i=>({
+        enabled: i===0?true:(document.getElementById('def-sw-'+i)?.classList.contains('on')??false),
+        amount_usd: parseFloat(document.getElementById('def-pamt-'+i)?.value)||5,
+        offset_pct: i===0?0:(parseFloat(document.getElementById('def-poff-'+i)?.value)||0.4)
+      }))
+    }))
+  };
+  if(!cfg.api_key||!cfg.api_secret){ toast('Uzupełnij API!','var(--red)'); return; }
+  if(!cfg.pairs.length){ toast('Dodaj parę!','var(--yellow)'); return; }
+  try {
+    const r=await apiFetch('/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
+    if(r.ok){ toast('✅ Zapisano','var(--green)'); await fetchStatus(); }
+    else toast('❌ Błąd zapisu','var(--red)');
+  } catch(e){ if(e.message!=='Unauthorized') toast('❌ Brak połączenia','var(--red)'); }
+}
+
+async function loadConfig(){
+  try {
+    const r=await apiFetch('/config'); if(!r.ok) return;
+    const d=await r.json();
+    if(d.api_key) document.getElementById('api_key').value=d.api_key;
+    if(d.api_secret) document.getElementById('api_secret').value=d.api_secret;
+    if(d.pairs&&d.pairs.length){
+      d.pairs.forEach(ps=>{ pairs[ps.symbol]=ps; if(!document.getElementById(`card-${ps.symbol}`)) renderCard(ps.symbol); });
+      const p=d.pairs[0];
+      if(p){
+        document.getElementById('def-interval').value=p.interval||'Min15';
+        document.getElementById('def-leverage').value=p.leverage||10;
+        document.getElementById('def-tp').value=p.tp_pct||0.8;
+        document.getElementById('def-sl').value=p.sl_pct||0.4;
+        document.getElementById('def-ema-window').value=p.ema_window||5;
+        if(p.ema_filter_enabled){ document.getElementById('def-ema-sw').classList.add('on'); document.getElementById('def-ema-en').value='1'; }
+        if(p.ma200_enabled){ document.getElementById('def-ma200-sw').classList.add('on'); document.getElementById('def-ma200-en').value='1'; }
+        if(p.pyramid_levels){ p.pyramid_levels.forEach((lvl,i)=>{ pyrEnabled.def[i]=lvl.enabled; }); initDefPyr();
+          p.pyramid_levels.forEach((lvl,i)=>{ const amt=document.getElementById(`def-pamt-${i}`); const off=document.getElementById(`def-poff-${i}`); if(amt) amt.value=lvl.amount_usd; if(off) off.value=lvl.offset_pct; }); }
+      }
+    }
+  } catch {}
+}
+
+async function startBot(){ await saveAndApply(); try { const r=await apiFetch('/start',{method:'POST'}); const d=await r.json(); if(d.ok) toast('🚀 Bot uruchomiony','var(--green)'); else toast(d.msg||'Błąd','var(--red)'); } catch {} }
+async function stopBot(){ try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {} }
+async function setMaxPositions(val){ try { await apiFetch('/max_positions/'+parseInt(val),{method:'POST'}); toast(`Max: ${val}`,'var(--cyan)'); } catch {} }
+async function toggleTpSl(){ const btn=document.getElementById('btn-tpsl'); const isOn=btn.textContent.includes('ON'); const val=isOn?0:1; try { await apiFetch('/tp_sl/'+val,{method:'POST'}); btn.textContent=val?'🛡️ TP/SL ON':'🛡️ TP/SL OFF'; btn.style.color=val?'':'var(--red)'; toast(val?'🛡️ TP/SL włączone':'⛔ TP/SL wyłączone',val?'var(--green)':'var(--red)'); } catch {} }
+async function toggleHedging(){ const btn=document.getElementById('btn-hedge'); const isOn=btn.classList.contains('btn-go'); const val=isOn?0:1; try { await apiFetch('/hedging/'+val,{method:'POST'}); if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚡ HEDGE ON'; toast('⚡ Hedging ON','var(--yellow)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚡ HEDGE'; toast('⚡ Hedging OFF','var(--cyan)'); } } catch {} }
+async function toggleMarginMode(){ const btn=document.getElementById('btn-margin'); const isCross=btn.textContent.includes('CROSS'); const val=isCross?1:2; try { await apiFetch('/margin_mode/'+val,{method:'POST'}); btn.textContent=val===1?'🔒 ISOLATED':'🔓 CROSS'; toast(`Tryb: ${val===1?'Isolated':'Cross'}`,'var(--cyan)'); } catch {} }
+async function toggleSignalsOnly(){ const btn=document.getElementById('btn-signals'); const isActive=btn.classList.contains('btn-go'); const enabled=isActive?0:1; try { await apiFetch(`/signals_only/${enabled}`,{method:'POST'}); if(enabled){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='📡 SYGNAŁY ON'; toast('📡 Tryb sygnałów','var(--yellow)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='📡 SYGNAŁY'; toast('🚀 Tryb tradingu','var(--green)'); } } catch {} }
+async function testPair(sym){ toast(`▶ Test ${sym}…`,'var(--cyan)'); try { await apiFetch(`/test/${sym}`,{method:'POST'}); toast(`✅ ${sym} OK`); } catch {} }
+async function resetPyramid(sym){ try { await apiFetch(`/reset_pyramid/${sym}`,{method:'POST'}); toast(`🔄 ${sym} reset`,'var(--yellow)'); } catch {} }
+
+function applyStatus(data){
+  const running=data.running;
+  const pill=document.getElementById('status-pill'); const pip=document.getElementById('pip');
+  pill.className=`pill ${running?'on':'off'}`;
+  document.getElementById('status-txt').textContent=running?'AKTYWNY':'ZATRZYMANY';
+  if(running) pip.classList.add('blink'); else pip.classList.remove('blink');
+  document.getElementById('btn-start').disabled=running;
+  document.getElementById('btn-stop').disabled=!running;
+  renderGlobalLogs(data.global_logs);
+  const marginBtn=document.getElementById('btn-margin'); if(marginBtn) marginBtn.textContent=data.margin_mode===2?'🔓 CROSS':'🔒 ISOLATED';
+  const maxPosEl=document.getElementById('max-positions'); if(maxPosEl&&data.max_positions) maxPosEl.value=data.max_positions;
+  const tpslBtn=document.getElementById('btn-tpsl'); if(tpslBtn){ tpslBtn.textContent=data.tp_sl_enabled===false?'🛡️ TP/SL OFF':'🛡️ TP/SL ON'; tpslBtn.style.color=data.tp_sl_enabled===false?'var(--red)':''; }
+  const hedgeBtn=document.getElementById('btn-hedge'); if(hedgeBtn){ if(data.hedging_enabled){ hedgeBtn.classList.remove('btn-outline'); hedgeBtn.classList.add('btn-go'); hedgeBtn.textContent='⚡ HEDGE ON'; } else { hedgeBtn.classList.remove('btn-go'); hedgeBtn.classList.add('btn-outline'); hedgeBtn.textContent='⚡ HEDGE'; } }
+  const sigBtn=document.getElementById('btn-signals'); if(sigBtn){ if(data.signals_only){ sigBtn.classList.remove('btn-outline'); sigBtn.classList.add('btn-go'); sigBtn.textContent='📡 SYGNAŁY ON'; } else { sigBtn.classList.remove('btn-go'); sigBtn.classList.add('btn-outline'); sigBtn.textContent='📡 SYGNAŁY'; } }
+
+  (data.pairs||[]).forEach(ps=>{
+    const sym=ps.symbol;
+    if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
+    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    const metaStr=`${ivMap[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction} • TP:${ps.tp_pct}% SL:${ps.sl_pct}%`;
+    setText(`pair-meta-${sym}`,metaStr);
+    setText(`pp-${sym}`,ps.last_price?Number(ps.last_price).toLocaleString():'—');
+    const labels={LONG:'▲ LONG',SHORT:'▼ SHORT',WAIT:'◆ CZEKAM',NONE:'— CZEKAM'};
+    const sc=document.getElementById(`sc-${sym}`); if(sc){ sc.className=`schip ${ps.last_signal_dir||'NONE'}`; sc.textContent=labels[ps.last_signal_dir]||'—'; }
+    const card=document.getElementById(`card-${sym}`); if(card){ card.classList.remove('long-active','short-active'); if(ps.pyramid?.active) card.classList.add(ps.pyramid.side==='LONG'?'long-active':'short-active'); }
+    if(ps.last_macd!=null){ const el=document.getElementById(`macd-${sym}`); if(el){ el.textContent=ps.last_macd.toFixed(5); el.className=`psc-v ${ps.last_macd>=0?'g':'r'}`; } }
+    if(ps.last_signal_line!=null){ const el=document.getElementById(`msig-${sym}`); if(el){ el.textContent=ps.last_signal_line.toFixed(5); el.className=`psc-v ${ps.last_signal_line>=0?'g':'r'}`; } }
+    setText(`ema10-${sym}`,ps.last_ema10??'—');
+    setText(`ema30-${sym}`,ps.last_ema30??'—');
+    setText(`tp-${sym}`,ps.current_tp?ps.current_tp.toFixed(4):'—');
+    setText(`sl-${sym}`,ps.current_sl?ps.current_sl.toFixed(4):'—');
+    const pyrEl=document.getElementById(`pyrs-${sym}`);
+    if(pyrEl&&ps.pyramid){ pyrEl.innerHTML=[0,1,2,3].map(i=>{ const e=ps.pyramid.entries?.[i]; if(e){ const cls=e.side==='LONG'?'fl':'fs'; const pc=e.side==='LONG'?'g':'r'; return `<div class="pec ${cls}"><div class="pec-n">Poziom ${i+1} • ${e.time}</div><div class="pec-p ${pc}">${e.price}</div><div class="pec-info">Vol:${e.vol} • ${e.side}</div></div>`; } return `<div class="pec"><div class="pec-n">Poziom ${i+1}</div><div class="pec-empty">—</div></div>`; }).join(''); }
+    renderPositions(sym,ps.open_positions);
+    renderLogs(`log-${sym}`,ps.logs);
+  });
+}
+
+function renderPositions(sym,pos){ const wrap=document.getElementById(`pos-${sym}`); if(!wrap) return; if(!pos||!pos.length){ wrap.innerHTML='<div class="no-pos">Brak pozycji</div>'; return; } const rows=pos.map(p=>{ const s=p.positionType==1?`<span style="color:var(--green)">LONG</span>`:`<span style="color:var(--red)">SHORT</span>`; const pnl=parseFloat(p.unrealizedProfit||p.unrealizedValue||0); return `<tr><td>${p.symbol}</td><td>${s}</td><td>${p.holdVol}</td><td>${p.openAvgPrice}</td><td style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl.toFixed(4)}</td><td>${p.leverage}x</td></tr>`; }).join(''); wrap.innerHTML=`<table class="pos-table"><thead><tr><th>Symbol</th><th>Strona</th><th>Vol</th><th>Cena</th><th>PnL</th><th>Dźwig.</th></tr></thead><tbody>${rows}</tbody></table>`; }
+function renderLogs(elId,logs){ const el=document.getElementById(elId); if(!el||!logs||!logs.length) return; el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span><span class="ll ${l.level}">${l.level}</span><span class="lm">${l.msg}</span></div>`).join(''); }
+function renderGlobalLogs(logs){ const el=document.getElementById('glog'); if(!el||!logs||!logs.length) return; el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span><span class="ll ${l.level}">${l.level}</span><span class="lm">${l.msg}</span></div>`).join(''); }
+function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+function toast(msg,color='var(--orange)'){ const t=document.getElementById('toast'); t.style.borderLeftColor=color; t.style.color=color; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+async function fetchStatus(){ try { const r=await apiFetch('/status'); if(!r.ok) return; applyStatus(await r.json()); } catch {} }
+async function fetchBalance(){ try { const r=await apiFetch('/balance'); if(!r.ok) return; const d=await r.json(); renderBalance(d.balance||[]); } catch {} }
+function renderBalance(bal){ const el=document.getElementById('balance-box'); if(!el) return; if(!bal.length){ el.innerHTML='<div style="padding:8px 0;color:var(--text2)">Brak środków</div>'; return; } el.innerHTML=bal.map(b=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 0;border-bottom:1px solid var(--b1)"><div><div style="font-size:.52rem;color:var(--text2)">WALUTA</div><div style="font-size:.82rem;font-weight:700;color:var(--orange)">${b.currency}</div></div><div><div style="font-size:.52rem;color:var(--text2)">EQUITY</div><div style="font-size:.82rem;font-weight:700">${b.equity}</div></div><div><div style="font-size:.52rem;color:var(--text2)">DOSTĘPNE</div><div style="font-size:.82rem;font-weight:700;color:var(--green)">${b.available}</div></div><div><div style="font-size:.52rem;color:var(--text2)">PNL</div><div style="font-size:.82rem;font-weight:700;color:${b.unrealized_pnl>=0?'var(--green)':'var(--red)'}">${b.unrealized_pnl}</div></div></div>`).join(''); }
+</script>
+</body>
+</html>
