@@ -297,7 +297,7 @@ class PairState:
         self.bb_period = 20; self.bb_std = 2.0; self.bb_proximity = 0.0; self.bb_breakout_pct = 0.0
         self.stoch_period = 14; self.stoch_smooth_k = 3; self.stoch_smooth_d = 3
         self.stoch_overbought = 80; self.stoch_oversold = 20
-        self.ma200_enabled = False; self.ma200_tf = "Hour1"
+        self.ma200_enabled = False; self.ma200_tf = "Min60"
         self.pyramid_levels = [
             {"enabled": True,  "amount_usd": 10.0, "offset_pct": 0.0},
             {"enabled": True,  "amount_usd": 20.0, "offset_pct": 0.3},
@@ -1021,7 +1021,7 @@ class PairConfig(BaseModel):
     bb_period: int = 20; bb_std: float = 2.0; bb_proximity: float = 0.0; bb_breakout_pct: float = 0.0
     stoch_period: int = 14; stoch_smooth_k: int = 3; stoch_smooth_d: int = 3
     stoch_overbought: int = 80; stoch_oversold: int = 20
-    ma200_enabled: bool = False; ma200_tf: str = "Hour1"
+    ma200_enabled: bool = False; ma200_tf: str = "Min60"
     pyramid_levels: List[PyramidLevelIn] = []
     leverage: int = 10; tp_mode: str = "FROM_AVG"; tp_pct: float = 1.0; sl_pct: float = 1.5
 
