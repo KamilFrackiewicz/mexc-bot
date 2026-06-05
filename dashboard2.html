@@ -173,6 +173,7 @@ input:focus,select:focus{border-color:var(--orange);}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-free" onclick="toggleFreeEntries()">🔄 FREE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
     <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
     <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
@@ -545,6 +546,16 @@ async function loadConfig(){
 async function startBot(){ await saveAndApply(); try { const r=await apiFetch('/start',{method:'POST'}); const d=await r.json(); if(d.ok) toast('🚀 Bot uruchomiony','var(--green)'); else toast(d.msg||'Błąd','var(--red)'); } catch {} }
 async function stopBot(){ try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {} }
 async function setMaxPositions(val){ try { await apiFetch('/max_positions/'+parseInt(val),{method:'POST'}); toast(`Max: ${val}`,'var(--cyan)'); } catch {} }
+async function toggleFreeEntries(){
+  const btn=document.getElementById('btn-free');
+  const isOn=btn.classList.contains('btn-go');
+  const val=isOn?0:1;
+  try {
+    await apiFetch('/free_entries/'+val,{method:'POST'});
+    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='🔄 FREE ON'; toast('🔄 Free entries ON','var(--orange)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='🔄 FREE OFF'; toast('🔄 Free entries OFF','var(--cyan)'); }
+  } catch {}
+}
 async function toggleTpSl(){ const btn=document.getElementById('btn-tpsl'); const isOn=btn.textContent.includes('ON'); const val=isOn?0:1; try { await apiFetch('/tp_sl/'+val,{method:'POST'}); btn.textContent=val?'🛡️ TP/SL ON':'🛡️ TP/SL OFF'; btn.style.color=val?'':'var(--red)'; toast(val?'🛡️ TP/SL włączone':'⛔ TP/SL wyłączone',val?'var(--green)':'var(--red)'); } catch {} }
 async function toggleHedging(){ const btn=document.getElementById('btn-hedge'); const isOn=btn.classList.contains('btn-go'); const val=isOn?0:1; try { await apiFetch('/hedging/'+val,{method:'POST'}); if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚡ HEDGE ON'; toast('⚡ Hedging ON','var(--yellow)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚡ HEDGE'; toast('⚡ Hedging OFF','var(--cyan)'); } } catch {} }
 async function toggleMarginMode(){ const btn=document.getElementById('btn-margin'); const isCross=btn.textContent.includes('CROSS'); const val=isCross?1:2; try { await apiFetch('/margin_mode/'+val,{method:'POST'}); btn.textContent=val===1?'🔒 ISOLATED':'🔓 CROSS'; toast(`Tryb: ${val===1?'Isolated':'Cross'}`,'var(--cyan)'); } catch {} }
@@ -563,6 +574,8 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn=document.getElementById('btn-margin'); if(marginBtn) marginBtn.textContent=data.margin_mode===2?'🔓 CROSS':'🔒 ISOLATED';
   const maxPosEl=document.getElementById('max-positions'); if(maxPosEl&&data.max_positions) maxPosEl.value=data.max_positions;
+  const freeBtn=document.getElementById('btn-free');
+  if(freeBtn){ if(data.free_entries){ freeBtn.classList.remove('btn-outline'); freeBtn.classList.add('btn-go'); freeBtn.textContent='🔄 FREE ON'; } else { freeBtn.classList.remove('btn-go'); freeBtn.classList.add('btn-outline'); freeBtn.textContent='🔄 FREE OFF'; } }
   const tpslBtn=document.getElementById('btn-tpsl'); if(tpslBtn){ tpslBtn.textContent=data.tp_sl_enabled===false?'🛡️ TP/SL OFF':'🛡️ TP/SL ON'; tpslBtn.style.color=data.tp_sl_enabled===false?'var(--red)':''; }
   const hedgeBtn=document.getElementById('btn-hedge'); if(hedgeBtn){ if(data.hedging_enabled){ hedgeBtn.classList.remove('btn-outline'); hedgeBtn.classList.add('btn-go'); hedgeBtn.textContent='⚡ HEDGE ON'; } else { hedgeBtn.classList.remove('btn-go'); hedgeBtn.classList.add('btn-outline'); hedgeBtn.textContent='⚡ HEDGE'; } }
   const sigBtn=document.getElementById('btn-signals'); if(sigBtn){ if(data.signals_only){ sigBtn.classList.remove('btn-outline'); sigBtn.classList.add('btn-go'); sigBtn.textContent='📡 SYGNAŁY ON'; } else { sigBtn.classList.remove('btn-go'); sigBtn.classList.add('btn-outline'); sigBtn.textContent='📡 SYGNAŁY'; } }

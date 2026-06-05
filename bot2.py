@@ -283,6 +283,7 @@ class GlobalState:
         self.margin_mode = 1
         self.tp_sl_enabled = True
         self.hedging_enabled = False
+        self.free_entries = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -315,6 +316,7 @@ def save_config():
         data["margin_mode"] = gstate.margin_mode
         data["tp_sl_enabled"] = gstate.tp_sl_enabled
         data["hedging_enabled"] = gstate.hedging_enabled
+        data["free_entries"] = gstate.free_entries
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
     except Exception as e:
         logger.error(f"Save error: {e}")
@@ -330,6 +332,7 @@ def load_config():
         gstate.margin_mode    = data.get("margin_mode", 1)
         gstate.tp_sl_enabled  = data.get("tp_sl_enabled", True)
         gstate.hedging_enabled = data.get("hedging_enabled", False)
+        gstate.free_entries = data.get("free_entries", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol")
             if not sym: continue
@@ -487,12 +490,12 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         ps.last_signal_dir = signal
 
         ema_str = f" EMA10:{round(ps.last_ema10,4) if ps.last_ema10 else '-'} EMA30:{round(ps.last_ema30,4) if ps.last_ema30 else '-'}"
-        ma_str  = f" MA200:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
+        ma_str  = f" MA200:{round(ps.last_ma200,4) if ps.last_ma200 else 'off'}"
         ps.log(f"P:{price} MACD:{round(ps.last_macd,5)} SIG:{round(ps.last_signal,5)} "
                f"xL:{macd_cross_long} xS:{macd_cross_short}{ema_str}{ma_str} -> {signal}")
 
         # ── Wejście ───────────────────────────────────────────────────────────
-        if signal in ("LONG", "SHORT") and not ps.pyramid_active:
+        if signal in ("LONG", "SHORT") and (not ps.pyramid_active or gstate.free_entries):
             active_count = sum(1 for p in gstate.pairs.values() if p.pyramid_active)
             if active_count >= gstate.max_positions:
                 ps.log(f"Blokada: {active_count}/{gstate.max_positions} pozycji", "WARN")
@@ -858,6 +861,12 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/free_entries/{enabled}")
+async def set_free_entries(enabled: int, _=Depends(require_auth)):
+    gstate.free_entries = bool(enabled)
+    save_config(); gstate.log(f"Free entries: {gstate.free_entries}")
+    return {"ok": True, "free_entries": gstate.free_entries}
+
 @app.post("/api/hedging/{enabled}")
 async def set_hedging(enabled: int, _=Depends(require_auth)):
     gstate.hedging_enabled = bool(enabled)
@@ -872,6 +881,7 @@ def get_status(_=Depends(require_auth)):
             "margin_mode": gstate.margin_mode,
             "tp_sl_enabled": gstate.tp_sl_enabled,
             "hedging_enabled": gstate.hedging_enabled,
+            "free_entries": gstate.free_entries,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
