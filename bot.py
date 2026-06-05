@@ -852,9 +852,7 @@ def _open_hedge_level(client, ps, side, price):
         tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode, price_prec)
         ps.hedge_current_tp = tp_price; ps.hedge_current_sl = sl_price
         ps.log(f"HEDGE {side} | Cena:{exec_price} | TP:{tp_price} | SL:{sl_price} | Dok:{len(limit_ids)}", "SUCCESS")
-        tg(f"⚡ <b>{ps.symbol}</b> HEDGE {side}
-Cena: {exec_price}
-TP: {tp_price} | SL: {sl_price}")
+        tg(f"⚡ <b>{ps.symbol}</b> HEDGE {side}\nCena: {exec_price}\nTP: {tp_price} | SL: {sl_price}")
     except Exception as e:
         ps.log(f"HEDGE blad: {e}", "ERROR")
 
@@ -963,8 +961,7 @@ async def pyramid_monitor_loop():
                             if h_tp or h_sl:
                                 reason = "TP" if h_tp else "SL"
                                 ps.log(f"HEDGE {reason} @ {price} (TP:{ps.hedge_current_tp} SL:{ps.hedge_current_sl})", "SUCCESS")
-                                tg(f"{'✅' if reason=='TP' else '❌'} <b>{ps.symbol}</b> HEDGE {reason}
-Cena: {price}")
+                                tg(f"{'✅' if reason=='TP' else '❌'} <b>{ps.symbol}</b> HEDGE {reason}\nCena: {price}")
                                 h_pos_type = 1 if ps.hedge_side == "LONG" else 2
                                 for pos in all_pos:
                                     if pos.get("symbol") == ps.symbol and pos.get("positionType") == h_pos_type:
