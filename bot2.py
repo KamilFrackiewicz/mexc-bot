@@ -191,7 +191,7 @@ class PairState:
         self.interval = "Min15"; self.direction = "BOTH"
         self.ema_filter_enabled = False
         self.ema_window = 5
-        self.ma200_enabled = False; self.ma200_tf = "Hour1"
+        self.ma200_enabled = False; self.ma200_tf = "Min60"
         self.pyramid_levels = [
             {"enabled": True,  "amount_usd": 5.0,  "offset_pct": 0.0},
             {"enabled": False, "amount_usd": 5.0,  "offset_pct": 0.4},
