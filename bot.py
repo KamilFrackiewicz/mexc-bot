@@ -316,6 +316,11 @@ class PairState:
         self.current_sl: Optional[float] = None
         self.pyramid_limit_order_ids: List = []
         self.open_positions = []; self.logs: List[dict] = []
+        self.hedge_entries: List[PyramidEntry] = []
+        self.hedge_active = False; self.hedge_side = None
+        self.hedge_current_tp: Optional[float] = None
+        self.hedge_current_sl: Optional[float] = None
+        self.hedge_limit_order_ids: List = []
 
     def log(self, msg, level="INFO"):
         self.logs.insert(0, {"time": datetime.now().strftime("%H:%M:%S"),
@@ -343,6 +348,10 @@ class PairState:
     def reset_pyramid(self):
         self.pyramid_entries = []; self.pyramid_active = False; self.pyramid_side = None
         self.pyramid_limit_order_ids = []
+
+    def reset_hedge(self):
+        self.hedge_entries = []; self.hedge_active = False; self.hedge_side = None
+        self.hedge_limit_order_ids = []
 
     def to_dict(self):
         return {
@@ -391,6 +400,8 @@ class GlobalState:
         self.signals_only = False
         self.max_positions = 1
         self.margin_mode = 1  # 1=Isolated, 2=Cross
+        self.tp_sl_enabled = True
+        self.hedging_enabled = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -425,6 +436,8 @@ def save_config():
         data["signals_only"] = gstate.signals_only
         data["max_positions"] = gstate.max_positions
         data["margin_mode"] = gstate.margin_mode
+        data["tp_sl_enabled"] = gstate.tp_sl_enabled
+        data["hedging_enabled"] = gstate.hedging_enabled
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -439,6 +452,8 @@ def load_config():
         gstate.signals_only = data.get("signals_only", False)
         gstate.max_positions = data.get("max_positions", 1)
         gstate.margin_mode = data.get("margin_mode", 1)
+        gstate.tp_sl_enabled = data.get("tp_sl_enabled", True)
+        gstate.hedging_enabled = data.get("hedging_enabled", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -598,8 +613,12 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                    f"MA200: {round(ps.last_ma200,0) if ps.last_ma200 else 'off'}")
             else:
                 _open_pyramid_level(client, ps, signal, price, 0)
+        elif gstate.hedging_enabled and signal in ("LONG","SHORT") and ps.pyramid_active and ps.pyramid_side != signal and not ps.hedge_active:
+            _open_hedge_level(client, ps, signal, price)
         elif ps.pyramid_active and ps.pyramid_side == signal:
             _check_pyramid_continuation(client, ps, price)
+        elif gstate.hedging_enabled and ps.hedge_active and ps.hedge_side == signal:
+            _check_hedge_continuation(client, ps, price)
 
     except Exception as e:
         ps.log(f"Błąd: {e}", "ERROR")
@@ -730,31 +749,30 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ps.current_sl = sl_price
 
         # Ustaw SL w MEXC przez stoporder/place z positionId
-        try:
-            import time as _time
-            _time.sleep(1.0)
-            positions = client.get_positions(ps.symbol)
-            if positions:
-                pos_id = positions[0].get("positionId")
-                hold_vol = positions[0].get("holdVol", 0)
-                pos_type = positions[0].get("positionType", 1)
-                price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
-                sl_result = client._post("/api/v1/private/stoporder/place", {
-                    "positionId": pos_id,
-                    "symbol": ps.symbol,
-                    "vol": hold_vol,
-                    "lossTrend": 1,
-                    "profitTrend": 1,
-                    "stopLossPrice": round(sl_price, price_prec)
-                })
-                if sl_result.get("success"):
-                    ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
+        if not gstate.tp_sl_enabled:
+            ps.log(f"TP/SL wyłączone — pozycja bez SL w MEXC", "WARN")
+        else:
+            try:
+                import time as _time
+                _time.sleep(1.0)
+                positions = client.get_positions(ps.symbol)
+                if positions:
+                    pos_id = positions[0].get("positionId")
+                    hold_vol = positions[0].get("holdVol", 0)
+                    pos_type = positions[0].get("positionType", 1)
+                    price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
+                    sl_result = client._post("/api/v1/private/stoporder/place", {
+                        "positionId": pos_id, "symbol": ps.symbol, "vol": hold_vol,
+                        "lossTrend": 1, "profitTrend": 1, "stopLossPrice": round(sl_price, price_prec)
+                    })
+                    if sl_result.get("success"):
+                        ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
+                    else:
+                        ps.log(f"Blad SL/TP MEXC: {sl_result.get('message')} — bot monitoruje", "WARN")
                 else:
-                    ps.log(f"Blad SL/TP MEXC: {sl_result.get('message')} — bot monitoruje", "WARN")
-            else:
-                ps.log(f"Brak pozycji — bot monitoruje SL @ {sl_price}", "WARN")
-        except Exception as e:
-            ps.log(f"Blad SL MEXC: {e}", "WARN")
+                    ps.log(f"Brak pozycji — bot monitoruje SL @ {sl_price}", "WARN")
+            except Exception as e:
+                ps.log(f"Blad SL MEXC: {e}", "WARN")
 
         ps.log(
             f"Poz.1/{len(active)} {side} | Cena:{exec_price} | Vol:{vol0} | "
@@ -806,6 +824,65 @@ def _check_pyramid_continuation(client, ps, price):
         ps.log(f"check_continuation blad: {e}", "ERROR")
 
 
+def _open_hedge_level(client, ps, side, price):
+    """Otwiera hedge pozycję (przeciwna strona)"""
+    active = [l for l in ps.pyramid_levels if l.get("enabled", True)]
+    if not active: return
+    lvl = active[0]
+    try:
+        ticker = client.get_ticker(ps.symbol)
+        exec_price = float(ticker.get("lastPrice", price))
+        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0, "TRX_USDT": 10.0, "LTC_USDT": 0.01, "AVAX_USDT": 0.1, "ONDO_USDT": 10.0, "UNI_USDT": 0.1, "TAO_USDT": 0.01, "XAU_USDT": 0.001, "ARB_USDT": 1.0, "GALA_USDT": 10.0, "ATOM_USDT": 0.1, "DOT_USDT": 0.1, "ALGO_USDT": 1.0, "JUP_USDT": 10.0, "KAITO_USDT": 1.0, "PENGU_USDT": 10.0, "WLFI_USDT": 1.0, "BCH_USDT": 0.01}.get(ps.symbol, 1.0)
+        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
+        vol0 = max(1, round(lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)))
+        result = client.place_order(ps.symbol, 1 if side == "LONG" else 3, vol0, ps.leverage, None, None)
+        if not result.get("success", False):
+            ps.log(f"HEDGE odrzucony: {result.get('message','')}", "ERROR"); return
+        ps.hedge_entries.append(PyramidEntry(exec_price, vol0, side))
+        ps.hedge_active = True; ps.hedge_side = side
+        limit_ids = []; last_dok_price = exec_price
+        for i, dok_lvl in enumerate(active[1:], start=1):
+            dok_price = round(last_dok_price * (1 - dok_lvl["offset_pct"]/100) if side == "LONG" else last_dok_price * (1 + dok_lvl["offset_pct"]/100), price_prec)
+            dok_vol = max(1, round(dok_lvl["amount_usd"] / (dok_price * contract_size / ps.leverage)))
+            dr = client._post("/api/v1/private/order/submit", {"symbol": ps.symbol, "side": 1 if side=="LONG" else 3, "openType": gstate.margin_mode, "type": 1, "vol": dok_vol, "leverage": ps.leverage, "price": dok_price})
+            if dr.get("success"): limit_ids.append(dr.get("data")); last_dok_price = dok_price
+            time.sleep(2.0)
+        ps.hedge_limit_order_ids = limit_ids
+        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct, price_prec)
+        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode, price_prec)
+        ps.hedge_current_tp = tp_price; ps.hedge_current_sl = sl_price
+        ps.log(f"HEDGE {side} | Cena:{exec_price} | TP:{tp_price} | SL:{sl_price} | Dok:{len(limit_ids)}", "SUCCESS")
+        tg(f"⚡ <b>{ps.symbol}</b> HEDGE {side}
+Cena: {exec_price}
+TP: {tp_price} | SL: {sl_price}")
+    except Exception as e:
+        ps.log(f"HEDGE blad: {e}", "ERROR")
+
+
+def _check_hedge_continuation(client, ps, price):
+    """Sprawdza dokładki hedge pozycji"""
+    try:
+        positions = client.get_positions(ps.symbol)
+        if not positions: return
+        h_type = 1 if ps.hedge_side == "LONG" else 2
+        h_pos = [p for p in positions if p.get("positionType") == h_type]
+        if not h_pos: return
+        pos = h_pos[0]; hold_vol = pos.get("holdVol", 0)
+        active = [l for l in ps.pyramid_levels if l.get("enabled", True)]
+        known_vol = sum(e.vol for e in ps.hedge_entries)
+        if hold_vol > known_vol and len(ps.hedge_entries) < len(active):
+            new_vol = hold_vol - known_vol
+            exec_price = float(pos.get("openAvgPrice", price))
+            ps.hedge_entries.append(PyramidEntry(exec_price, new_vol, ps.hedge_side))
+            ps.log(f"HEDGE Dokladka {len(ps.hedge_entries)}/{len(active)} @ {exec_price}", "SUCCESS")
+            price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
+            last_price = ps.hedge_entries[-1].price
+            ps.hedge_current_tp = _calc_tp(last_price, last_price, ps.hedge_side, ps.tp_pct, ps.tp_mode, price_prec)
+            ps.log(f"HEDGE TP zaktualizowany: {ps.hedge_current_tp}")
+    except Exception as e:
+        ps.log(f"HEDGE check blad: {e}", "ERROR")
+
+
 # ─── BOT LOOP ────────────────────────────────────────────────────────────────
 
 async def pyramid_monitor_loop():
@@ -821,7 +898,7 @@ async def pyramid_monitor_loop():
         try:
             client  = MEXCClient(gstate.api_key, gstate.api_secret)
             actives = [ps for ps in gstate.pairs.values()
-                       if ps.enabled and ps.pyramid_active]
+                       if ps.enabled and (ps.pyramid_active or (gstate.hedging_enabled and ps.hedge_active))]
             for ps in actives:
                 try:
                     ticker = client.get_ticker(ps.symbol)
@@ -833,7 +910,7 @@ async def pyramid_monitor_loop():
                     _check_pyramid_continuation(client, ps, price)
 
                     # Sprawdz TP/SL z pamieci bota
-                    if ps.current_tp and ps.current_sl and ps.pyramid_side:
+                    if gstate.tp_sl_enabled and ps.current_tp and ps.current_sl and ps.pyramid_side:
                         tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG"
                                   else price <= ps.current_tp)
                         sl_hit = (price <= ps.current_sl if ps.pyramid_side == "LONG"
@@ -877,6 +954,30 @@ async def pyramid_monitor_loop():
                         ps.current_sl = None
                     else:
                         ps.open_positions = current
+                    # Hedge monitoring
+                    if gstate.hedging_enabled and ps.hedge_active:
+                        _check_hedge_continuation(client, ps, price)
+                        if gstate.tp_sl_enabled and ps.hedge_current_tp and ps.hedge_current_sl:
+                            h_tp = (price >= ps.hedge_current_tp if ps.hedge_side == "LONG" else price <= ps.hedge_current_tp)
+                            h_sl = (price <= ps.hedge_current_sl if ps.hedge_side == "LONG" else price >= ps.hedge_current_sl)
+                            if h_tp or h_sl:
+                                reason = "TP" if h_tp else "SL"
+                                ps.log(f"HEDGE {reason} @ {price} (TP:{ps.hedge_current_tp} SL:{ps.hedge_current_sl})", "SUCCESS")
+                                tg(f"{'✅' if reason=='TP' else '❌'} <b>{ps.symbol}</b> HEDGE {reason}
+Cena: {price}")
+                                h_pos_type = 1 if ps.hedge_side == "LONG" else 2
+                                for pos in all_pos:
+                                    if pos.get("symbol") == ps.symbol and pos.get("positionType") == h_pos_type:
+                                        client.close_position(ps.symbol, h_pos_type, pos.get("holdVol",0), ps.leverage)
+                                try: client._post("/api/v1/private/order/cancel_all", {"symbol": ps.symbol})
+                                except: pass
+                                ps.reset_hedge(); ps.hedge_current_tp = None; ps.hedge_current_sl = None
+                        else:
+                            h_pos_type = 1 if ps.hedge_side == "LONG" else 2
+                            h_current = [p for p in all_pos if p.get("symbol") == ps.symbol and p.get("positionType") == h_pos_type]
+                            if not h_current:
+                                ps.log("HEDGE pozycja zamknieta (MEXC) - resetuje", "SUCCESS")
+                                ps.reset_hedge(); ps.hedge_current_tp = None; ps.hedge_current_sl = None
                 except Exception as e:
                     ps.log(f"Monitor blad: {e}", "ERROR")
                 await asyncio.sleep(0.3)
@@ -1003,6 +1104,20 @@ async def set_max_positions(val: int, _=Depends(require_auth)):
     gstate.log(f"Maks. pozycji: {gstate.max_positions}")
     return {"ok": True, "max_positions": gstate.max_positions}
 
+@app.post("/api/tp_sl/{enabled}")
+async def set_tp_sl(enabled: int, _=Depends(require_auth)):
+    gstate.tp_sl_enabled = bool(enabled)
+    mode = "✅ TP/SL włączone" if gstate.tp_sl_enabled else "⛔ TP/SL wyłączone"
+    save_config(); gstate.log(mode); tg(mode)
+    return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
+
+@app.post("/api/hedging/{enabled}")
+async def set_hedging(enabled: int, _=Depends(require_auth)):
+    gstate.hedging_enabled = bool(enabled)
+    mode = "⚡ Hedging włączony" if gstate.hedging_enabled else "⚡ Hedging wyłączony"
+    save_config(); gstate.log(mode)
+    return {"ok": True, "hedging_enabled": gstate.hedging_enabled}
+
 @app.post("/api/signals_only/{enabled}")
 async def set_signals_only(enabled: int, _=Depends(require_auth)):
     gstate.signals_only = bool(enabled)
@@ -1018,6 +1133,8 @@ def get_status(_=Depends(require_auth)):
             "signals_only": gstate.signals_only,
             "max_positions": gstate.max_positions,
             "margin_mode": gstate.margin_mode,
+            "tp_sl_enabled": gstate.tp_sl_enabled,
+            "hedging_enabled": gstate.hedging_enabled,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
