@@ -536,6 +536,7 @@ async function loadConfig(){
         document.getElementById('def-ema-window').value=p.ema_window||5;
         if(p.ema_filter_enabled){ document.getElementById('def-ema-sw').classList.add('on'); document.getElementById('def-ema-en').value='1'; }
         if(p.ma200_enabled){ document.getElementById('def-ma200-sw').classList.add('on'); document.getElementById('def-ma200-en').value='1'; }
+        if(p.ma200_tf) document.getElementById('def-ma200-tf').value=p.ma200_tf;
         if(p.pyramid_levels){ p.pyramid_levels.forEach((lvl,i)=>{ pyrEnabled.def[i]=lvl.enabled; }); initDefPyr();
           p.pyramid_levels.forEach((lvl,i)=>{ const amt=document.getElementById(`def-pamt-${i}`); const off=document.getElementById(`def-poff-${i}`); if(amt) amt.value=lvl.amount_usd; if(off) off.value=lvl.offset_pct; }); }
       }
