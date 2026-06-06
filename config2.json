@@ -10,7 +10,7 @@
       "ema_filter_enabled": false,
       "ema_window": 5,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Hour4",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -45,7 +45,7 @@
       "ema_filter_enabled": false,
       "ema_window": 5,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Hour4",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -80,7 +80,7 @@
       "ema_filter_enabled": false,
       "ema_window": 5,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Hour4",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -115,7 +115,7 @@
       "ema_filter_enabled": false,
       "ema_window": 5,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Hour4",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -144,9 +144,9 @@
     }
   ],
   "signals_only": false,
-  "max_positions": 2,
+  "max_positions": 4,
   "margin_mode": 2,
-  "tp_sl_enabled": false,
+  "tp_sl_enabled": true,
   "hedging_enabled": false,
-  "free_entries": true
+  "free_entries": false
 }
