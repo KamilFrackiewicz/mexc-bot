@@ -5,7 +5,7 @@
     {
       "symbol": "XRP_USDT",
       "enabled": true,
-      "interval": "Hour4",
+      "interval": "Min60",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 5,
@@ -33,14 +33,14 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 31,
+      "leverage": 12,
       "tp_pct": 1.0,
       "sl_pct": 1.0
     },
     {
       "symbol": "BTC_USDT",
       "enabled": true,
-      "interval": "Hour4",
+      "interval": "Min60",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 5,
@@ -68,14 +68,14 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 31,
+      "leverage": 12,
       "tp_pct": 1.0,
       "sl_pct": 1.0
     },
     {
       "symbol": "ETH_USDT",
       "enabled": true,
-      "interval": "Hour4",
+      "interval": "Min60",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 5,
@@ -103,14 +103,14 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 31,
+      "leverage": 12,
       "tp_pct": 1.0,
       "sl_pct": 1.0
     },
     {
       "symbol": "SOL_USDT",
       "enabled": true,
-      "interval": "Hour4",
+      "interval": "Min60",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 5,
@@ -138,7 +138,7 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 31,
+      "leverage": 12,
       "tp_pct": 1.0,
       "sl_pct": 1.0
     }

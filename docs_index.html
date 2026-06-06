@@ -1,0 +1,503 @@
+cat > /var/www/html/docs/index.html << 'ENDOFFILE'
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>46ent Trading Bot — Dokumentacja</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
+:root {
+  --bg:#07090e;--s1:#0c1018;--s2:#111826;
+  --b1:#1a2840;--b2:#243550;
+  --cyan:#00ddff;--cyan2:rgba(0,221,255,.1);
+  --green:#00ff9d;--green2:rgba(0,255,157,.1);
+  --red:#ff3355;--red2:rgba(255,51,85,.1);
+  --yellow:#ffcc00;--yellow2:rgba(255,204,0,.1);
+  --purple:#a78bfa;--purple2:rgba(167,139,250,.1);
+  --orange:#ff9500;--orange2:rgba(255,149,0,.1);
+  --text:#c0d4e8;--text2:#4a6a85;
+  --mono:'JetBrains Mono',monospace;--sans:'Barlow',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;
+  background-image:radial-gradient(ellipse 70% 50% at 0 0,rgba(0,221,255,.03) 0,transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%,rgba(167,139,250,.03) 0,transparent 55%);}
+
+header{display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:60px;background:rgba(7,9,14,.97);
+  border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:200;
+  backdrop-filter:blur(20px);}
+.logo{font-family:var(--mono);font-size:.85rem;font-weight:700;
+  letter-spacing:.22em;color:var(--cyan);}
+.nav{display:flex;gap:8px;}
+.nav a{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--text2);
+  text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;
+  transition:all .2s;}
+.nav a:hover,.nav a.active{color:var(--cyan);border-color:var(--cyan);background:var(--cyan2);}
+.nav a.bb{color:var(--cyan);}
+.nav a.tt{color:var(--orange);border-color:var(--b1);}
+.nav a.tt:hover{color:var(--orange);border-color:var(--orange);background:var(--orange2);}
+
+.hero{text-align:center;padding:80px 32px 60px;
+  background:linear-gradient(180deg,rgba(0,221,255,.05) 0,transparent 100%);}
+.hero-title{font-family:var(--mono);font-size:2rem;font-weight:700;
+  letter-spacing:.1em;color:var(--cyan);margin-bottom:16px;}
+.hero-sub{font-size:1.1rem;color:var(--text2);max-width:600px;margin:0 auto 32px;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:12px 24px;border-radius:3px;
+  text-decoration:none;transition:all .15s;border:none;cursor:pointer;}
+.btn-cyan{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(0,221,255,.3);}
+.btn-cyan:hover{box-shadow:0 0 32px rgba(0,221,255,.5);transform:translateY(-1px);}
+.btn-orange{background:var(--orange);color:#000;box-shadow:0 0 20px rgba(255,149,0,.3);}
+.btn-orange:hover{box-shadow:0 0 32px rgba(255,149,0,.5);transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--b1);}
+.btn-outline:hover{color:var(--cyan);border-color:var(--cyan);}
+
+.container{max-width:1100px;margin:0 auto;padding:0 32px 80px;}
+
+.section{margin-bottom:64px;}
+.section-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:24px;
+  display:flex;align-items:center;gap:12px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--b1);}
+
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;margin-bottom:16px;}
+.card-header{padding:16px 24px;background:var(--s2);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;gap:12px;}
+.card-title{font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--text);}
+.card-tag{font-family:var(--mono);font-size:.55rem;letter-spacing:.14em;
+  padding:3px 10px;border-radius:10px;}
+.tag-bb{background:var(--cyan2);color:var(--cyan);border:1px solid rgba(0,221,255,.3);}
+.tag-tt{background:var(--orange2);color:var(--orange);border:1px solid rgba(255,149,0,.3);}
+.tag-both{background:var(--purple2);color:var(--purple);border:1px solid rgba(167,139,250,.3);}
+.card-body{padding:24px;}
+.card-body p{color:var(--text);line-height:1.7;margin-bottom:12px;font-size:.95rem;}
+.card-body p:last-child{margin-bottom:0;}
+
+.rule-list{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.rule{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+  background:var(--s2);border-radius:4px;border-left:3px solid var(--b2);}
+.rule.long{border-left-color:var(--green);}
+.rule.short{border-left-color:var(--red);}
+.rule.info{border-left-color:var(--cyan);}
+.rule.warn{border-left-color:var(--yellow);}
+.rule-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.rule-text{font-size:.88rem;color:var(--text);line-height:1.6;}
+.rule-text strong{color:var(--cyan);font-family:var(--mono);font-size:.8rem;}
+
+.params-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:16px;}
+.param{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:14px 16px;}
+.param-name{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--cyan);margin-bottom:6px;}
+.param-name.orange{color:var(--orange);}
+.param-desc{font-size:.83rem;color:var(--text2);line-height:1.5;}
+.param-val{font-family:var(--mono);font-size:.65rem;color:var(--green);margin-top:4px;}
+
+.btn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:16px;}
+.btn-doc{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:14px 16px;}
+.btn-doc-name{font-family:var(--mono);font-size:.72rem;font-weight:700;margin-bottom:6px;}
+.btn-doc-name.c{color:var(--cyan);}
+.btn-doc-name.g{color:var(--green);}
+.btn-doc-name.r{color:var(--red);}
+.btn-doc-name.y{color:var(--yellow);}
+.btn-doc-name.o{color:var(--orange);}
+.btn-doc-name.p{color:var(--purple);}
+.btn-doc-desc{font-size:.83rem;color:var(--text2);line-height:1.5;}
+
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px;}
+.flow-step{background:var(--s2);border:1px solid var(--b1);border-radius:4px;
+  padding:8px 14px;font-family:var(--mono);font-size:.65rem;color:var(--text);}
+.flow-arrow{color:var(--text2);font-size:.8rem;}
+.flow-step.highlight{border-color:var(--cyan);color:var(--cyan);background:var(--cyan2);}
+
+.warning-box{background:rgba(255,204,0,.05);border:1px solid rgba(255,204,0,.3);
+  border-radius:6px;padding:16px 20px;margin-top:16px;display:flex;gap:12px;align-items:flex-start;}
+.warning-box p{color:var(--yellow);font-size:.88rem;line-height:1.6;margin:0;}
+
+.tip-box{background:rgba(0,221,255,.05);border:1px solid rgba(0,221,255,.2);
+  border-radius:6px;padding:16px 20px;margin-top:16px;display:flex;gap:12px;align-items:flex-start;}
+.tip-box p{color:var(--cyan);font-size:.88rem;line-height:1.6;margin:0;}
+
+table{width:100%;border-collapse:collapse;margin-top:16px;}
+th{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text2);padding:10px 14px;text-align:left;
+  border-bottom:1px solid var(--b1);background:var(--s2);}
+td{padding:10px 14px;border-bottom:1px solid rgba(26,40,64,.5);
+  font-size:.85rem;color:var(--text);}
+td:first-child{font-family:var(--mono);font-size:.72rem;color:var(--cyan);}
+tr:hover td{background:rgba(255,255,255,.02);}
+
+footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
+  font-family:var(--mono);font-size:.6rem;color:var(--text2);letter-spacing:.1em;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">▣ 46ENT TRADING BOT</div>
+  <div class="nav">
+    <a href="/" class="bb">▣ BB+StochRSI</a>
+    <a href="/tiktak" class="tt">▣ TikTak MACD</a>
+    <a href="/docs" class="active">📖 Dokumentacja</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">▣ Trading 46ent Bot</div>
+  <div class="hero-sub">Automatyczny bot do tradingu kontraktami futures na giełdzie MEXC. Dwie niezależne strategie, piramida wejść, hedging i pełna kontrola z poziomu dashboardu.</div>
+  <div class="hero-btns">
+    <a href="/" class="btn btn-cyan">▣ Bot BB+StochRSI</a>
+    <a href="/tiktak" class="btn btn-orange">▣ Bot TikTak MACD</a>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- STRATEGIE -->
+<div class="section">
+  <div class="section-title">Strategie tradingowe</div>
+
+  <!-- BB + STOCH RSI -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Strategia BB + Stochastic RSI</div>
+      <span class="card-tag tag-bb">STRATEGIA 1</span>
+    </div>
+    <div class="card-body">
+      <p>Strategia oparta na <strong>Bollinger Bands</strong> i <strong>Stochastic RSI</strong>. Bot szuka momentów gdy cena wybiła poza wstęgę Bollingera jednocześnie gdy oscylator Stochastic RSI generuje sygnał odwrócenia trendu.</p>
+
+      <div class="rule-list">
+        <div class="rule long">
+          <div class="rule-icon">▲</div>
+          <div class="rule-text"><strong>LONG:</strong> Linia K przecina linię D od dołu (crossover) + K poniżej strefy wyprzedania (domyślnie 20) + cena wybiła dolną wstęgę BB w ostatnich 3 świecach</div>
+        </div>
+        <div class="rule short">
+          <div class="rule-icon">▼</div>
+          <div class="rule-text"><strong>SHORT:</strong> Linia K przecina linię D od góry (crossunder) + K powyżej strefy wykupienia (domyślnie 80) + cena wybiła górną wstęgę BB w ostatnich 3 świecach</div>
+        </div>
+        <div class="rule info">
+          <div class="rule-icon">📊</div>
+          <div class="rule-text"><strong>Filtr MA200 (opcjonalny):</strong> Gdy włączony — LONG tylko gdy cena powyżej MA200, SHORT tylko gdy cena poniżej MA200. Działa jako filtr trendu.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIKTAK -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Strategia TikTak — MACD + EMA</div>
+      <span class="card-tag tag-tt">STRATEGIA 2</span>
+    </div>
+    <div class="card-body">
+      <p>Strategia oparta na <strong>MACD</strong> (Moving Average Convergence Divergence) z opcjonalnym filtrem <strong>EMA 10/30</strong>. Bot wchodzi w pozycję tylko gdy przecięcie MACD następuje w odpowiedniej strefie (poniżej/powyżej zera).</p>
+
+      <div class="rule-list">
+        <div class="rule long">
+          <div class="rule-icon">▲</div>
+          <div class="rule-text"><strong>LONG:</strong> Linia MACD przecina linię sygnałową od dołu <strong>poniżej zera</strong> (bieżąca świeca)</div>
+        </div>
+        <div class="rule short">
+          <div class="rule-icon">▼</div>
+          <div class="rule-text"><strong>SHORT:</strong> Linia MACD przecina linię sygnałową od góry <strong>powyżej zera</strong> (bieżąca świeca)</div>
+        </div>
+        <div class="rule info">
+          <div class="rule-icon">📈</div>
+          <div class="rule-text"><strong>Filtr EMA 10/30 (opcjonalny):</strong> Gdy włączony — dodatkowo wymaga przecięcia EMA10 z EMA30 w oknie N świec (domyślnie 5) po sygnale MACD</div>
+        </div>
+        <div class="rule info">
+          <div class="rule-icon">📊</div>
+          <div class="rule-text"><strong>Filtr MA200 (opcjonalny):</strong> Identyczny jak w strategii BB — filtruje kierunek po trendzie</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <span>💡</span>
+        <p>MACD używa standardowych ustawień 12/26/9. Bot sprawdza crossover tylko na bieżącej świecy — nie na historycznych. Gwarantuje to świeżość sygnału.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PIRAMIDA -->
+<div class="section">
+  <div class="section-title">System piramidy wejść</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Jak działa piramida</div>
+      <span class="card-tag tag-both">OBA BOTY</span>
+    </div>
+    <div class="card-body">
+      <p>Bot obsługuje do <strong>4 poziomów wejść</strong>. Pierwsze wejście to market order, kolejne (dokładki) ustawiane są jako limit orders w MEXC od razu przy otwarciu pozycji.</p>
+
+      <div class="flow">
+        <div class="flow-step highlight">Sygnał</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">Wejście 1 (market)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Dokładka 2 (limit @ offset%)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Dokładka 3 (limit @ offset%)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Dokładka 4 (limit @ offset%)</div>
+      </div>
+
+      <div class="rule-list" style="margin-top:16px;">
+        <div class="rule info">
+          <div class="rule-icon">📌</div>
+          <div class="rule-text"><strong>Offset %</strong> — każda dokładka jest ustawiana o X% niżej (LONG) lub wyżej (SHORT) od poprzedniej dokładki</div>
+        </div>
+        <div class="rule info">
+          <div class="rule-icon">🎯</div>
+          <div class="rule-text"><strong>TP</strong> — liczony od ostatniej dokładki która weszła + X%. Bot monitoruje cenę co 5 sekund</div>
+        </div>
+        <div class="rule info">
+          <div class="rule-icon">🛡️</div>
+          <div class="rule-text"><strong>SL</strong> — ustawiany w MEXC jako stoporder od ostatniej dokładki - X%. Działa niezależnie od bota</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARAMETRY -->
+<div class="section">
+  <div class="section-title">Parametry konfiguracji</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">BB + Stochastic RSI</div>
+      <span class="card-tag tag-bb">STRATEGIA 1</span>
+    </div>
+    <div class="card-body">
+      <div class="params-grid">
+        <div class="param">
+          <div class="param-name">Interwał</div>
+          <div class="param-desc">Timeframe świec. Zalecane: 5min lub 15min</div>
+          <div class="param-val">Min5 / Min15</div>
+        </div>
+        <div class="param">
+          <div class="param-name">BB Okres</div>
+          <div class="param-desc">Liczba świec do obliczenia Bollinger Bands</div>
+          <div class="param-val">Domyślnie: 20</div>
+        </div>
+        <div class="param">
+          <div class="param-name">BB Std</div>
+          <div class="param-desc">Odchylenie standardowe wstęgi BB</div>
+          <div class="param-val">Domyślnie: 2.0</div>
+        </div>
+        <div class="param">
+          <div class="param-name">BB Próg wybicia %</div>
+          <div class="param-desc">O ile % cena musi wybić poza BB. 0 = samo wyjście poza wstęgę</div>
+          <div class="param-val">Domyślnie: 0%</div>
+        </div>
+        <div class="param">
+          <div class="param-name">Stoch Okres</div>
+          <div class="param-desc">Okres oscylatora Stochastic</div>
+          <div class="param-val">Domyślnie: 14</div>
+        </div>
+        <div class="param">
+          <div class="param-name">Stoch OB / OS</div>
+          <div class="param-desc">Poziomy wykupienia (OB) i wyprzedania (OS)</div>
+          <div class="param-val">OB: 80 / OS: 20</div>
+        </div>
+        <div class="param">
+          <div class="param-name">TP %</div>
+          <div class="param-desc">Procent zysku od ostatniej dokładki</div>
+          <div class="param-val">Domyślnie: 0.8%</div>
+        </div>
+        <div class="param">
+          <div class="param-name">SL %</div>
+          <div class="param-desc">Procent straty od ostatniej dokładki</div>
+          <div class="param-val">Domyślnie: 0.4%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">TikTak — MACD + EMA</div>
+      <span class="card-tag tag-tt">STRATEGIA 2</span>
+    </div>
+    <div class="card-body">
+      <div class="params-grid">
+        <div class="param">
+          <div class="param-name orange">Interwał</div>
+          <div class="param-desc">Timeframe świec. Zalecane: 15min lub 1h</div>
+          <div class="param-val">Min15 / Min60</div>
+        </div>
+        <div class="param">
+          <div class="param-name orange">MACD</div>
+          <div class="param-desc">Standardowe ustawienia — nie wymaga konfiguracji</div>
+          <div class="param-val">12 / 26 / 9</div>
+        </div>
+        <div class="param">
+          <div class="param-name orange">Filtr EMA 10/30</div>
+          <div class="param-desc">Opcjonalny — wymaga crossoveru EMA10/EMA30 po sygnale MACD</div>
+          <div class="param-val">Domyślnie: wyłączony</div>
+        </div>
+        <div class="param">
+          <div class="param-name orange">Okno EMA (świece)</div>
+          <div class="param-desc">Ile świec po sygnale MACD bot czeka na crossover EMA</div>
+          <div class="param-val">Domyślnie: 5</div>
+        </div>
+        <div class="param">
+          <div class="param-name orange">TP %</div>
+          <div class="param-desc">Procent zysku od ceny wejścia</div>
+          <div class="param-val">Domyślnie: 0.8%</div>
+        </div>
+        <div class="param">
+          <div class="param-name orange">SL %</div>
+          <div class="param-desc">Procent straty od ceny wejścia</div>
+          <div class="param-val">Domyślnie: 0.4%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRZYCISKI -->
+<div class="section">
+  <div class="section-title">Przyciski i opcje</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Nagłówek dashboardu</div>
+      <span class="card-tag tag-both">OBA BOTY</span>
+    </div>
+    <div class="card-body">
+      <div class="btn-grid">
+        <div class="btn-doc">
+          <div class="btn-doc-name g">▶ START</div>
+          <div class="btn-doc-desc">Uruchamia bota. Zapisuje konfigurację i startuje pętlę strategii.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name r">■ STOP</div>
+          <div class="btn-doc-desc">Zatrzymuje bota. Otwarte pozycje pozostają — bot przestaje monitorować.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name y">📡 SYGNAŁY</div>
+          <div class="btn-doc-desc">Tryb sygnałów — bot wykrywa sygnały i wysyła powiadomienia Telegram bez otwierania pozycji.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name c">🛡️ TP/SL ON/OFF</div>
+          <div class="btn-doc-desc">Włącza/wyłącza automatyczne TP i SL. Gdy wyłączone — pozycje nie mają stop loss w MEXC.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name y">⚡ HEDGE</div>
+          <div class="btn-doc-desc">Hedging — gdy aktywna pozycja LONG i pojawi się sygnał SHORT (lub odwrotnie), bot otwiera pozycję przeciwną na tej samej parze.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name o">🔄 FREE ENTRIES</div>
+          <div class="btn-doc-desc">Tylko TikTak — bot wchodzi na każdy sygnał MACD niezależnie czy pozycja jest już otwarta. Służy do dokupowania w trendzie.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name c">🔒 ISOLATED / CROSS</div>
+          <div class="btn-doc-desc">Tryb marginu. Isolated = oddzielny margin per pozycja. Cross = wspólny margin z całego konta.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name p">Max: [N]</div>
+          <div class="btn-doc-desc">Maksymalna liczba jednoczesnych pozycji. Bot nie otworzy nowej gdy limit osiągnięty.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Przyciski na karcie pary</div>
+      <span class="card-tag tag-both">OBA BOTY</span>
+    </div>
+    <div class="card-body">
+      <div class="btn-grid">
+        <div class="btn-doc">
+          <div class="btn-doc-name c">TEST</div>
+          <div class="btn-doc-desc">Uruchamia jednorazową analizę pary bez czekania na kolejny cykl. Przydatne do sprawdzenia sygnałów.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name r">RESET PYR</div>
+          <div class="btn-doc-desc">Resetuje stan piramidy w pamięci bota. Używaj gdy pozycja została zamknięta ręcznie a bot nadal ją "widzi".</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name r">USUŃ</div>
+          <div class="btn-doc-desc">Usuwa parę z bota. Nie zamyka otwartych pozycji w MEXC.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INTERWAŁY -->
+<div class="section">
+  <div class="section-title">Obsługiwane interwały</div>
+  <div class="card">
+    <div class="card-body">
+      <table>
+        <thead>
+          <tr><th>Wartość API</th><th>Opis</th><th>Zalecane dla</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Min1</td><td>1 minuta</td><td>Scalping (duże ryzyko szumu)</td></tr>
+          <tr><td>Min5</td><td>5 minut</td><td>BB+StochRSI krótkoterminowy</td></tr>
+          <tr><td>Min15</td><td>15 minut</td><td>BB+StochRSI / TikTak — zalecane</td></tr>
+          <tr><td>Min30</td><td>30 minut</td><td>TikTak średnioterminowy</td></tr>
+          <tr><td>Min60</td><td>1 godzina</td><td>TikTak / filtr MA200</td></tr>
+          <tr><td>Hour4</td><td>4 godziny</td><td>Filtr MA200 trendu</td></tr>
+        </tbody>
+      </table>
+      <div class="warning-box" style="margin-top:16px;">
+        <span>⚠️</span>
+        <p>MEXC API nie obsługuje parametru <strong>Hour1</strong> dla kontraktów futures. Używaj <strong>Min60</strong> dla timeframe 1h.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TELEGRAM -->
+<div class="section">
+  <div class="section-title">Powiadomienia Telegram</div>
+  <div class="card">
+    <div class="card-body">
+      <p>Bot wysyła powiadomienia na Telegram w następujących sytuacjach:</p>
+      <div class="rule-list">
+        <div class="rule long"><div class="rule-icon">🚀</div><div class="rule-text">Otwarcie nowej pozycji — symbol, kierunek, cena, TP, SL, liczba dokładek</div></div>
+        <div class="rule info"><div class="rule-icon">📌</div><div class="rule-text">Wykrycie dokładki — numer dokładki, cena, wolumen, aktualny TP</div></div>
+        <div class="rule long"><div class="rule-icon">✅</div><div class="rule-text">Zamknięcie pozycji na TP — symbol, cena zamknięcia</div></div>
+        <div class="rule short"><div class="rule-icon">❌</div><div class="rule-text">Zamknięcie pozycji na SL — symbol, cena zamknięcia</div></div>
+        <div class="rule info"><div class="rule-icon">📡</div><div class="rule-text">Sygnał w trybie sygnałów — wszystkie parametry bez otwierania pozycji</div></div>
+        <div class="rule info"><div class="rule-icon">⚡</div><div class="rule-text">Otwarcie/zamknięcie pozycji hedge</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WSKAZÓWKI -->
+<div class="section">
+  <div class="section-title">Wskazówki i dobre praktyki</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="rule-list">
+        <div class="rule warn"><div class="rule-icon">⚠️</div><div class="rule-text">Zawsze miej włączony <strong>TP/SL</strong> lub ustaw SL ręcznie w MEXC. Pozycja bez SL może doprowadzić do dużych strat przy gwałtownych ruchach rynku.</div></div>
+        <div class="rule info"><div class="rule-icon">💡</div><div class="rule-text">Używaj <strong>trybu sygnałów</strong> do weryfikacji strategii przed uruchomieniem tradingu na prawdziwych środkach.</div></div>
+        <div class="rule info"><div class="rule-icon">💡</div><div class="rule-text">Przy RR 2:1 (TP 0.8%, SL 0.4%) minimalny win rate potrzebny do zarabiania wynosi <strong>33%</strong>.</div></div>
+        <div class="rule info"><div class="rule-icon">💡</div><div class="rule-text">Filtr <strong>MA200</strong> znacząco redukuje liczbę sygnałów ale zwiększa ich jakość — szczególnie przydatny w silnych trendach.</div></div>
+        <div class="rule warn"><div class="rule-icon">⚠️</div><div class="rule-text">Tryb <strong>FREE ENTRIES</strong> w TikTak powoduje dokupowanie przy każdym sygnale. Używaj ostrożnie — w trendzie bocznym może generować wiele wejść.</div></div>
+        <div class="rule info"><div class="rule-icon">💡</div><div class="rule-text">Po ręcznym zamknięciu pozycji w MEXC użyj przycisku <strong>RESET PYR</strong> aby zsynchronizować stan bota.</div></div>
+        <div class="rule warn"><div class="rule-icon">⚠️</div><div class="rule-text">Bot działa na zasadzie zamkniętej świecy — sygnał generowany jest po zakończeniu świecy, nie w jej trakcie.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  ▣ 46ENT TRADING BOT — DOKUMENTACJA — 2026
+</footer>
+
+</body>
+</html>
