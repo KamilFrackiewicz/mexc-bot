@@ -982,7 +982,7 @@ async def pyramid_monitor_loop():
             gstate.log(f"Pyramid monitor error: {e}", "ERROR")
 
 async def bot_loop():
-    iv_map = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,"Hour1":3600,"Hour4":14400}
+    iv_map = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,"Min60":3600,"Hour4":14400}
     while gstate.running:
         if not gstate.api_key:
             await asyncio.sleep(5); continue
