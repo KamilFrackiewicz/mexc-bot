@@ -344,6 +344,12 @@ input[type=password]{letter-spacing:.1em;}
         <div class="field"><label>OS</label><input type="number" id="def-os" value="20"></div>
       </div>
 
+      <div class="f2">
+        <div class="field"><label>Okno BB→Stoch (świece)</label>
+          <input type="number" id="def-stoch-window" value="5" min="1" max="20"
+            title="Max ile świec po wybiciu BB bot czeka na crossover Stoch">
+        </div>
+      </div>
       <div class="sec">MA200 Filtr trendu</div>
       <div class="sw-row">
         <span class="sw-lbl">Włącz filtr MA200</span>
@@ -695,6 +701,7 @@ async function saveAndApply(){
       stoch_period: parseInt(document.getElementById('def-stoch').value),
       stoch_overbought: parseInt(document.getElementById('def-ob').value),
       stoch_oversold: parseInt(document.getElementById('def-os').value),
+      stoch_window: parseInt(document.getElementById('def-stoch-window').value)||5,
       ma200_enabled: document.getElementById('def-ma200-sw').classList.contains('on'),
       ma200_tf: document.getElementById('def-ma200-tf').value,
       tp_pct: parseFloat(document.getElementById('def-tp').value),
@@ -742,6 +749,7 @@ async function loadConfig(){
         document.getElementById('def-stoch').value = p.stoch_period || 14;
         document.getElementById('def-ob').value = p.stoch_overbought || 80;
         document.getElementById('def-os').value = p.stoch_oversold || 20;
+        if(p.stoch_window) document.getElementById('def-stoch-window').value = p.stoch_window;
         document.getElementById('def-tp').value = p.tp_pct || 1.0;
         document.getElementById('def-sl').value = p.sl_pct || 1.5;
         if(p.pyramid_levels) {
