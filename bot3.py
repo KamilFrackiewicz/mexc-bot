@@ -327,7 +327,7 @@ class PairState:
             "leverage": self.leverage,
             "tp_pct": self.tp_pct, "sl_pct": self.sl_pct,
             "last_price": self.last_price, "last_check": self.last_check,
-            "last_squeeze_on": self.last_squeeze_on,
+            "last_squeeze_on": bool(self.last_squeeze_on),
             "last_momentum": round(self.last_momentum, 6) if self.last_momentum else 0,
             "last_vol": self.last_vol, "last_vol_avg": self.last_vol_avg,
             "last_ma200": self.last_ma200,
