@@ -310,6 +310,9 @@ class PairState:
         self.last_bb_mid = self.last_stoch_k = self.last_stoch_d = None
         self.last_ma200 = None; self.last_signal = "NONE"; self.last_check = None
         self.divergence_bull = False; self.divergence_bear = False
+        self.stoch_window = 5
+        self.bb_breakout_candle: Optional[int] = None
+        self.bb_breakout_side: Optional[str] = None
         self.pyramid_entries: List[PyramidEntry] = []
         self.pyramid_active = False; self.pyramid_side = None
         self.current_tp: Optional[float] = None
@@ -366,6 +369,7 @@ class PairState:
             "stoch_smooth_d": self.stoch_smooth_d,
             "stoch_overbought": self.stoch_overbought,
             "stoch_oversold": self.stoch_oversold,
+            "stoch_window": self.stoch_window,
             "ma200_enabled": self.ma200_enabled, "ma200_tf": self.ma200_tf,
             "pyramid_levels": self.pyramid_levels,
             "leverage": self.leverage, "tp_mode": self.tp_mode,
@@ -429,7 +433,7 @@ def save_config():
                     "symbol","enabled","interval","direction","entry_timing",
                     "bb_period","bb_std","bb_proximity","bb_breakout_pct","stoch_period",
                     "stoch_smooth_k","stoch_smooth_d","stoch_overbought","stoch_oversold",
-                    "ma200_enabled","ma200_tf","pyramid_levels",
+                    "stoch_window","ma200_enabled","ma200_tf","pyramid_levels",
                     "leverage","tp_mode","tp_pct","sl_pct"
                 ]
             })
@@ -461,7 +465,7 @@ def load_config():
             for k in ["enabled","interval","direction","entry_timing",
                       "bb_period","bb_std","bb_proximity","bb_breakout_pct","stoch_period",
                       "stoch_smooth_k","stoch_smooth_d","stoch_overbought","stoch_oversold",
-                      "ma200_enabled","ma200_tf","pyramid_levels",
+                      "stoch_window","ma200_enabled","ma200_tf","pyramid_levels",
                       "leverage","tp_mode","tp_pct","sl_pct"]:
                 if k in pd: setattr(ps, k, pd[k])
         logger.info(f"✅ Config loaded — {len(gstate.pairs)} pairs")
@@ -544,15 +548,39 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         ps.last_stoch_k = round(k_now, 2)
         ps.last_stoch_d = round(d_now, 2)
 
-        # Crossover / Crossunder - sprawdz ostatnie 3 swiece
-        k_cross_over  = any(
-            k_series[-(i+2)] <= d_series[-(i+2)] and k_series[-(i+1)] > d_series[-(i+1)]
-            for i in range(3) if len(k_series) > i+2 and len(d_series) > i+2
-        ) and k_now < ps.stoch_oversold
-        k_cross_under = any(
-            k_series[-(i+2)] >= d_series[-(i+2)] and k_series[-(i+1)] < d_series[-(i+1)]
-            for i in range(3) if len(k_series) > i+2 and len(d_series) > i+2
-        ) and k_now > ps.stoch_overbought
+        # Crossover / Crossunder - tylko biezaca swieca z minimalnym przekroczeniem 0.5pkt
+        candle_idx = len(closes) - 1
+        cross_min = 0.5
+        k_cross_over_now  = (len(k_series) >= 2 and len(d_series) >= 2 and
+                             k_series[-2] <= d_series[-2] and
+                             k_series[-1] > d_series[-1] + cross_min and
+                             k_now < ps.stoch_oversold)
+        k_cross_under_now = (len(k_series) >= 2 and len(d_series) >= 2 and
+                             k_series[-2] >= d_series[-2] and
+                             k_series[-1] < d_series[-1] - cross_min and
+                             k_now > ps.stoch_overbought)
+
+        # Zapamiętaj wybicie BB
+        if near_lower and ps.bb_breakout_side != "LONG":
+            ps.bb_breakout_candle = candle_idx
+            ps.bb_breakout_side = "LONG"
+        if near_upper and ps.bb_breakout_side != "SHORT":
+            ps.bb_breakout_candle = candle_idx
+            ps.bb_breakout_side = "SHORT"
+
+        # Reset wybicia jesli za stare
+        window = ps.stoch_window
+        if ps.bb_breakout_candle is not None and (candle_idx - ps.bb_breakout_candle) > window:
+            ps.bb_breakout_candle = None
+            ps.bb_breakout_side = None
+
+        # Crossover w oknie po wybiciu BB
+        k_cross_over  = (k_cross_over_now and
+                         ps.bb_breakout_side == "LONG" and
+                         ps.bb_breakout_candle is not None)
+        k_cross_under = (k_cross_under_now and
+                         ps.bb_breakout_side == "SHORT" and
+                         ps.bb_breakout_candle is not None)
 
         # MA200 filter
         ma200_ok_long = ma200_ok_short = True
@@ -575,9 +603,9 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Sygnał
         signal = "WAIT"
-        long_ok  = (k_cross_over  and k_now < ps.stoch_oversold   and near_lower
+        long_ok  = (k_cross_over  and k_now < ps.stoch_oversold
                     and ma200_ok_long  and ps.direction in ("LONG",  "BOTH"))
-        short_ok = (k_cross_under and k_now > ps.stoch_overbought and near_upper
+        short_ok = (k_cross_under and k_now > ps.stoch_overbought
                     and ma200_ok_short and ps.direction in ("SHORT", "BOTH"))
 
         if long_ok:   signal = "LONG"
@@ -1057,7 +1085,7 @@ def set_config(cfg: GlobalConfig, _=Depends(require_auth)):
         ps = gstate.get_or_create(pc.symbol)
         for k in ["enabled","interval","direction","entry_timing","bb_period","bb_std",
                   "bb_proximity","bb_breakout_pct","stoch_period","stoch_smooth_k","stoch_smooth_d",
-                  "stoch_overbought","stoch_oversold","ma200_enabled","ma200_tf",
+                  "stoch_overbought","stoch_oversold","stoch_window","ma200_enabled","ma200_tf",
                   "leverage","tp_mode","tp_pct","sl_pct"]:
             setattr(ps, k, getattr(pc, k))
         if pc.pyramid_levels:
