@@ -710,6 +710,22 @@ async def bot_loop():
     while gstate.running:
         if not gstate.api_key:
             await asyncio.sleep(5); continue
+        now = datetime.now()
+        # Sprawdz czy dzien roboczy (pon=0 ... pt=4)
+        if now.weekday() > 4:
+            gstate.log(f"Weekend — czekam do poniedzialku")
+            for _ in range(3600):
+                if not gstate.running: break
+                await asyncio.sleep(1)
+            continue
+        # Sprawdz czy jestesmy w okolicach sesji NY (14:00-18:00 CET)
+        if not (14 <= now.hour < 18):
+            mins_to_open = ((14 - now.hour) * 60 - now.minute) % (24*60)
+            gstate.log(f"Poza oknem sesji NY — czekam {mins_to_open}min")
+            for _ in range(1800):
+                if not gstate.running: break
+                await asyncio.sleep(1)
+            continue
         client  = MEXCClient(gstate.api_key, gstate.api_secret)
         actives = [ps for ps in gstate.pairs.values() if ps.enabled]
         if not actives:
