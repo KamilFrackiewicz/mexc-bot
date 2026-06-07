@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTak Bot — 46ent</title>
+<title>Squeeze Bot — 46ent</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
 :root {
@@ -14,23 +14,23 @@
   --red:#ff3355;--red2:rgba(255,51,85,.1);
   --yellow:#ffcc00;--yellow2:rgba(255,204,0,.1);
   --purple:#a78bfa;--purple2:rgba(167,139,250,.1);
-  --orange:#ff9500;--orange2:rgba(255,149,0,.1);
+  --lime:#39ff14;--lime2:rgba(57,255,20,.1);
   --text:#c0d4e8;--text2:#4a6a85;
   --mono:'JetBrains Mono',monospace;--sans:'Barlow',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;
-  background-image:radial-gradient(ellipse 70% 50% at 0 0,rgba(255,149,0,.03) 0,transparent 55%),
+  background-image:radial-gradient(ellipse 70% 50% at 0 0,rgba(57,255,20,.03) 0,transparent 55%),
     radial-gradient(ellipse 60% 40% at 100% 100%,rgba(167,139,250,.03) 0,transparent 55%);}
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .login-box{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:40px 36px;width:360px;display:flex;flex-direction:column;gap:20px;}
-.login-logo{font-family:var(--mono);font-size:.8rem;font-weight:700;letter-spacing:.22em;color:var(--orange);text-align:center;}
+.login-logo{font-family:var(--mono);font-size:.8rem;font-weight:700;letter-spacing:.22em;color:var(--lime);text-align:center;}
 .login-sub{font-family:var(--mono);font-size:.6rem;color:var(--text2);letter-spacing:.14em;text-align:center;margin-top:-10px;}
 .login-err{font-family:var(--mono);font-size:.68rem;color:var(--red);background:var(--red2);border:1px solid rgba(255,51,85,.3);padding:8px 12px;border-radius:3px;display:none;}
 .login-err.show{display:block}
 #app{display:none}
 header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:54px;background:rgba(7,9,14,.97);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:200;backdrop-filter:blur(20px);}
-.logo{font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.22em;color:var(--orange);display:flex;align-items:center;gap:10px;}
+.logo{font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.22em;color:var(--lime);display:flex;align-items:center;gap:10px;}
 .logo-tag{font-size:.55rem;color:var(--text2);letter-spacing:.1em;background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:10px;}
 .hdr-r{display:flex;align-items:center;gap:8px;}
 .pill{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;padding:4px 14px;border-radius:20px;border:1px solid var(--b2);display:flex;align-items:center;gap:6px;transition:all .3s;}
@@ -47,7 +47,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .btn-outline{background:transparent;color:var(--cyan);border:1px solid var(--b2);}
 .btn-outline:hover{border-color:var(--cyan);background:var(--cyan2);}
 .btn-sm{padding:5px 12px;font-size:.58rem;}
-.btn-orange{background:var(--orange);color:#000;}
+.btn-lime{background:var(--lime);color:#000;box-shadow:0 0 16px rgba(57,255,20,.2);}
 .btn-purple{background:var(--purple);color:#000;}
 .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(255,51,85,.3);font-size:.58rem;padding:4px 10px;}
 .btn-danger:hover{background:var(--red2);}
@@ -58,12 +58,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .sidebar{display:flex;flex-direction:column;gap:14px;}
 .main{display:flex;flex-direction:column;gap:14px;}
 .panel{background:var(--s1);border:1px solid var(--b1);border-radius:6px;overflow:hidden;}
-.ph{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:var(--orange);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+.ph{padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--b1);font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;color:var(--lime);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
 .pb{padding:16px;display:flex;flex-direction:column;gap:11px;}
 .field{display:flex;flex-direction:column;gap:4px;}
 label{font-family:var(--mono);font-size:.57rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);}
 input,select{background:var(--bg);border:1px solid var(--b1);border-radius:3px;color:var(--text);font-family:var(--mono);font-size:.8rem;padding:7px 10px;outline:none;transition:border-color .15s;width:100%;}
-input:focus,select:focus{border-color:var(--orange);}
+input:focus,select:focus{border-color:var(--lime);}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .sec{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;color:var(--purple);text-transform:uppercase;padding:4px 0 0;}
@@ -71,12 +71,12 @@ input:focus,select:focus{border-color:var(--orange);}
 .sw-lbl{font-family:var(--mono);font-size:.65rem;color:var(--text);}
 .sw{width:36px;height:20px;background:var(--b1);border-radius:10px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;}
 .sw::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--text2);transition:all .2s;}
-.sw.on{background:var(--orange);}
+.sw.on{background:var(--lime);}
 .sw.on::after{left:19px;background:#000;}
 .pyr-row{display:grid;grid-template-columns:22px 30px 1fr 1fr;gap:8px;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:3px;padding:9px 12px;}
 .pyr-n{font-family:var(--mono);font-size:.85rem;font-weight:700;color:var(--text2);text-align:center;}
 .pi{background:var(--bg);border:1px solid var(--b1);border-radius:2px;color:var(--text);font-family:var(--mono);font-size:.75rem;padding:5px 8px;width:100%;outline:none;}
-.pi:focus{border-color:var(--orange);}
+.pi:focus{border-color:var(--lime);}
 .pi:disabled{opacity:.35;}
 .pi-lbl{font-family:var(--mono);font-size:.52rem;color:var(--text2);margin-bottom:2px;letter-spacing:.08em;}
 .pair-card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;transition:border-color .3s;}
@@ -85,7 +85,7 @@ input:focus,select:focus{border-color:var(--orange);}
 .pair-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--s2);border-bottom:1px solid var(--b1);cursor:pointer;}
 .pair-hdr-l{display:flex;align-items:center;gap:12px;}
 .pair-name{font-family:var(--mono);font-size:.9rem;font-weight:700;color:var(--text);letter-spacing:.06em;}
-.pair-price{font-family:var(--mono);font-size:.82rem;color:var(--orange);}
+.pair-price{font-family:var(--mono);font-size:.82rem;color:var(--lime);}
 .pair-hdr-r{display:flex;align-items:center;gap:6px;}
 .schip{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:.08em;display:inline-flex;align-items:center;gap:5px;}
 .schip::before{content:'';width:6px;height:6px;border-radius:50%;}
@@ -95,6 +95,9 @@ input:focus,select:focus{border-color:var(--orange);}
 .schip.SHORT::before{background:var(--red);box-shadow:0 0 6px var(--red);}
 .schip.WAIT,.schip.NONE{background:transparent;color:var(--text2);border:1px solid var(--b1);}
 .schip.WAIT::before,.schip.NONE::before{background:var(--text2);}
+.sq-badge{font-family:var(--mono);font-size:.62rem;padding:3px 10px;border-radius:3px;letter-spacing:.06em;}
+.sq-badge.on{background:rgba(255,204,0,.1);color:var(--yellow);border:1px solid rgba(255,204,0,.3);}
+.sq-badge.off{background:var(--lime2);color:var(--lime);border:1px solid rgba(57,255,20,.3);}
 .pair-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
 .pair-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--b1);border-radius:4px;overflow:hidden;}
 .psc{background:var(--s2);padding:10px 12px;}
@@ -102,11 +105,7 @@ input:focus,select:focus{border-color:var(--orange);}
 .psc-v{font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--text);}
 .psc-v.c{color:var(--cyan);}.psc-v.g{color:var(--green);}
 .psc-v.r{color:var(--red);}.psc-v.y{color:var(--yellow);}
-.psc-v.o{color:var(--orange);}.psc-v.p{color:var(--purple);}
-.macd-bar{display:flex;align-items:center;gap:10px;}
-.macd-lbl{font-family:var(--mono);font-size:.6rem;color:var(--text2);min-width:80px;}
-.macd-val{font-family:var(--mono);font-size:.75rem;font-weight:700;}
-.macd-val.pos{color:var(--green);}.macd-val.neg{color:var(--red);}
+.psc-v.l{color:var(--lime);}.psc-v.p{color:var(--purple);}
 .pyr-status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .pec{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:10px 12px;transition:all .3s;}
 .pec.fl{border-color:rgba(0,255,157,.4);background:rgba(0,255,157,.05);}
@@ -135,9 +134,9 @@ input:focus,select:focus{border-color:var(--orange);}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;backdrop-filter:blur(4px);align-items:center;justify-content:center;}
 .modal-bg.show{display:flex;}
 .modal{background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:24px;width:360px;display:flex;flex-direction:column;gap:14px;}
-.modal-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;}
+.modal-title{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--lime);text-transform:uppercase;}
 .modal-btns{display:flex;gap:8px;}
-.toast{position:fixed;top:66px;right:18px;background:var(--s2);border:1px solid var(--b1);border-left:3px solid var(--orange);padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:.72rem;color:var(--orange);z-index:400;transform:translateX(130%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.toast{position:fixed;top:66px;right:18px;background:var(--s2);border:1px solid var(--b1);border-left:3px solid var(--lime);padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:.72rem;color:var(--lime);z-index:400;transform:translateX(130%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .toast.show{transform:translateX(0);}
 ::-webkit-scrollbar{width:3px;height:3px;}
 ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
@@ -146,8 +145,8 @@ input:focus,select:focus{border-color:var(--orange);}
 <body>
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
-    <div class="login-logo">▣ TikTak Bot</div>
-    <div class="login-sub">STRATEGIA MACD + EMA — ZALOGUJ SIĘ</div>
+    <div class="login-logo">▣ Squeeze Bot</div>
+    <div class="login-sub">BB SQUEEZE + KELTNER + MOMENTUM</div>
     <div class="login-err" id="login-err">Nieprawidłowe hasło</div>
     <div class="field"><label>Hasło</label>
       <input type="password" id="login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
@@ -158,12 +157,12 @@ input:focus,select:focus{border-color:var(--orange);}
 
 <div id="app">
 <header>
-  <div class="logo">▣ TikTak Bot<span class="logo-tag">MACD + EMA</span></div>
+  <div class="logo">▣ Squeeze Bot<span class="logo-tag">BB+KC+MOM</span></div>
   <div class="hdr-r">
-    <a href="/" class="nav-link">◀ BB+StochRSI</a>
+    <a href="/" class="nav-link">▣ BB+StochRSI</a>
+    <a href="/tiktak" class="nav-link">▣ TikTak</a>
+    <a href="/docs" class="nav-link">📖 Docs</a>
     <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
-    <a href="/squeeze" class="btn btn-outline btn-sm" style="text-decoration:none;color:var(--green)">▣ Squeeze</a>
-    <a href="/docs" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none">📖 DOCS</a>
     <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
     <button class="btn btn-outline btn-sm" onclick="showModal('pw-modal')">🔒 HASŁO</button>
     <button class="btn btn-outline btn-sm" onclick="doLogout()">WYLOGUJ</button>
@@ -175,8 +174,8 @@ input:focus,select:focus{border-color:var(--orange);}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
-    <button class="btn btn-outline btn-sm" id="btn-free" onclick="toggleFreeEntries()">🔄 FREE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
+    <button class="btn btn-outline btn-sm" id="btn-free" onclick="toggleFreeEntries()">🔄 FREE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
     <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
   </div>
@@ -193,7 +192,7 @@ input:focus,select:focus{border-color:var(--orange);}
   </div>
 
   <div class="panel">
-    <div class="ph">⚙️ Konfiguracja TikTak</div>
+    <div class="ph">⚙️ Konfiguracja Squeeze</div>
     <div class="pb">
       <div class="sec">Para & Interwał</div>
       <div class="f2">
@@ -207,24 +206,22 @@ input:focus,select:focus{border-color:var(--orange);}
         <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
       </div>
 
-      <div class="sec">MACD (12/26/9)</div>
-      <div style="font-family:var(--mono);font-size:.62rem;color:var(--text2);padding:4px 0">
-        Standardowe ustawienia — crossover linii MACD z sygnałem.<br>
-        LONG: przecięcie od dołu poniżej zera<br>
-        SHORT: przecięcie od góry powyżej zera
+      <div class="sec">Bollinger Bands</div>
+      <div class="f2">
+        <div class="field"><label>Okres BB</label><input type="number" id="def-bb-period" value="20" min="5"></div>
+        <div class="field"><label>Std BB</label><input type="number" id="def-bb-std" value="2.0" min="0.5" step="0.1"></div>
       </div>
 
-      <div class="sec">Filtr EMA 10/30</div>
-      <div class="sw-row">
-        <span class="sw-lbl">Włącz filtr EMA 10/30</span>
-        <button class="sw" id="def-ema-sw" onclick="toggleSw('def-ema-sw','def-ema-en')"></button>
-        <input type="hidden" id="def-ema-en" value="0">
+      <div class="sec">Keltner Channels</div>
+      <div class="f3">
+        <div class="field"><label>Okres KC</label><input type="number" id="def-kc-period" value="20" min="5"></div>
+        <div class="field"><label>ATR</label><input type="number" id="def-kc-atr" value="10" min="3"></div>
+        <div class="field"><label>Mnożnik</label><input type="number" id="def-kc-mult" value="1.5" min="0.5" step="0.1"></div>
       </div>
+
+      <div class="sec">Wolumen</div>
       <div class="f2">
-        <div class="field"><label>Okno EMA (świece)</label>
-          <input type="number" id="def-ema-window" value="5" min="1" max="20"
-            title="Max ile świec wstecz sprawdzamy crossover EMA po sygnale MACD">
-        </div>
+        <div class="field"><label>Średnia (świece)</label><input type="number" id="def-vol-period" value="20" min="5"></div>
       </div>
 
       <div class="sec">Filtr MA200</div>
@@ -236,15 +233,15 @@ input:focus,select:focus{border-color:var(--orange);}
       <div class="f2">
         <div class="field"><label>Timeframe MA200</label>
           <select id="def-ma200-tf">
-            <option value="Min60">1 godz</option><option value="Hour4">4 godz</option>
+            <option value="Min60">1 godz</option><option value="Hour4" selected>4 godz</option>
           </select>
         </div>
       </div>
 
       <div class="sec">TP / SL</div>
       <div class="f2">
-        <div class="field"><label>TP %</label><input type="number" id="def-tp" value="0.8" step="0.1"></div>
-        <div class="field"><label>SL %</label><input type="number" id="def-sl" value="0.4" step="0.1"></div>
+        <div class="field"><label>TP %</label><input type="number" id="def-tp" value="1.5" step="0.1"></div>
+        <div class="field"><label>SL %</label><input type="number" id="def-sl" value="0.5" step="0.1"></div>
       </div>
 
       <div class="sec">Piramida wejść</div>
@@ -262,13 +259,13 @@ input:focus,select:focus{border-color:var(--orange);}
     <div id="balance-box" style="padding:8px 14px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">— kliknij ↻ —</div>
   </div>
 
-  <button class="btn btn-orange btn-full" onclick="saveAndApply()">ZAPISZ I ZASTOSUJ</button>
+  <button class="btn btn-lime btn-full" onclick="saveAndApply()">ZAPISZ I ZASTOSUJ</button>
 </div>
 
 <div class="main">
   <div id="pairs-grid">
     <div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">
-      Kliknij <strong style="color:var(--orange)">+ DODAJ PARĘ</strong> aby zacząć
+      Kliknij <strong style="color:var(--lime)">+ DODAJ PARĘ</strong> aby zacząć
     </div>
   </div>
 </div>
@@ -325,8 +322,8 @@ input:focus,select:focus{border-color:var(--orange);}
 <div class="toast" id="toast"></div>
 
 <script>
-const API = '/tiktak/api';
-let TOKEN = localStorage.getItem('tiktok_token') || '';
+const API = '/squeeze/api';
+let TOKEN = localStorage.getItem('squeeze_token') || '';
 let pairs = {};
 const pyrEnabled = {def:[true,false,false,false]};
 
@@ -334,13 +331,13 @@ async function doLogin() {
   const pw = document.getElementById('login-pw').value;
   try {
     const r = await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
-    if(r.ok){ const d=await r.json(); TOKEN=d.token; localStorage.setItem('tiktok_token',TOKEN); showApp(); }
+    if(r.ok){ const d=await r.json(); TOKEN=d.token; localStorage.setItem('squeeze_token',TOKEN); showApp(); }
     else document.getElementById('login-err').classList.add('show');
   } catch { document.getElementById('login-err').classList.add('show'); }
 }
 
 async function doLogout() {
-  localStorage.removeItem('tiktok_token'); TOKEN='';
+  localStorage.removeItem('squeeze_token'); TOKEN='';
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
@@ -385,7 +382,7 @@ function toggleSw(swId, hiddenId) {
 
 function initDefPyr() {
   const c=document.getElementById('def-pyr'); if(!c) return; c.innerHTML='';
-  const defaults=[{amt:5,off:0},{amt:5,off:0.4},{amt:10,off:0.4},{amt:20,off:0.4}];
+  const defaults=[{amt:5,off:0},{amt:5,off:0.5},{amt:10,off:0.5},{amt:20,off:0.5}];
   for(let i=0;i<4;i++){
     const on=pyrEnabled.def[i];
     c.innerHTML+=`<div class="pyr-row">
@@ -417,15 +414,19 @@ function buildCfg(sym, dir='BOTH'){
     symbol:sym, enabled:true,
     interval: document.getElementById('def-interval').value,
     direction:dir,
-    ema_filter_enabled: document.getElementById('def-ema-en').value==='1',
-    ema_window: parseInt(document.getElementById('def-ema-window').value)||5,
+    bb_period: parseInt(document.getElementById('def-bb-period').value)||20,
+    bb_std: parseFloat(document.getElementById('def-bb-std').value)||2.0,
+    kc_period: parseInt(document.getElementById('def-kc-period').value)||20,
+    kc_atr: parseInt(document.getElementById('def-kc-atr').value)||10,
+    kc_mult: parseFloat(document.getElementById('def-kc-mult').value)||1.5,
+    vol_period: parseInt(document.getElementById('def-vol-period').value)||20,
     ma200_enabled: document.getElementById('def-ma200-en').value==='1',
     ma200_tf: document.getElementById('def-ma200-tf').value,
     leverage: parseInt(document.getElementById('def-leverage').value),
     pyramid_levels:[0,1,2,3].map(i=>({
       enabled: pyrEnabled.def[i],
       amount_usd: parseFloat(document.getElementById(`def-pamt-${i}`)?.value)||5,
-      offset_pct: i===0?0:(parseFloat(document.getElementById(`def-poff-${i}`)?.value)||0.4)
+      offset_pct: i===0?0:(parseFloat(document.getElementById(`def-poff-${i}`)?.value)||0.5)
     })),
     tp_pct: parseFloat(document.getElementById('def-tp').value),
     sl_pct: parseFloat(document.getElementById('def-sl').value),
@@ -438,7 +439,7 @@ async function removePair(sym){
   delete pairs[sym];
   const el=document.getElementById(`card-${sym}`); if(el) el.remove();
   if(!Object.keys(pairs).length)
-    document.getElementById('pairs-grid').innerHTML='<div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">Kliknij <strong style="color:var(--orange)">+ DODAJ PARĘ</strong> aby zacząć</div>';
+    document.getElementById('pairs-grid').innerHTML='<div style="text-align:center;padding:50px;font-family:var(--mono);font-size:.75rem;color:var(--text2)">Kliknij <strong style="color:var(--lime)">+ DODAJ PARĘ</strong> aby zacząć</div>';
   toast(`Usunięto ${sym}`,'var(--yellow)');
 }
 
@@ -456,6 +457,7 @@ function cardHTML(sym){ return `
       <div class="pair-price" id="pp-${sym}">—</div>
       <span id="pair-meta-${sym}" style="font-family:var(--mono);font-size:.6rem;color:var(--text2);background:var(--s2);border:1px solid var(--b1);padding:2px 8px;border-radius:3px">—</span>
       <span class="schip NONE" id="sc-${sym}">— CZEKAM</span>
+      <span id="sq-${sym}"></span>
     </div>
     <div class="pair-hdr-r">
       <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();testPair('${sym}')">TEST</button>
@@ -466,10 +468,10 @@ function cardHTML(sym){ return `
   </div>
   <div class="collapsible pair-body">
     <div class="pair-stats">
-      <div class="psc"><div class="psc-l">MACD</div><div class="psc-v o" id="macd-${sym}">—</div></div>
-      <div class="psc"><div class="psc-l">Signal</div><div class="psc-v p" id="msig-${sym}">—</div></div>
-      <div class="psc"><div class="psc-l">EMA10</div><div class="psc-v c" id="ema10-${sym}">—</div></div>
-      <div class="psc"><div class="psc-l">EMA30</div><div class="psc-v y" id="ema30-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Squeeze</div><div class="psc-v y" id="sq-stat-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Momentum</div><div class="psc-v" id="mom-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">Vol/Avg</div><div class="psc-v l" id="vol-${sym}">—</div></div>
+      <div class="psc"><div class="psc-l">MA200</div><div class="psc-v y" id="ma-${sym}">—</div></div>
       <div class="psc"><div class="psc-l">TP</div><div class="psc-v g" id="tp-${sym}">—</div></div>
       <div class="psc"><div class="psc-l">SL</div><div class="psc-v r" id="sl-${sym}">—</div></div>
     </div>
@@ -499,8 +501,12 @@ async function saveAndApply(){
       ...p,
       interval: document.getElementById('def-interval').value,
       leverage: parseInt(document.getElementById('def-leverage').value),
-      ema_filter_enabled: document.getElementById('def-ema-sw').classList.contains('on'),
-      ema_window: parseInt(document.getElementById('def-ema-window').value)||5,
+      bb_period: parseInt(document.getElementById('def-bb-period').value)||20,
+      bb_std: parseFloat(document.getElementById('def-bb-std').value)||2.0,
+      kc_period: parseInt(document.getElementById('def-kc-period').value)||20,
+      kc_atr: parseInt(document.getElementById('def-kc-atr').value)||10,
+      kc_mult: parseFloat(document.getElementById('def-kc-mult').value)||1.5,
+      vol_period: parseInt(document.getElementById('def-vol-period').value)||20,
       ma200_enabled: document.getElementById('def-ma200-sw').classList.contains('on'),
       ma200_tf: document.getElementById('def-ma200-tf').value,
       tp_pct: parseFloat(document.getElementById('def-tp').value),
@@ -508,7 +514,7 @@ async function saveAndApply(){
       pyramid_levels:[0,1,2,3].map(i=>({
         enabled: i===0?true:(document.getElementById('def-sw-'+i)?.classList.contains('on')??false),
         amount_usd: parseFloat(document.getElementById('def-pamt-'+i)?.value)||5,
-        offset_pct: i===0?0:(parseFloat(document.getElementById('def-poff-'+i)?.value)||0.4)
+        offset_pct: i===0?0:(parseFloat(document.getElementById('def-poff-'+i)?.value)||0.5)
       }))
     }))
   };
@@ -533,12 +539,16 @@ async function loadConfig(){
       if(p){
         document.getElementById('def-interval').value=p.interval||'Min15';
         document.getElementById('def-leverage').value=p.leverage||10;
-        document.getElementById('def-tp').value=p.tp_pct||0.8;
-        document.getElementById('def-sl').value=p.sl_pct||0.4;
-        document.getElementById('def-ema-window').value=p.ema_window||5;
-        if(p.ema_filter_enabled){ document.getElementById('def-ema-sw').classList.add('on'); document.getElementById('def-ema-en').value='1'; }
-        if(p.ma200_enabled){ document.getElementById('def-ma200-sw').classList.add('on'); document.getElementById('def-ma200-en').value='1'; }
+        document.getElementById('def-tp').value=p.tp_pct||1.5;
+        document.getElementById('def-sl').value=p.sl_pct||0.5;
+        if(p.bb_period) document.getElementById('def-bb-period').value=p.bb_period;
+        if(p.bb_std) document.getElementById('def-bb-std').value=p.bb_std;
+        if(p.kc_period) document.getElementById('def-kc-period').value=p.kc_period;
+        if(p.kc_atr) document.getElementById('def-kc-atr').value=p.kc_atr;
+        if(p.kc_mult) document.getElementById('def-kc-mult').value=p.kc_mult;
+        if(p.vol_period) document.getElementById('def-vol-period').value=p.vol_period;
         if(p.ma200_tf) document.getElementById('def-ma200-tf').value=p.ma200_tf;
+        if(p.ma200_enabled){ document.getElementById('def-ma200-sw').classList.add('on'); document.getElementById('def-ma200-en').value='1'; }
         if(p.pyramid_levels){ p.pyramid_levels.forEach((lvl,i)=>{ pyrEnabled.def[i]=lvl.enabled; }); initDefPyr();
           p.pyramid_levels.forEach((lvl,i)=>{ const amt=document.getElementById(`def-pamt-${i}`); const off=document.getElementById(`def-poff-${i}`); if(amt) amt.value=lvl.amount_usd; if(off) off.value=lvl.offset_pct; }); }
       }
@@ -549,17 +559,8 @@ async function loadConfig(){
 async function startBot(){ await saveAndApply(); try { const r=await apiFetch('/start',{method:'POST'}); const d=await r.json(); if(d.ok) toast('🚀 Bot uruchomiony','var(--green)'); else toast(d.msg||'Błąd','var(--red)'); } catch {} }
 async function stopBot(){ try { await apiFetch('/stop',{method:'POST'}); toast('🛑 Bot zatrzymany','var(--yellow)'); } catch {} }
 async function setMaxPositions(val){ try { await apiFetch('/max_positions/'+parseInt(val),{method:'POST'}); toast(`Max: ${val}`,'var(--cyan)'); } catch {} }
-async function toggleFreeEntries(){
-  const btn=document.getElementById('btn-free');
-  const isOn=btn.classList.contains('btn-go');
-  const val=isOn?0:1;
-  try {
-    await apiFetch('/free_entries/'+val,{method:'POST'});
-    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='🔄 FREE ON'; toast('🔄 Free entries ON','var(--orange)'); }
-    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='🔄 FREE OFF'; toast('🔄 Free entries OFF','var(--cyan)'); }
-  } catch {}
-}
 async function toggleTpSl(){ const btn=document.getElementById('btn-tpsl'); const isOn=btn.textContent.includes('ON'); const val=isOn?0:1; try { await apiFetch('/tp_sl/'+val,{method:'POST'}); btn.textContent=val?'🛡️ TP/SL ON':'🛡️ TP/SL OFF'; btn.style.color=val?'':'var(--red)'; toast(val?'🛡️ TP/SL włączone':'⛔ TP/SL wyłączone',val?'var(--green)':'var(--red)'); } catch {} }
+async function toggleFreeEntries(){ const btn=document.getElementById('btn-free'); const isOn=btn.classList.contains('btn-go'); const val=isOn?0:1; try { await apiFetch('/free_entries/'+val,{method:'POST'}); if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='🔄 FREE ON'; toast('🔄 Free ON','var(--lime)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='🔄 FREE OFF'; toast('🔄 Free OFF','var(--cyan)'); } } catch {} }
 async function toggleHedging(){ const btn=document.getElementById('btn-hedge'); const isOn=btn.classList.contains('btn-go'); const val=isOn?0:1; try { await apiFetch('/hedging/'+val,{method:'POST'}); if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚡ HEDGE ON'; toast('⚡ Hedging ON','var(--yellow)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚡ HEDGE'; toast('⚡ Hedging OFF','var(--cyan)'); } } catch {} }
 async function toggleMarginMode(){ const btn=document.getElementById('btn-margin'); const isCross=btn.textContent.includes('CROSS'); const val=isCross?1:2; try { await apiFetch('/margin_mode/'+val,{method:'POST'}); btn.textContent=val===1?'🔒 ISOLATED':'🔓 CROSS'; toast(`Tryb: ${val===1?'Isolated':'Cross'}`,'var(--cyan)'); } catch {} }
 async function toggleSignalsOnly(){ const btn=document.getElementById('btn-signals'); const isActive=btn.classList.contains('btn-go'); const enabled=isActive?0:1; try { await apiFetch(`/signals_only/${enabled}`,{method:'POST'}); if(enabled){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='📡 SYGNAŁY ON'; toast('📡 Tryb sygnałów','var(--yellow)'); } else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='📡 SYGNAŁY'; toast('🚀 Tryb tradingu','var(--green)'); } } catch {} }
@@ -577,26 +578,26 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn=document.getElementById('btn-margin'); if(marginBtn) marginBtn.textContent=data.margin_mode===2?'🔓 CROSS':'🔒 ISOLATED';
   const maxPosEl=document.getElementById('max-positions'); if(maxPosEl&&data.max_positions) maxPosEl.value=data.max_positions;
-  const freeBtn=document.getElementById('btn-free');
-  if(freeBtn){ if(data.free_entries){ freeBtn.classList.remove('btn-outline'); freeBtn.classList.add('btn-go'); freeBtn.textContent='🔄 FREE ON'; } else { freeBtn.classList.remove('btn-go'); freeBtn.classList.add('btn-outline'); freeBtn.textContent='🔄 FREE OFF'; } }
   const tpslBtn=document.getElementById('btn-tpsl'); if(tpslBtn){ tpslBtn.textContent=data.tp_sl_enabled===false?'🛡️ TP/SL OFF':'🛡️ TP/SL ON'; tpslBtn.style.color=data.tp_sl_enabled===false?'var(--red)':''; }
+  const freeBtn=document.getElementById('btn-free'); if(freeBtn){ if(data.free_entries){ freeBtn.classList.remove('btn-outline'); freeBtn.classList.add('btn-go'); freeBtn.textContent='🔄 FREE ON'; } else { freeBtn.classList.remove('btn-go'); freeBtn.classList.add('btn-outline'); freeBtn.textContent='🔄 FREE OFF'; } }
   const hedgeBtn=document.getElementById('btn-hedge'); if(hedgeBtn){ if(data.hedging_enabled){ hedgeBtn.classList.remove('btn-outline'); hedgeBtn.classList.add('btn-go'); hedgeBtn.textContent='⚡ HEDGE ON'; } else { hedgeBtn.classList.remove('btn-go'); hedgeBtn.classList.add('btn-outline'); hedgeBtn.textContent='⚡ HEDGE'; } }
   const sigBtn=document.getElementById('btn-signals'); if(sigBtn){ if(data.signals_only){ sigBtn.classList.remove('btn-outline'); sigBtn.classList.add('btn-go'); sigBtn.textContent='📡 SYGNAŁY ON'; } else { sigBtn.classList.remove('btn-go'); sigBtn.classList.add('btn-outline'); sigBtn.textContent='📡 SYGNAŁY'; } }
 
   (data.pairs||[]).forEach(ps=>{
     const sym=ps.symbol;
     if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
-    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Min60:'1h',Hour4:'4h'};
     const metaStr=`${ivMap[ps.interval]||ps.interval} • ${ps.leverage}x • ${ps.direction} • TP:${ps.tp_pct}% SL:${ps.sl_pct}%`;
     setText(`pair-meta-${sym}`,metaStr);
     setText(`pp-${sym}`,ps.last_price?Number(ps.last_price).toLocaleString():'—');
     const labels={LONG:'▲ LONG',SHORT:'▼ SHORT',WAIT:'◆ CZEKAM',NONE:'— CZEKAM'};
-    const sc=document.getElementById(`sc-${sym}`); if(sc){ sc.className=`schip ${ps.last_signal_dir||'NONE'}`; sc.textContent=labels[ps.last_signal_dir]||'—'; }
+    const sc=document.getElementById(`sc-${sym}`); if(sc){ sc.className=`schip ${ps.last_signal||'NONE'}`; sc.textContent=labels[ps.last_signal]||'—'; }
+    const sqEl=document.getElementById(`sq-${sym}`); if(sqEl){ sqEl.innerHTML=ps.last_squeeze_on?'<span class="sq-badge on">🔴 SQUEEZE</span>':'<span class="sq-badge off">🟢 FIRED</span>'; }
     const card=document.getElementById(`card-${sym}`); if(card){ card.classList.remove('long-active','short-active'); if(ps.pyramid?.active) card.classList.add(ps.pyramid.side==='LONG'?'long-active':'short-active'); }
-    if(ps.last_macd!=null){ const el=document.getElementById(`macd-${sym}`); if(el){ el.textContent=ps.last_macd.toFixed(5); el.className=`psc-v ${ps.last_macd>=0?'g':'r'}`; } }
-    if(ps.last_signal_line!=null){ const el=document.getElementById(`msig-${sym}`); if(el){ el.textContent=ps.last_signal_line.toFixed(5); el.className=`psc-v ${ps.last_signal_line>=0?'g':'r'}`; } }
-    setText(`ema10-${sym}`,ps.last_ema10??'—');
-    setText(`ema30-${sym}`,ps.last_ema30??'—');
+    const sqStat=document.getElementById(`sq-stat-${sym}`); if(sqStat){ sqStat.textContent=ps.last_squeeze_on?'ON':'OFF'; sqStat.className=`psc-v ${ps.last_squeeze_on?'y':'l'}`; }
+    const momEl=document.getElementById(`mom-${sym}`); if(momEl){ const m=ps.last_momentum||0; momEl.textContent=m.toFixed(5); momEl.className=`psc-v ${m>=0?'g':'r'}`; }
+    if(ps.last_vol&&ps.last_vol_avg){ setText(`vol-${sym}`,`${(ps.last_vol/ps.last_vol_avg).toFixed(1)}x`); }
+    setText(`ma-${sym}`,ps.last_ma200?ps.last_ma200.toFixed(4):'off');
     setText(`tp-${sym}`,ps.current_tp?ps.current_tp.toFixed(4):'—');
     setText(`sl-${sym}`,ps.current_sl?ps.current_sl.toFixed(4):'—');
     const pyrEl=document.getElementById(`pyrs-${sym}`);
@@ -610,10 +611,10 @@ function renderPositions(sym,pos){ const wrap=document.getElementById(`pos-${sym
 function renderLogs(elId,logs){ const el=document.getElementById(elId); if(!el||!logs||!logs.length) return; el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span><span class="ll ${l.level}">${l.level}</span><span class="lm">${l.msg}</span></div>`).join(''); }
 function renderGlobalLogs(logs){ const el=document.getElementById('glog'); if(!el||!logs||!logs.length) return; el.innerHTML=logs.map(l=>`<div class="le"><span class="lt">${l.time}</span><span class="ll ${l.level}">${l.level}</span><span class="lm">${l.msg}</span></div>`).join(''); }
 function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
-function toast(msg,color='var(--orange)'){ const t=document.getElementById('toast'); t.style.borderLeftColor=color; t.style.color=color; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function toast(msg,color='var(--lime)'){ const t=document.getElementById('toast'); t.style.borderLeftColor=color; t.style.color=color; t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 async function fetchStatus(){ try { const r=await apiFetch('/status'); if(!r.ok) return; applyStatus(await r.json()); } catch {} }
 async function fetchBalance(){ try { const r=await apiFetch('/balance'); if(!r.ok) return; const d=await r.json(); renderBalance(d.balance||[]); } catch {} }
-function renderBalance(bal){ const el=document.getElementById('balance-box'); if(!el) return; if(!bal.length){ el.innerHTML='<div style="padding:8px 0;color:var(--text2)">Brak środków</div>'; return; } el.innerHTML=bal.map(b=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 0;border-bottom:1px solid var(--b1)"><div><div style="font-size:.52rem;color:var(--text2)">WALUTA</div><div style="font-size:.82rem;font-weight:700;color:var(--orange)">${b.currency}</div></div><div><div style="font-size:.52rem;color:var(--text2)">EQUITY</div><div style="font-size:.82rem;font-weight:700">${b.equity}</div></div><div><div style="font-size:.52rem;color:var(--text2)">DOSTĘPNE</div><div style="font-size:.82rem;font-weight:700;color:var(--green)">${b.available}</div></div><div><div style="font-size:.52rem;color:var(--text2)">PNL</div><div style="font-size:.82rem;font-weight:700;color:${b.unrealized_pnl>=0?'var(--green)':'var(--red)'}">${b.unrealized_pnl}</div></div></div>`).join(''); }
+function renderBalance(bal){ const el=document.getElementById('balance-box'); if(!el) return; if(!bal.length){ el.innerHTML='<div style="padding:8px 0;color:var(--text2)">Brak środków</div>'; return; } el.innerHTML=bal.map(b=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 0;border-bottom:1px solid var(--b1)"><div><div style="font-size:.52rem;color:var(--text2)">WALUTA</div><div style="font-size:.82rem;font-weight:700;color:var(--lime)">${b.currency}</div></div><div><div style="font-size:.52rem;color:var(--text2)">EQUITY</div><div style="font-size:.82rem;font-weight:700">${b.equity}</div></div><div><div style="font-size:.52rem;color:var(--text2)">DOSTĘPNE</div><div style="font-size:.82rem;font-weight:700;color:var(--green)">${b.available}</div></div><div><div style="font-size:.52rem;color:var(--text2)">PNL</div><div style="font-size:.82rem;font-weight:700;color:${b.unrealized_pnl>=0?'var(--green)':'var(--red)'}">${b.unrealized_pnl}</div></div></div>`).join(''); }
 </script>
 </body>
 </html>
