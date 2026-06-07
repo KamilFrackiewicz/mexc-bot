@@ -1,0 +1,1104 @@
+{
+  "api_key": "mx0vgl6vJiDoOP5SZi",
+  "api_secret": "242d4e0a0c8547c680d9c002ce2f6c30",
+  "pairs": [
+    {
+      "symbol": "BTC_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ETH_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "SOL_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "SUI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "XRP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "BNB_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "TRX_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "DOGE_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "HYPE_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ADA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "LINK_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "NAS100_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "SP500_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "LTC_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "AVAX_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ONDO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "UNI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "TAO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ARB_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "GALA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ATOM_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "DOT_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "ALGO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "JUP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "KAITO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "PENGU_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "WLFI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    },
+    {
+      "symbol": "BCH_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "kc_period": 20,
+      "kc_atr": 10,
+      "kc_mult": 1.5,
+      "vol_period": 20,
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.5,
+      "sl_pct": 0.5
+    }
+  ],
+  "signals_only": false,
+  "max_positions": 4,
+  "margin_mode": 1,
+  "tp_sl_enabled": true,
+  "hedging_enabled": false,
+  "free_entries": false
+}
