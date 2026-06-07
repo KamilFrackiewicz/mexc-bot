@@ -506,9 +506,11 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             calc_bollinger(closes[:-1], ps.bb_period, ps.bb_std)[0] is not None
         )
 
-        long_ok  = (squeeze_off and momentum > 0 and vol_ok and
+        # Minimalny prog momentum — przynajmniej 0.1% ceny
+        mom_threshold = price * 0.001
+        long_ok  = (squeeze_off and momentum > mom_threshold and vol_ok and
                     ma200_ok_long and ps.direction in ("LONG", "BOTH"))
-        short_ok = (squeeze_off and momentum < 0 and vol_ok and
+        short_ok = (squeeze_off and momentum < -mom_threshold and vol_ok and
                     ma200_ok_short and ps.direction in ("SHORT", "BOTH"))
 
         # Dodatkowy warunek — cena wybiła wstęgę BB
