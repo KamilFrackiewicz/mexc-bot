@@ -7,9 +7,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -42,9 +42,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -77,9 +77,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -112,9 +112,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -147,9 +147,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -182,9 +182,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -217,9 +217,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {
@@ -252,9 +252,9 @@
       "enabled": true,
       "interval": "Min15",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 5,
-      "ma200_enabled": true,
+      "ema_filter_enabled": true,
+      "ema_window": 10,
+      "ma200_enabled": false,
       "ma200_tf": "Min60",
       "pyramid_levels": [
         {

@@ -139,6 +139,7 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
     <a href="/" class="bb">▣ BB+StochRSI</a>
     <a href="/tiktak" class="tt">▣ TikTak MACD</a>
     <a href="/squeeze" style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#39ff14;text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;">▣ Squeeze</a>
+    <a href="/orb" style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#a78bfa;text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;">▣ ORB</a>
     <a href="/docs" class="active">📖 Dokumentacja</a>
   </div>
 </header>
@@ -151,6 +152,7 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
     <a href="/" class="btn btn-cyan">▣ Bot BB+StochRSI</a>
     <a href="/tiktak" class="btn btn-orange">▣ Bot TikTak MACD</a>
     <a href="/squeeze" class="btn" style="background:#39ff14;color:#000;box-shadow:0 0 20px rgba(57,255,20,.3);">▣ Bot Squeeze</a>
+    <a href="/orb" class="btn" style="background:#a78bfa;color:#000;box-shadow:0 0 20px rgba(167,139,250,.3);">▣ Bot ORB</a>
   </div>
 </div>
 
@@ -257,6 +259,45 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
         <div class="param"><div class="param-name" style="color:#39ff14">Śr. wolumenu</div><div class="param-desc">Ile świec do obliczenia średniego wolumenu</div><div class="param-val">Domyślnie: 20</div></div>
         <div class="param"><div class="param-name" style="color:#39ff14">TP %</div><div class="param-desc">Procent zysku — squeeze generuje duże ruchy</div><div class="param-val">Domyślnie: 1.5%</div></div>
         <div class="param"><div class="param-name" style="color:#39ff14">SL %</div><div class="param-desc">Ciasny SL bo wejście przy przełamaniu</div><div class="param-val">Domyślnie: 0.5%</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORB -->
+<div class="section">
+  <div class="section-title">Strategia ORB — Opening Range Breakout</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">ORB — Przebicie zakresu otwarcia NY</div>
+      <span class="card-tag" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.3);">STRATEGIA 4</span>
+    </div>
+    <div class="card-body">
+      <p>Strategia oparta na <strong>Opening Range Breakout</strong> — jednej z najbardziej sprawdzonych technik tradingu intraday. Bot wyznacza High i Low pierwszej świecy po otwarciu sesji w Nowym Jorku (15:30 CET latem, 16:30 zimą), a następnie czeka na przebicie tych poziomów.</p>
+      <div class="rule-list">
+        <div class="rule info"><div class="rule-icon">📐</div><div class="rule-text"><strong>Krok 1 — Wyznaczenie ORB:</strong> Bot czeka na zamknięcie pierwszej świecy (1min, 5min lub 15min) po otwarciu NY i zapamiętuje jej High i Low jako poziomy ORB.</div></div>
+        <div class="rule long"><div class="rule-icon">▲</div><div class="rule-text"><strong>LONG:</strong> Kolejna świeca zamyka się powyżej poziomu High ORB — sygnał kontynuacji wzrostu</div></div>
+        <div class="rule short"><div class="rule-icon">▼</div><div class="rule-text"><strong>SHORT:</strong> Kolejna świeca zamyka się poniżej poziomu Low ORB — sygnał kontynuacji spadku</div></div>
+        <div class="rule info"><div class="rule-icon">⏰</div><div class="rule-text"><strong>Okno tradingowe:</strong> Max 2 godziny po otwarciu NY. Po tym czasie bot przestaje szukać sygnałów do następnego dnia.</div></div>
+        <div class="rule info"><div class="rule-icon">📊</div><div class="rule-text"><strong>Filtr MA200 (opcjonalny):</strong> Identyczny jak w pozostałych strategiach</div></div>
+      </div>
+      <div class="tip-box"><span>💡</span><p>ORB działa najlepiej na <strong>NAS100 i SP500</strong> — indeksach które reagują silnie na otwarcie sesji NY. Świeca 5min daje najlepszy balans między dokładnością a szybkością sygnału.</p></div>
+      <div class="warning-box"><span>⚠️</span><p>Bot działa tylko przez <strong>2 godziny dziennie</strong> (15:30-17:30 CET latem). Poza tym oknem czeka na następne otwarcie. ORB resetuje się automatycznie każdego dnia.</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Parametry ORB</div>
+      <span class="card-tag" style="background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.3);">STRATEGIA 4</span>
+    </div>
+    <div class="card-body">
+      <div class="params-grid">
+        <div class="param"><div class="param-name" style="color:#a78bfa">Świeca ORB</div><div class="param-desc">Interwał pierwszej świecy do wyznaczenia High/Low</div><div class="param-val">1min / 5min / 15min</div></div>
+        <div class="param"><div class="param-name" style="color:#a78bfa">Otwarcie NY</div><div class="param-desc">Czas otwarcia sesji w czasie lokalnym serwera (Warsaw)</div><div class="param-val">15:30 CET (lato) / 16:30 (zima)</div></div>
+        <div class="param"><div class="param-name" style="color:#a78bfa">Okno tradingowe</div><div class="param-desc">Max czas po otwarciu gdy bot szuka sygnałów</div><div class="param-val">2 godziny</div></div>
+        <div class="param"><div class="param-name" style="color:#a78bfa">TP %</div><div class="param-desc">Procent zysku od ceny wejścia</div><div class="param-val">Domyślnie: 1.0%</div></div>
+        <div class="param"><div class="param-name" style="color:#a78bfa">SL %</div><div class="param-desc">Procent straty od ceny wejścia</div><div class="param-val">Domyślnie: 0.5%</div></div>
+        <div class="param"><div class="param-name" style="color:#a78bfa">RESET ORB</div><div class="param-desc">Przycisk ręcznego resetu poziomów ORB dla pary</div><div class="param-val">Automatyczny reset co dzień</div></div>
       </div>
     </div>
   </div>
