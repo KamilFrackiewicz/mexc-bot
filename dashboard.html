@@ -585,6 +585,7 @@ function buildCfg(sym, dir='BOTH', amt=33){
     stoch_smooth_k:3, stoch_smooth_d:3,
     stoch_overbought: parseInt(document.getElementById('def-ob').value),
     stoch_oversold: parseInt(document.getElementById('def-os').value),
+    stoch_window: parseInt(document.getElementById('def-stoch-window')?.value)||5,
     ma200_enabled: document.getElementById('def-ma200-en').value==='1',
     ma200_tf: document.getElementById('def-ma200-tf').value,
     leverage: parseInt(document.getElementById('def-leverage').value),
