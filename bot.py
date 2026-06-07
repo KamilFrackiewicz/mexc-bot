@@ -1049,6 +1049,7 @@ class PairConfig(BaseModel):
     bb_period: int = 20; bb_std: float = 2.0; bb_proximity: float = 0.0; bb_breakout_pct: float = 0.0
     stoch_period: int = 14; stoch_smooth_k: int = 3; stoch_smooth_d: int = 3
     stoch_overbought: int = 80; stoch_oversold: int = 20
+    stoch_window: int = 5
     ma200_enabled: bool = False; ma200_tf: str = "Min60"
     pyramid_levels: List[PyramidLevelIn] = []
     leverage: int = 10; tp_mode: str = "FROM_AVG"; tp_pct: float = 1.0; sl_pct: float = 1.5
