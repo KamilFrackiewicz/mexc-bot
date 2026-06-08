@@ -5,7 +5,7 @@
     {
       "symbol": "XRP_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -40,7 +40,7 @@
     {
       "symbol": "BTC_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -75,7 +75,7 @@
     {
       "symbol": "ETH_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -110,7 +110,7 @@
     {
       "symbol": "SOL_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -145,7 +145,7 @@
     {
       "symbol": "SUI_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -180,7 +180,7 @@
     {
       "symbol": "TRX_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -215,7 +215,7 @@
     {
       "symbol": "DOGE_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,
@@ -250,7 +250,7 @@
     {
       "symbol": "BNB_USDT",
       "enabled": true,
-      "interval": "Min15",
+      "interval": "Min5",
       "direction": "BOTH",
       "ema_filter_enabled": true,
       "ema_window": 10,

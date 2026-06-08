@@ -38,8 +38,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ETH_USDT",
@@ -77,8 +77,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "SOL_USDT",
@@ -116,8 +116,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "SUI_USDT",
@@ -155,8 +155,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "XRP_USDT",
@@ -194,8 +194,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "BNB_USDT",
@@ -233,8 +233,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "TRX_USDT",
@@ -272,8 +272,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "DOGE_USDT",
@@ -311,8 +311,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "HYPE_USDT",
@@ -350,8 +350,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ADA_USDT",
@@ -389,8 +389,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "LINK_USDT",
@@ -428,8 +428,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "LTC_USDT",
@@ -467,8 +467,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "AVAX_USDT",
@@ -506,8 +506,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ONDO_USDT",
@@ -545,8 +545,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "UNI_USDT",
@@ -584,8 +584,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "TAO_USDT",
@@ -623,8 +623,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ARB_USDT",
@@ -662,8 +662,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "GALA_USDT",
@@ -701,8 +701,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ATOM_USDT",
@@ -740,8 +740,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "DOT_USDT",
@@ -779,8 +779,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "ALGO_USDT",
@@ -818,8 +818,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "JUP_USDT",
@@ -857,8 +857,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "KAITO_USDT",
@@ -896,8 +896,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "PENGU_USDT",
@@ -935,8 +935,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "WLFI_USDT",
@@ -974,8 +974,8 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     },
     {
       "symbol": "BCH_USDT",
@@ -1013,12 +1013,12 @@
         }
       ],
       "leverage": 10,
-      "tp_pct": 1.5,
-      "sl_pct": 0.5
+      "tp_pct": 2.0,
+      "sl_pct": 1.0
     }
   ],
   "signals_only": false,
-  "max_positions": 4,
+  "max_positions": 1,
   "margin_mode": 1,
   "tp_sl_enabled": true,
   "hedging_enabled": false,

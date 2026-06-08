@@ -1,0 +1,44 @@
+{
+  "api_key": "mx0vgl6vJiDoOP5SZi",
+  "api_secret": "242d4e0a0c8547c680d9c002ce2f6c30",
+  "pairs": [
+    {
+      "symbol": "NAS100_USDT",
+      "enabled": true,
+      "interval": "Min5",
+      "direction": "BOTH",
+      "ma200_enabled": false,
+      "ma200_tf": "Hour4",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 1.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.5
+        }
+      ],
+      "leverage": 10,
+      "tp_pct": 1.0,
+      "sl_pct": 1.0
+    }
+  ],
+  "signals_only": false,
+  "max_positions": 1,
+  "margin_mode": 1,
+  "tp_sl_enabled": true,
+  "hedging_enabled": false
+}

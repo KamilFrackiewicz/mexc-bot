@@ -491,14 +491,16 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         # Sygnał breakout
         signal = "WAIT"
         prec = _prec(ps.symbol)
-
-        # Ostatnia zamknieta swica przebila ORB
-        last_close = closes[-1]
+        # Logika: poprzednia swica zamknela sie poza H/L
+        #         biezaca swica otwiera sie poza H/L = wejscie
+        opens = [float(x) for x in kdata.get("open", [])]
+        if len(opens) < 2: ps.log("Za malo danych open", "WARN"); return
         prev_close = closes[-2]
+        curr_open  = opens[-1]
 
-        long_ok  = (prev_close <= ps.orb_high and last_close > ps.orb_high and
+        long_ok  = (prev_close > ps.orb_high and curr_open > ps.orb_high and
                     ma200_ok_long and ps.direction in ("LONG", "BOTH"))
-        short_ok = (prev_close >= ps.orb_low and last_close < ps.orb_low and
+        short_ok = (prev_close < ps.orb_low and curr_open < ps.orb_low and
                     ma200_ok_short and ps.direction in ("SHORT", "BOTH"))
 
         if long_ok:    signal = "LONG"
