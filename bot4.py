@@ -435,8 +435,10 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             for i, t in enumerate(times):
                 t_sec = int(t) // 1000 if int(t) > 9999999999 else int(t)
                 if t_sec >= orb_ts:
-                    orb_candle_idx = i
-                    break
+                    # Swica musi miec zakres H > L (nie pusta)
+                    if float(highs[i]) > float(lows[i]):
+                        orb_candle_idx = i
+                        break
 
             if orb_candle_idx is None:
                 ps.log(f"Czekam na swiece ORB (15:{30 if now.dst() else 30})", "INFO")
