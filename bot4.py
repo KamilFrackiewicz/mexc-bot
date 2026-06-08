@@ -429,10 +429,12 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                 ps.log("Brak danych swiec", "WARN"); return
 
             # Znajdz swice ORB — pierwsza swica po 15:30
-            orb_ts = int(orb_start.timestamp() * 1000)
+            # MEXC zwraca timestamps w sekundach
+            orb_ts = int(orb_start.timestamp())
             orb_candle_idx = None
             for i, t in enumerate(times):
-                if int(t) >= orb_ts:
+                t_sec = int(t) // 1000 if int(t) > 9999999999 else int(t)
+                if t_sec >= orb_ts:
                     orb_candle_idx = i
                     break
 
