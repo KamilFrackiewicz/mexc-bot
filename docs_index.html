@@ -276,8 +276,9 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
       <p>Strategia oparta na <strong>Opening Range Breakout</strong> — jednej z najbardziej sprawdzonych technik tradingu intraday. Bot wyznacza High i Low pierwszej świecy po otwarciu sesji w Nowym Jorku (15:30 CET latem, 16:30 zimą), a następnie czeka na przebicie tych poziomów.</p>
       <div class="rule-list">
         <div class="rule info"><div class="rule-icon">📐</div><div class="rule-text"><strong>Krok 1 — Wyznaczenie ORB:</strong> Bot czeka na zamknięcie pierwszej świecy (1min, 5min lub 15min) po otwarciu NY i zapamiętuje jej High i Low jako poziomy ORB.</div></div>
-        <div class="rule long"><div class="rule-icon">▲</div><div class="rule-text"><strong>LONG:</strong> Kolejna świeca zamyka się powyżej poziomu High ORB — sygnał kontynuacji wzrostu</div></div>
-        <div class="rule short"><div class="rule-icon">▼</div><div class="rule-text"><strong>SHORT:</strong> Kolejna świeca zamyka się poniżej poziomu Low ORB — sygnał kontynuacji spadku</div></div>
+        <div class="rule long"><div class="rule-icon">▲</div><div class="rule-text"><strong>LONG:</strong> Poprzednia świeca zamknęła się <strong>powyżej High ORB</strong> + bieżąca świeca otwiera się powyżej High ORB → wejście LONG na otwarciu</div></div>
+        <div class="rule short"><div class="rule-icon">▼</div><div class="rule-text"><strong>SHORT:</strong> Poprzednia świeca zamknęła się <strong>poniżej Low ORB</strong> + bieżąca świeca otwiera się poniżej Low ORB → wejście SHORT na otwarciu</div></div>
+        <div class="rule info"><div class="rule-icon">⚠️</div><div class="rule-text">Bot pomija puste świece (H=L) przy wyznaczaniu poziomów ORB — bierze pierwszą świecę z rzeczywistym zakresem po otwarciu NY</div></div>
         <div class="rule info"><div class="rule-icon">⏰</div><div class="rule-text"><strong>Okno tradingowe:</strong> Max 2 godziny po otwarciu NY. Po tym czasie bot przestaje szukać sygnałów do następnego dnia.</div></div>
         <div class="rule info"><div class="rule-icon">📊</div><div class="rule-text"><strong>Filtr MA200 (opcjonalny):</strong> Identyczny jak w pozostałych strategiach</div></div>
       </div>
