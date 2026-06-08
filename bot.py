@@ -560,19 +560,26 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                              k_series[-1] < d_series[-1] - cross_min and
                              k_now > ps.stoch_overbought)
 
-        # Zapamiętaj wybicie BB
+        # Pobierz timestamp ostatniej swieci
+        kdata_times = kdata.get("time", [])
+        last_ts = int(kdata_times[-1]) if kdata_times else 0
+        iv_seconds = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,"Min60":3600,"Hour4":14400}.get(ps.interval, 300)
+
+        # Zapamiętaj wybicie BB (timestamp pierwszej swieci wybicia)
         if near_lower and ps.bb_breakout_side != "LONG":
-            ps.bb_breakout_candle = candle_idx
+            ps.bb_breakout_candle = last_ts
             ps.bb_breakout_side = "LONG"
         if near_upper and ps.bb_breakout_side != "SHORT":
-            ps.bb_breakout_candle = candle_idx
+            ps.bb_breakout_candle = last_ts
             ps.bb_breakout_side = "SHORT"
 
-        # Reset wybicia jesli za stare
+        # Reset wybicia jesli za stare (okno w swiecach)
         window = ps.stoch_window
-        if ps.bb_breakout_candle is not None and (candle_idx - ps.bb_breakout_candle) > window:
-            ps.bb_breakout_candle = None
-            ps.bb_breakout_side = None
+        if ps.bb_breakout_candle is not None:
+            candles_elapsed = (last_ts - ps.bb_breakout_candle) // (iv_seconds * 1000)
+            if candles_elapsed > window:
+                ps.bb_breakout_candle = None
+                ps.bb_breakout_side = None
 
         # Crossover w oknie po wybiciu BB
         k_cross_over  = (k_cross_over_now and
