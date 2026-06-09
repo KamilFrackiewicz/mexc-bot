@@ -38,7 +38,7 @@
   ],
   "signals_only": false,
   "max_positions": 1,
-  "margin_mode": 1,
+  "margin_mode": 2,
   "tp_sl_enabled": true,
   "hedging_enabled": false
 }
