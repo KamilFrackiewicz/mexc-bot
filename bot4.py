@@ -244,6 +244,8 @@ class PairState:
         self.orb_low:  Optional[float] = None
         self.orb_date: Optional[str]   = None
         self.orb_set:  bool = False
+        self.orb_traded_long: bool = False
+        self.orb_traded_short: bool = False
         # Wskazniki
         self.last_price = None; self.last_check = None
         self.last_ma200 = None
@@ -273,6 +275,8 @@ class PairState:
     def reset_orb(self):
         self.orb_high = None; self.orb_low = None
         self.orb_set = False
+        self.orb_traded_long = False
+        self.orb_traded_short = False
 
     @property
     def pyramid_avg_entry(self):
@@ -415,6 +419,8 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         if ps.orb_date != today:
             ps.reset_orb()
             ps.orb_date = today
+            ps.orb_traded_long = False
+            ps.orb_traded_short = False
             ps.log(f"Nowy dzien — reset ORB ({today})")
 
         # ── Krok 1: Wyznacz poziomy ORB ───────────────────────────────────────
@@ -515,6 +521,10 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                f" prev:{round(prev_close,prec)} close:{round(last_close,prec)}{ma_str} -> {signal}")
 
         if signal in ("LONG","SHORT") and not ps.pyramid_active:
+            if signal == "LONG" and ps.orb_traded_long:
+                ps.log("ORB LONG juz handlowano dzisiaj"); return
+            if signal == "SHORT" and ps.orb_traded_short:
+                ps.log("ORB SHORT juz handlowano dzisiaj"); return
             active_count = sum(1 for p in gstate.pairs.values() if p.pyramid_active)
             if active_count >= gstate.max_positions:
                 ps.log(f"Blokada: {active_count}/{gstate.max_positions} pozycji", "WARN")
@@ -609,6 +619,8 @@ def _open_position(client, ps, side, price):
                         ps.log(f"Blad SL: {sl_result.get('message')} — bot monitoruje", "WARN")
             except Exception as e:
                 ps.log(f"Blad SL: {e}", "WARN")
+        if side == "LONG": ps.orb_traded_long = True
+        else: ps.orb_traded_short = True
         ps.log(f"[ORB] {side} | Cena:{exec_price} | TP:{tp_price} | SL:{sl_price} | Dok:{len(limit_ids)}", "SUCCESS")
         tg(f"🚀 <b>{ps.symbol}</b> [ORB] {side}\nCena: {exec_price}\nTP: {tp_price} | SL: {sl_price}\nORB H:{round(ps.orb_high,prec)} L:{round(ps.orb_low,prec)}")
     except Exception as e:
