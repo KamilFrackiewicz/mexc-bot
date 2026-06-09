@@ -576,8 +576,13 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         # Reset wybicia jesli za stare (okno w swiecach)
         window = ps.stoch_window
         if ps.bb_breakout_candle is not None:
-            candles_elapsed = (last_ts - ps.bb_breakout_candle) // (iv_seconds * 1000)
+            # last_ts jest w sekundach, iv_seconds tez w sekundach
+            ts_now = int(kdata_times[-1]) if kdata_times else 0
+            ts_now = ts_now // 1000 if ts_now > 9999999999 else ts_now
+            bb_ts  = ps.bb_breakout_candle // 1000 if ps.bb_breakout_candle > 9999999999 else ps.bb_breakout_candle
+            candles_elapsed = (ts_now - bb_ts) // iv_seconds
             if candles_elapsed > window:
+                ps.log(f"BB breakout wygas ({candles_elapsed} swiec > {window})")
                 ps.bb_breakout_candle = None
                 ps.bb_breakout_side = None
 
