@@ -497,6 +497,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         #         biezaca swica otwiera sie poza H/L = wejscie
         opens = [float(x) for x in kdata.get("open", [])]
         if len(opens) < 2: ps.log("Za malo danych open", "WARN"); return
+        last_close = closes[-1]
         prev_close = closes[-2]
         curr_open  = opens[-1]
 
