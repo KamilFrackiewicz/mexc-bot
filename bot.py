@@ -971,9 +971,8 @@ async def pyramid_monitor_loop():
                             be_sl = round(be_sl, prec)
                             ps.current_sl = be_sl
                             ps.be_activated = True
-                            ps.log(f"🛡️ Break Even aktywowany @ {price} — SL → {be_sl}", "SUCCESS")
-                            tg(f"🛡️ <b>{ps.symbol}</b> Break Even aktywowany
-Cena: {price} | Nowy SL: {be_sl}")
+                            ps.log(f"Break Even aktywowany @ {price} — SL: {be_sl}", "SUCCESS")
+                            tg(f"<b>{ps.symbol}</b> Break Even aktywowany\nCena: {price} | Nowy SL: {be_sl}")
                             try:
                                 positions = client.get_positions(ps.symbol)
                                 if positions:
