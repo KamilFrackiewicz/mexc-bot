@@ -744,8 +744,8 @@ async def bot_loop():
         try: save_logs()
         except: pass
         # Sprawdzaj co minute
-        gstate.log(f"Sprawdzam za 60s ({len(actives)} par)")
-        for _ in range(60):
+        gstate.log(f"Sprawdzam za 15s ({len(actives)} par)")
+        for _ in range(15):
             if not gstate.running: break
             await asyncio.sleep(1)
 
