@@ -288,6 +288,7 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-be" onclick="toggleBE()">⚖️ BE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
     <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
     <button class="btn btn-outline btn-sm" id="btn-margin" onclick="toggleMarginMode()">🔒 ISOLATED</button>
@@ -348,6 +349,21 @@ input[type=password]{letter-spacing:.1em;}
         <div class="field"><label>Okno BB→Stoch (świece)</label>
           <input type="number" id="def-stoch-window" value="5" min="1" max="20"
             title="Max ile świec po wybiciu BB bot czeka na crossover Stoch">
+        </div>
+      </div>
+      <div class="sec">Break Even</div>
+      <div class="sw-row">
+        <span class="sw-lbl">Włącz Break Even</span>
+        <button class="sw" id="be-sw" onclick="toggleBE()"></button>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Próg BE %</label>
+          <input type="number" id="be-trigger" value="0.3" min="0.1" step="0.1"
+            title="Przy jakim % zysku aktywuje Break Even">
+        </div>
+        <div class="field"><label>SL po BE %</label>
+          <input type="number" id="be-sl" value="0.1" min="0" step="0.1"
+            title="SL po aktywacji BE (od ceny wejścia)">
         </div>
       </div>
       <div class="sec">MA200 Filtr trendu</div>
@@ -786,6 +802,20 @@ async function setMaxPositions(val){
   try {
     await apiFetch('/max_positions/'+parseInt(val), {method:'POST'});
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
+  } catch {}
+}
+async function toggleBE(){
+  const btn=document.getElementById('btn-be');
+  const sw=document.getElementById('be-sw');
+  const isOn=btn.classList.contains('btn-go');
+  const val=isOn?0:1;
+  try {
+    await apiFetch('/be/'+val,{method:'POST'});
+    const trigger=parseFloat(document.getElementById('be-trigger').value)||0.3;
+    const sl=parseFloat(document.getElementById('be-sl').value)||0.1;
+    await apiFetch(`/be_config?trigger=${trigger}&sl=${sl}`,{method:'POST'});
+    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚖️ BE ON'; sw.classList.add('on'); toast('⚖️ Break Even ON','var(--cyan)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚖️ BE OFF'; sw.classList.remove('on'); toast('⚖️ Break Even OFF','var(--text2)'); }
   } catch {}
 }
 async function toggleTpSl(){

@@ -317,6 +317,7 @@ class PairState:
         self.pyramid_active = False; self.pyramid_side = None
         self.current_tp: Optional[float] = None
         self.current_sl: Optional[float] = None
+        self.be_activated: bool = False
         self.pyramid_limit_order_ids: List = []
         self.open_positions = []; self.logs: List[dict] = []
         self.hedge_entries: List[PyramidEntry] = []
@@ -351,6 +352,7 @@ class PairState:
     def reset_pyramid(self):
         self.pyramid_entries = []; self.pyramid_active = False; self.pyramid_side = None
         self.pyramid_limit_order_ids = []
+        self.be_activated = False
 
     def reset_hedge(self):
         self.hedge_entries = []; self.hedge_active = False; self.hedge_side = None
@@ -406,6 +408,9 @@ class GlobalState:
         self.margin_mode = 1  # 1=Isolated, 2=Cross
         self.tp_sl_enabled = True
         self.hedging_enabled = False
+        self.be_enabled = False
+        self.be_trigger_pct = 0.3
+        self.be_sl_pct = 0.1
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -442,6 +447,9 @@ def save_config():
         data["margin_mode"] = gstate.margin_mode
         data["tp_sl_enabled"] = gstate.tp_sl_enabled
         data["hedging_enabled"] = gstate.hedging_enabled
+        data["be_enabled"] = gstate.be_enabled
+        data["be_trigger_pct"] = gstate.be_trigger_pct
+        data["be_sl_pct"] = gstate.be_sl_pct
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -458,6 +466,9 @@ def load_config():
         gstate.margin_mode = data.get("margin_mode", 1)
         gstate.tp_sl_enabled = data.get("tp_sl_enabled", True)
         gstate.hedging_enabled = data.get("hedging_enabled", False)
+        gstate.be_enabled = data.get("be_enabled", False)
+        gstate.be_trigger_pct = data.get("be_trigger_pct", 0.3)
+        gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -948,6 +959,34 @@ async def pyramid_monitor_loop():
                     _check_pyramid_continuation(client, ps, price)
 
                     # Sprawdz TP/SL z pamieci bota
+                    # Break Even
+                    if (gstate.be_enabled and ps.pyramid_active and ps.pyramid_side and
+                            ps.pyramid_entries and not ps.be_activated):
+                        entry_price = ps.pyramid_entries[0].price
+                        be_trigger = entry_price * (1 + gstate.be_trigger_pct / 100) if ps.pyramid_side == "LONG" else entry_price * (1 - gstate.be_trigger_pct / 100)
+                        be_sl = entry_price * (1 + gstate.be_sl_pct / 100) if ps.pyramid_side == "LONG" else entry_price * (1 - gstate.be_sl_pct / 100)
+                        be_triggered = (price >= be_trigger if ps.pyramid_side == "LONG" else price <= be_trigger)
+                        if be_triggered:
+                            prec = PRICE_PREC.get(ps.symbol, 4)
+                            be_sl = round(be_sl, prec)
+                            ps.current_sl = be_sl
+                            ps.be_activated = True
+                            ps.log(f"🛡️ Break Even aktywowany @ {price} — SL → {be_sl}", "SUCCESS")
+                            tg(f"🛡️ <b>{ps.symbol}</b> Break Even aktywowany
+Cena: {price} | Nowy SL: {be_sl}")
+                            try:
+                                positions = client.get_positions(ps.symbol)
+                                if positions:
+                                    pos_id   = positions[0].get("positionId")
+                                    hold_vol = positions[0].get("holdVol", 0)
+                                    client._post("/api/v1/private/stoporder/place", {
+                                        "positionId": pos_id, "symbol": ps.symbol,
+                                        "vol": hold_vol, "lossTrend": 1, "profitTrend": 1,
+                                        "stopLossPrice": be_sl
+                                    })
+                            except Exception as e:
+                                ps.log(f"BE SL blad: {e}", "WARN")
+
                     if gstate.tp_sl_enabled and ps.current_tp and ps.current_sl and ps.pyramid_side:
                         tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG"
                                   else price <= ps.current_tp)
@@ -1149,6 +1188,19 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/be/{enabled}")
+async def set_be(enabled: int, _=Depends(require_auth)):
+    gstate.be_enabled = bool(enabled)
+    save_config(); gstate.log(f"Break Even: {gstate.be_enabled}")
+    return {"ok": True, "be_enabled": gstate.be_enabled}
+
+@app.post("/api/be_config")
+async def set_be_config(trigger: float, sl: float, _=Depends(require_auth)):
+    gstate.be_trigger_pct = trigger
+    gstate.be_sl_pct = sl
+    save_config(); gstate.log(f"BE config: trigger={trigger}% sl={sl}%")
+    return {"ok": True}
+
 @app.post("/api/hedging/{enabled}")
 async def set_hedging(enabled: int, _=Depends(require_auth)):
     gstate.hedging_enabled = bool(enabled)
@@ -1173,6 +1225,9 @@ def get_status(_=Depends(require_auth)):
             "margin_mode": gstate.margin_mode,
             "tp_sl_enabled": gstate.tp_sl_enabled,
             "hedging_enabled": gstate.hedging_enabled,
+            "be_enabled": gstate.be_enabled,
+            "be_trigger_pct": gstate.be_trigger_pct,
+            "be_sl_pct": gstate.be_sl_pct,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
