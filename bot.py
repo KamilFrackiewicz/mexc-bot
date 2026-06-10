@@ -1025,6 +1025,8 @@ async def pyramid_monitor_loop():
                     current = [p for p in all_pos if p.get("symbol") == ps.symbol]
                     if not current and ps.pyramid_active:
                         ps.log("Pozycja zamknieta (MEXC TP/SL) - resetuje piramide", "SUCCESS")
+                        try: client._post("/api/v1/private/order/cancel_all", {"symbol": ps.symbol})
+                        except: pass
                         ps.reset_pyramid()
                         ps.current_tp = None
                         ps.current_sl = None
