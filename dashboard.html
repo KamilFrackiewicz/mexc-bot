@@ -809,6 +809,12 @@ async function saveBEConfig(){
   const sl=parseFloat(document.getElementById('be-sl').value)||0.1;
   try { await apiFetch(`/be_config?trigger=${trigger}&sl=${sl}`,{method:'POST'}); } catch {}
 }
+document.addEventListener('DOMContentLoaded', function(){
+  const beTrigger=document.getElementById('be-trigger');
+  const beSl=document.getElementById('be-sl');
+  if(beTrigger) beTrigger.addEventListener('change', saveBEConfig);
+  if(beSl) beSl.addEventListener('change', saveBEConfig);
+});
 async function toggleBE(){
   const btn=document.getElementById('btn-be');
   const sw=document.getElementById('be-sw');
