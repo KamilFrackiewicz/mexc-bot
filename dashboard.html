@@ -804,16 +804,19 @@ async function setMaxPositions(val){
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
   } catch {}
 }
+async function saveBEConfig(){
+  const trigger=parseFloat(document.getElementById('be-trigger').value)||0.3;
+  const sl=parseFloat(document.getElementById('be-sl').value)||0.1;
+  try { await apiFetch(`/be_config?trigger=${trigger}&sl=${sl}`,{method:'POST'}); } catch {}
+}
 async function toggleBE(){
   const btn=document.getElementById('btn-be');
   const sw=document.getElementById('be-sw');
   const isOn=btn.classList.contains('btn-go');
   const val=isOn?0:1;
   try {
+    await saveBEConfig();
     await apiFetch('/be/'+val,{method:'POST'});
-    const trigger=parseFloat(document.getElementById('be-trigger').value)||0.3;
-    const sl=parseFloat(document.getElementById('be-sl').value)||0.1;
-    await apiFetch(`/be_config?trigger=${trigger}&sl=${sl}`,{method:'POST'});
     if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚖️ BE ON'; sw.classList.add('on'); toast('⚖️ Break Even ON','var(--cyan)'); }
     else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚖️ BE OFF'; sw.classList.remove('on'); toast('⚖️ Break Even OFF','var(--text2)'); }
   } catch {}
