@@ -887,6 +887,11 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const beBtn=document.getElementById('btn-be');
+  const beSw=document.getElementById('be-sw');
+  if(beBtn){ if(data.be_enabled){ beBtn.classList.remove('btn-outline'); beBtn.classList.add('btn-go'); beBtn.textContent='⚖️ BE ON'; if(beSw) beSw.classList.add('on'); } else { beBtn.classList.remove('btn-go'); beBtn.classList.add('btn-outline'); beBtn.textContent='⚖️ BE OFF'; if(beSw) beSw.classList.remove('on'); } }
+  if(data.be_trigger_pct) document.getElementById('be-trigger').value=data.be_trigger_pct;
+  if(data.be_sl_pct!==undefined) document.getElementById('be-sl').value=data.be_sl_pct;
   const tpslBtn = document.getElementById('btn-tpsl');
   if(tpslBtn){ tpslBtn.textContent = data.tp_sl_enabled===false ? '🛡️ TP/SL OFF' : '🛡️ TP/SL ON'; tpslBtn.style.color = data.tp_sl_enabled===false ? 'var(--red)' : ''; }
   const hedgeBtn = document.getElementById('btn-hedge');
