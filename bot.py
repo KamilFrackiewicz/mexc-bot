@@ -962,9 +962,11 @@ async def pyramid_monitor_loop():
                     # Break Even
                     if (gstate.be_enabled and ps.pyramid_active and ps.pyramid_side and
                             ps.pyramid_entries and not ps.be_activated):
-                        entry_price = ps.pyramid_entries[0].price
-                        be_trigger = entry_price * (1 + gstate.be_trigger_pct / 100) if ps.pyramid_side == "LONG" else entry_price * (1 - gstate.be_trigger_pct / 100)
-                        be_sl = entry_price * (1 + gstate.be_sl_pct / 100) if ps.pyramid_side == "LONG" else entry_price * (1 - gstate.be_sl_pct / 100)
+                        # Srednia cena ze wszystkich wejsc
+                        total_vol = sum(e.vol for e in ps.pyramid_entries)
+                        avg_price = sum(e.price * e.vol for e in ps.pyramid_entries) / total_vol if total_vol else ps.pyramid_entries[0].price
+                        be_trigger = avg_price * (1 + gstate.be_trigger_pct / 100) if ps.pyramid_side == "LONG" else avg_price * (1 - gstate.be_trigger_pct / 100)
+                        be_sl = avg_price * (1 + gstate.be_sl_pct / 100) if ps.pyramid_side == "LONG" else avg_price * (1 - gstate.be_sl_pct / 100)
                         be_triggered = (price >= be_trigger if ps.pyramid_side == "LONG" else price <= be_trigger)
                         if be_triggered:
                             prec = {"BTC_USDT":1,"ETH_USDT":2,"SOL_USDT":2,"SUI_USDT":4,"DOGE_USDT":5,"ADA_USDT":4,"LINK_USDT":3,"HYPE_USDT":3,"NAS100_USDT":0,"SP500_USDT":2,"BNB_USDT":1,"XRP_USDT":4,"TRX_USDT":5,"LTC_USDT":2,"AVAX_USDT":3,"ONDO_USDT":4,"UNI_USDT":3,"TAO_USDT":2,"XAU_USDT":2,"ARB_USDT":5,"GALA_USDT":6,"ATOM_USDT":3,"DOT_USDT":3,"ALGO_USDT":4,"JUP_USDT":4,"KAITO_USDT":4,"PENGU_USDT":6,"WLFI_USDT":5,"BCH_USDT":2}.get(ps.symbol, 4)
