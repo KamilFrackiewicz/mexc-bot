@@ -5,12 +5,12 @@
     {
       "symbol": "XRP_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -40,12 +40,12 @@
     {
       "symbol": "BTC_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -75,12 +75,12 @@
     {
       "symbol": "ETH_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -110,12 +110,12 @@
     {
       "symbol": "SOL_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -145,12 +145,12 @@
     {
       "symbol": "SUI_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -180,12 +180,12 @@
     {
       "symbol": "TRX_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -215,12 +215,12 @@
     {
       "symbol": "DOGE_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -250,12 +250,12 @@
     {
       "symbol": "BNB_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min1",
       "direction": "BOTH",
-      "ema_filter_enabled": false,
+      "ema_filter_enabled": true,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min5",
+      "ma200_tf": "Min60",
       "pyramid_levels": [
         {
           "enabled": true,
@@ -283,8 +283,8 @@
       "sl_pct": 0.5
     }
   ],
-  "signals_only": true,
-  "max_positions": 8,
+  "signals_only": false,
+  "max_positions": 2,
   "margin_mode": 2,
   "tp_sl_enabled": true,
   "hedging_enabled": false,

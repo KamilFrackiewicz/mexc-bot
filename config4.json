@@ -12,7 +12,7 @@
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 5.0,
           "offset_pct": 0.0
         },
         {
@@ -31,14 +31,17 @@
           "offset_pct": 0.5
         }
       ],
-      "leverage": 10,
+      "leverage": 21,
       "tp_pct": 0.5,
-      "sl_pct": 0.5
+      "sl_pct": 0.3
     }
   ],
   "signals_only": false,
   "max_positions": 1,
   "margin_mode": 2,
   "tp_sl_enabled": true,
-  "hedging_enabled": false
+  "hedging_enabled": false,
+  "be_enabled": true,
+  "be_trigger_pct": 0.2,
+  "be_sl_pct": 0.1
 }
