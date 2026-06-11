@@ -255,6 +255,7 @@ class PairState:
         self.pyramid_active = False; self.pyramid_side = None
         self.current_tp: Optional[float] = None
         self.current_sl: Optional[float] = None
+        self.be_activated: bool = False
         self.pyramid_limit_order_ids: List = []
         self.open_positions = []; self.logs: List[dict] = []
         self.hedge_entries: List[PyramidEntry] = []
@@ -290,6 +291,7 @@ class PairState:
     def reset_pyramid(self):
         self.pyramid_entries = []; self.pyramid_active = False
         self.pyramid_side = None; self.pyramid_limit_order_ids = []
+        self.be_activated = False
 
     def reset_hedge(self):
         self.hedge_entries = []; self.hedge_active = False
@@ -329,6 +331,9 @@ class GlobalState:
         self.margin_mode = 1
         self.tp_sl_enabled = True
         self.hedging_enabled = False
+        self.be_enabled = False
+        self.be_trigger_pct = 0.3
+        self.be_sl_pct = 0.1
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -360,6 +365,9 @@ def save_config():
         data["margin_mode"] = gstate.margin_mode
         data["tp_sl_enabled"] = gstate.tp_sl_enabled
         data["hedging_enabled"] = gstate.hedging_enabled
+        data["be_enabled"] = gstate.be_enabled
+        data["be_trigger_pct"] = gstate.be_trigger_pct
+        data["be_sl_pct"] = gstate.be_sl_pct
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
     except Exception as e:
         logger.error(f"Save error: {e}")
@@ -375,6 +383,9 @@ def load_config():
         gstate.margin_mode    = data.get("margin_mode", 1)
         gstate.tp_sl_enabled  = data.get("tp_sl_enabled", True)
         gstate.hedging_enabled = data.get("hedging_enabled", False)
+        gstate.be_enabled = data.get("be_enabled", False)
+        gstate.be_trigger_pct = data.get("be_trigger_pct", 0.3)
+        gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol")
             if not sym: continue
@@ -682,6 +693,34 @@ async def monitor_loop():
                     if price <= 0: continue
                     ps.last_price = price
                     _check_continuation(client, ps, price)
+                    # Break Even
+                    if (gstate.be_enabled and ps.pyramid_active and ps.pyramid_side and
+                            ps.pyramid_entries and not ps.be_activated):
+                        total_vol = sum(e.vol for e in ps.pyramid_entries)
+                        avg_price = sum(e.price * e.vol for e in ps.pyramid_entries) / total_vol if total_vol else ps.pyramid_entries[0].price
+                        be_trigger = avg_price * (1 + gstate.be_trigger_pct / 100) if ps.pyramid_side == "LONG" else avg_price * (1 - gstate.be_trigger_pct / 100)
+                        be_sl = avg_price * (1 + gstate.be_sl_pct / 100) if ps.pyramid_side == "LONG" else avg_price * (1 - gstate.be_sl_pct / 100)
+                        be_triggered = (price >= be_trigger if ps.pyramid_side == "LONG" else price <= be_trigger)
+                        if be_triggered:
+                            prec = {"BTC_USDT":1,"ETH_USDT":2,"SOL_USDT":2,"SUI_USDT":4,"DOGE_USDT":5,"ADA_USDT":4,"LINK_USDT":3,"HYPE_USDT":3,"NAS100_USDT":0,"SP500_USDT":2,"BNB_USDT":1,"XRP_USDT":4,"TRX_USDT":5,"LTC_USDT":2,"AVAX_USDT":3,"ONDO_USDT":4,"UNI_USDT":3,"TAO_USDT":2,"XAU_USDT":2,"ARB_USDT":5,"GALA_USDT":6,"ATOM_USDT":3,"DOT_USDT":3,"ALGO_USDT":4,"JUP_USDT":4,"KAITO_USDT":4,"PENGU_USDT":6,"WLFI_USDT":5,"BCH_USDT":2}.get(ps.symbol, 4)
+                            be_sl = round(be_sl, prec)
+                            ps.current_sl = be_sl
+                            ps.be_activated = True
+                            ps.log(f"Break Even aktywowany @ {price} — SL: {be_sl}", "SUCCESS")
+                            tg(f"<b>{ps.symbol}</b> [ORB] Break Even aktywowany\nCena: {price} | Nowy SL: {be_sl}")
+                            try:
+                                positions = client.get_positions(ps.symbol)
+                                if positions:
+                                    pos_id   = positions[0].get("positionId")
+                                    hold_vol = positions[0].get("holdVol", 0)
+                                    client._post("/api/v1/private/stoporder/place", {
+                                        "positionId": pos_id, "symbol": ps.symbol,
+                                        "vol": hold_vol, "lossTrend": 1, "profitTrend": 1,
+                                        "stopLossPrice": be_sl
+                                    })
+                            except Exception as e:
+                                ps.log(f"BE SL blad: {e}", "WARN")
+
                     if gstate.tp_sl_enabled and ps.current_tp and ps.current_sl and ps.pyramid_side:
                         tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG" else price <= ps.current_tp)
                         sl_hit = (price <= ps.current_sl if ps.pyramid_side == "LONG" else price >= ps.current_sl)
@@ -853,6 +892,19 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/be/{enabled}")
+async def set_be(enabled: int, _=Depends(require_auth)):
+    gstate.be_enabled = bool(enabled)
+    save_config(); gstate.log(f"Break Even: {gstate.be_enabled}")
+    return {"ok": True, "be_enabled": gstate.be_enabled}
+
+@app.post("/api/be_config")
+async def set_be_config(trigger: float, sl: float, _=Depends(require_auth)):
+    gstate.be_trigger_pct = trigger
+    gstate.be_sl_pct = sl
+    save_config(); gstate.log(f"BE config: trigger={trigger}% sl={sl}%")
+    return {"ok": True}
+
 @app.post("/api/hedging/{enabled}")
 async def set_hedging(enabled: int, _=Depends(require_auth)):
     gstate.hedging_enabled = bool(enabled)
@@ -874,6 +926,9 @@ def get_status(_=Depends(require_auth)):
             "margin_mode": gstate.margin_mode,
             "tp_sl_enabled": gstate.tp_sl_enabled,
             "hedging_enabled": gstate.hedging_enabled,
+            "be_enabled": gstate.be_enabled,
+            "be_trigger_pct": gstate.be_trigger_pct,
+            "be_sl_pct": gstate.be_sl_pct,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
