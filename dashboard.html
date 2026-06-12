@@ -402,6 +402,13 @@ input[type=password]{letter-spacing:.1em;}
     <div id="balance-box" style="padding:8px 14px;font-family:var(--mono);font-size:.65rem;color:var(--text2)">— kliknij ↻ aby odświeżyć —</div>
   </div>
 
+  <div class="panel">
+    <div class="ph">🧮 Kalkulator TP/SL</div>
+    <div class="pb" id="calc-box">
+      <div style="font-family:var(--mono);font-size:.62rem;color:var(--text2)">Zapisz konfigurację aby zobaczyć wyliczenia</div>
+    </div>
+  </div>
+
   <button class="btn btn-purple btn-full" onclick="saveAndApply()">ZAPISZ I ZASTOSUJ</button>
 </div>
 
@@ -1053,6 +1060,60 @@ async function fetchStatus(){
   } catch {}
 }
 
+function updateCalc(){
+  try {
+    const lev = parseInt(document.getElementById('def-leverage').value) || 10;
+    const tp  = parseFloat(document.getElementById('def-tp').value) || 0.8;
+    const sl  = parseFloat(document.getElementById('def-sl').value) || 0.4;
+    const be  = parseFloat(document.getElementById('be-trigger').value) || 0.3;
+    const beSl = parseFloat(document.getElementById('be-sl').value) || 0.1;
+
+    // Pobierz poziomy piramidy
+    const amt0  = parseFloat(document.getElementById('def-pamt-0')?.value) || 5;
+    const off1  = parseFloat(document.getElementById('def-poff-1')?.value) || 0.5;
+    const amt1  = parseFloat(document.getElementById('def-pamt-1')?.value) || 5;
+    const sw1   = document.getElementById('def-sw-1')?.classList.contains('on');
+    const off2  = parseFloat(document.getElementById('def-poff-2')?.value) || 0.5;
+    const amt2  = parseFloat(document.getElementById('def-pamt-2')?.value) || 10;
+    const sw2   = document.getElementById('def-sw-2')?.classList.contains('on');
+    const off3  = parseFloat(document.getElementById('def-poff-3')?.value) || 0.5;
+    const amt3  = parseFloat(document.getElementById('def-pamt-3')?.value) || 20;
+    const sw3   = document.getElementById('def-sw-3')?.classList.contains('on');
+
+    // Tylko wejście 1
+    const tp1  = (amt0 * lev * tp / 100).toFixed(2);
+    const sl1  = (amt0 * lev * sl / 100).toFixed(2);
+    const be1  = (amt0 * lev * beSl / 100).toFixed(2);
+
+    // Z dokładkami
+    let totalAmt = amt0;
+    let avgOffset = 0;
+    let dokStr = '';
+    if(sw1){ totalAmt+=amt1; avgOffset+=off1; dokStr+=`<div class="le"><span class="lt">Dok.2</span><span class="ll INFO">+${off1}%</span><span class="lm">${amt1}$ margin</span></div>`; }
+    if(sw2){ totalAmt+=amt2; avgOffset+=off2; dokStr+=`<div class="le"><span class="lt">Dok.3</span><span class="ll INFO">+${off2}%</span><span class="lm">${amt2}$ margin</span></div>`; }
+    if(sw3){ totalAmt+=amt3; avgOffset+=off3; dokStr+=`<div class="le"><span class="lt">Dok.4</span><span class="ll INFO">+${off3}%</span><span class="lm">${amt3}$ margin</span></div>`; }
+
+    const tpAll = (totalAmt * lev * tp / 100).toFixed(2);
+    const slAll = (totalAmt * lev * sl / 100).toFixed(2);
+    const beAll = (totalAmt * lev * beSl / 100).toFixed(2);
+
+    document.getElementById('calc-box').innerHTML = `
+      <div class="sec">Bez dokładek (${amt0}$ × ${lev}x)</div>
+      <div class="le"><span class="lt" style="color:var(--green)">TP</span><span class="ll SUCCESS">+${tp}%</span><span class="lm" style="color:var(--green);font-weight:700">+${tp1}$</span></div>
+      <div class="le"><span class="lt" style="color:var(--red)">SL</span><span class="ll ERROR">-${sl}%</span><span class="lm" style="color:var(--red);font-weight:700">-${sl1}$</span></div>
+      <div class="le"><span class="lt" style="color:var(--cyan)">BE</span><span class="ll INFO">+${beSl}%</span><span class="lm" style="color:var(--cyan);font-weight:700">+${be1}$</span></div>
+      ${totalAmt > amt0 ? `
+      <div class="sec">Z dokładkami (${totalAmt}$ × ${lev}x)</div>
+      ${dokStr}
+      <div class="le"><span class="lt" style="color:var(--green)">TP</span><span class="ll SUCCESS">+${tp}%</span><span class="lm" style="color:var(--green);font-weight:700">+${tpAll}$</span></div>
+      <div class="le"><span class="lt" style="color:var(--red)">SL</span><span class="ll ERROR">-${sl}%</span><span class="lm" style="color:var(--red);font-weight:700">-${slAll}$</span></div>
+      <div class="le"><span class="lt" style="color:var(--cyan)">BE</span><span class="ll INFO">+${beSl}%</span><span class="lm" style="color:var(--cyan);font-weight:700">+${beAll}$</span></div>
+      ` : ''}
+      <div class="sec">Próg BE aktywacji</div>
+      <div class="le"><span class="lt" style="color:var(--yellow)">🎯</span><span class="ll WARN">${be}%</span><span class="lm" style="color:var(--yellow)">od średniej wejść</span></div>
+    `;
+  } catch(e) { console.error(e); }
+}
 async function fetchBalance(){
   try {
     const r=await apiFetch('/balance');
