@@ -1095,8 +1095,8 @@ function updateCalc(){
     // BE SL (od całego wolumenu × beSl%)
     const beSlAmt = totalAmt * lev * beSl / 100;
 
-    // Próg BE (od całego wolumenu × be%)
-    const beTriggerAmt = totalAmt * lev * be / 100;
+    // Próg BE (od wejścia 1 × be%) - aktywacja progu
+    const beTriggerAmt = amt0 * lev * be / 100;
 
     // RR
     const rr = (tpWithDok / slWithDok).toFixed(2);
