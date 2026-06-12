@@ -517,6 +517,7 @@ function showApp() {
   document.getElementById('app').style.display = 'block';
   loadConfig();
   fetchStatus();
+  updateCalc();
   setInterval(fetchStatus, 5000);
 }
 
@@ -746,6 +747,7 @@ async function saveAndApply(){
     if(r.ok){
       toast('✅ Zapisano konfigurację','var(--green)');
       await fetchStatus();
+      updateCalc();
     } else toast('❌ Błąd zapisu','var(--red)');
   } catch(e){ if(e.message!=='Unauthorized') toast('❌ Brak połączenia','var(--red)'); }
 }
