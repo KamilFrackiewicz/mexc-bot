@@ -1068,8 +1068,8 @@ function updateCalc(){
     const lev  = parseInt(document.getElementById('def-leverage').value) || 10;
     const tp   = parseFloat(document.getElementById('def-tp').value) || 0.8;
     const sl   = parseFloat(document.getElementById('def-sl').value) || 0.4;
-    const be   = parseFloat(document.getElementById('be-trigger').value) || 0.3;
-    const beSl = parseFloat(document.getElementById('be-sl').value) || 0.1;
+    const be   = parseFloat(document.getElementById('be-trigger')?.value) || 0.3;
+    const beSl = parseFloat(document.getElementById('be-sl')?.value) || 0.1;
     const amt0 = parseFloat(document.getElementById('def-pamt-0')?.value) || 5;
 
     // Zbierz aktywne dokładki
@@ -1078,64 +1078,48 @@ function updateCalc(){
       const sw  = document.getElementById('def-sw-'+i)?.classList.contains('on');
       const amt = parseFloat(document.getElementById('def-pamt-'+i)?.value) || 5;
       const off = parseFloat(document.getElementById('def-poff-'+i)?.value) || 0.5;
-      if(sw) doks.push({amt, off});
+      if(sw) doks.push({amt, off, n:i+1});
     }
 
-    // Symulacja LONG (SHORT jest symetryczny)
-    // Cena bazowa = 100, wejście 1 @ 100
-    const price0 = 100;
-    let entries = [{price: price0, amt: amt0}];
-    let lastPrice = price0;
-    for(const d of doks){
-      lastPrice = lastPrice * (1 - d.off/100); // dokładka niżej (LONG)
-      entries.push({price: lastPrice, amt: d.amt});
-    }
-    const lastDokPrice = entries[entries.length-1].price;
-    const totalAmt = entries.reduce((s,e)=>s+e.amt, 0);
-    // Srednia cena wejscia
-    const avgPrice = entries.reduce((s,e)=>s+e.price*e.amt,0) / totalAmt;
+    const totalAmt = amt0 + doks.reduce((s,d)=>s+d.amt, 0);
 
-    // TP od ostatniej dokładki + tp%
-    const tpPrice = lastDokPrice * (1 + tp/100);
-    // SL od ostatniej dokładki - sl%
-    const slPrice = lastDokPrice * (1 - sl/100);
-    // BE SL od sredniej - beSl%
-    const beSlPrice = avgPrice * (1 - beSl/100);
+    // TP bez dokładek (od wejścia 1)
+    const tpNoDok = amt0 * lev * tp / 100;
 
-    // Zysk/strata per jednostka margin
-    // Pozycja = amt * lev kontraktów po cenie price
-    // PnL = (exitPrice - entryPrice) / entryPrice * amt * lev
-    let tpPnl = 0, slPnl = 0, bePnl = 0;
-    for(const e of entries){
-      tpPnl += (tpPrice - e.price) / e.price * e.amt * lev;
-      slPnl += (slPrice - e.price) / e.price * e.amt * lev;
-      bePnl += (beSlPrice - e.price) / e.price * e.amt * lev;
-    }
+    // TP z dokładkami (od całego wolumenu × TP%)
+    const tpWithDok = totalAmt * lev * tp / 100;
 
-    // BE trigger price
-    const beTriggerPrice = avgPrice * (1 + be/100);
-    let beTriggerPnl = 0;
-    for(const e of entries){
-      beTriggerPnl += (beTriggerPrice - e.price) / e.price * e.amt * lev;
-    }
+    // SL z dokładkami (od całego wolumenu × SL%)
+    const slWithDok = totalAmt * lev * sl / 100;
 
-    let dokStr = doks.map((d,i)=>`<div class="le"><span class="lt">Dok.${i+2}</span><span class="ll INFO">-${d.off}%</span><span class="lm">${d.amt}$ margin</span></div>`).join('');
+    // BE SL (od całego wolumenu × beSl%)
+    const beSlAmt = totalAmt * lev * beSl / 100;
+
+    // Próg BE (od całego wolumenu × be%)
+    const beTriggerAmt = totalAmt * lev * be / 100;
+
+    // RR
+    const rr = (tpWithDok / slWithDok).toFixed(2);
+
+    let dokStr = doks.map(d=>`<div class="le"><span class="lt">Dok.${d.n}</span><span class="ll INFO">-${d.off}%</span><span class="lm">${d.amt}$ margin</span></div>`).join('');
 
     document.getElementById('calc-box').innerHTML = `
-      <div class="sec">Wejście (${amt0}$${doks.length?` + ${doks.map(d=>d.amt+'$').join('+')}`:''} × ${lev}x)</div>
+      <div class="sec">Kapitał (${amt0}$${doks.length?' + '+doks.map(d=>d.amt+'$').join('+'):''} × ${lev}x)</div>
       ${dokStr}
-      <div class="le"><span class="lt">Avg</span><span class="ll INFO">${avgPrice.toFixed(3)}%</span><span class="lm" style="color:var(--text2)">średnia cena wejść</span></div>
-      <div class="sec">Wyniki</div>
-      <div class="le"><span class="lt" style="color:var(--green)">TP</span><span class="ll SUCCESS">+${tp}% od dok.</span><span class="lm" style="color:var(--green);font-weight:700">+${tpPnl.toFixed(2)}$</span></div>
-      <div class="le"><span class="lt" style="color:var(--red)">SL</span><span class="ll ERROR">-${sl}% od dok.</span><span class="lm" style="color:var(--red);font-weight:700">${slPnl.toFixed(2)}$</span></div>
-      <div class="le"><span class="lt" style="color:var(--cyan)">BE SL</span><span class="ll INFO">-${beSl}% od avg</span><span class="lm" style="color:var(--cyan);font-weight:700">${bePnl.toFixed(2)}$</span></div>
-      <div class="sec">Próg BE aktywacji</div>
-      <div class="le"><span class="lt" style="color:var(--yellow)">🎯</span><span class="ll WARN">+${be}% od avg</span><span class="lm" style="color:var(--yellow);font-weight:700">+${beTriggerPnl.toFixed(2)}$</span></div>
+      <div class="sec">TP</div>
+      <div class="le"><span class="lt" style="color:var(--green)">Bez dok.</span><span class="ll SUCCESS">+${tp}%</span><span class="lm" style="color:var(--green);font-weight:700">+${tpNoDok.toFixed(2)}$</span></div>
+      ${doks.length ? `<div class="le"><span class="lt" style="color:var(--green)">Z dok.</span><span class="ll SUCCESS">+${tp}%</span><span class="lm" style="color:var(--green);font-weight:700">+${tpWithDok.toFixed(2)}$</span></div>` : ''}
+      <div class="sec">SL (wszystkie wejścia)</div>
+      <div class="le"><span class="lt" style="color:var(--red)">SL</span><span class="ll ERROR">-${sl}%</span><span class="lm" style="color:var(--red);font-weight:700">-${slWithDok.toFixed(2)}$</span></div>
+      <div class="sec">Break Even</div>
+      <div class="le"><span class="lt" style="color:var(--yellow)">🎯 Próg</span><span class="ll WARN">+${be}%</span><span class="lm" style="color:var(--yellow);font-weight:700">+${beTriggerAmt.toFixed(2)}$</span></div>
+      <div class="le"><span class="lt" style="color:var(--cyan)">BE SL</span><span class="ll INFO">+${beSl}%</span><span class="lm" style="color:var(--cyan);font-weight:700">+${beSlAmt.toFixed(2)}$</span></div>
       <div class="sec">RR</div>
-      <div class="le"><span class="lt">Ratio</span><span class="ll ${tpPnl/Math.abs(slPnl)>=1?'SUCCESS':'ERROR'}">${(tpPnl/Math.abs(slPnl)).toFixed(2)}:1</span><span class="lm" style="color:var(--text2)">TP/SL</span></div>
+      <div class="le"><span class="lt">Ratio</span><span class="ll ${rr>=1?'SUCCESS':'ERROR'}">${rr}:1</span><span class="lm" style="color:var(--text2)">TP z dok. / SL</span></div>
     `;
   } catch(e) { console.error(e); }
 }
+
 async function fetchBalance(){
   try {
     const r=await apiFetch('/balance');
