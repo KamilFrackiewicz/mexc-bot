@@ -835,6 +835,12 @@ document.addEventListener('DOMContentLoaded', function(){
   const beSl=document.getElementById('be-sl');
   if(beTrigger) beTrigger.addEventListener('change', saveBEConfig);
   if(beSl) beSl.addEventListener('change', saveBEConfig);
+  // Kalkulator - aktualizuj przy zmianie ustawien
+  const calcFields = ['def-leverage','def-tp','def-sl','def-pamt-0','def-pamt-1','def-pamt-2','def-pamt-3','def-poff-1','def-poff-2','def-poff-3','be-trigger','be-sl'];
+  calcFields.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('change', updateCalc);
+  });
 });
 async function toggleBE(){
   const btn=document.getElementById('btn-be');
