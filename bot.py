@@ -411,6 +411,7 @@ class GlobalState:
         self.be_enabled = False
         self.be_trigger_pct = 0.3
         self.be_sl_pct = 0.1
+        self.fast_entry = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -450,6 +451,7 @@ def save_config():
         data["be_enabled"] = gstate.be_enabled
         data["be_trigger_pct"] = gstate.be_trigger_pct
         data["be_sl_pct"] = gstate.be_sl_pct
+        data["fast_entry"] = gstate.fast_entry
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -469,6 +471,7 @@ def load_config():
         gstate.be_enabled = data.get("be_enabled", False)
         gstate.be_trigger_pct = data.get("be_trigger_pct", 0.3)
         gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
+        gstate.fast_entry = data.get("fast_entry", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -1077,10 +1080,16 @@ async def bot_loop():
                 run_pair_strategy(client, ps)
                 await asyncio.sleep(0.5)
         min_iv = min((iv_map.get(ps.interval,300) for ps in actives), default=300)
-        gstate.log(f"Następne za {min_iv}s ({len(actives)} par)")
+        # Fast Entry — gdy jest aktywne wybicie BB sprawdzaj co 60s
+        has_breakout = gstate.fast_entry and any(
+            ps.bb_breakout_side is not None and not ps.pyramid_active
+            for ps in actives
+        )
+        wait_time = 60 if has_breakout else min_iv
+        gstate.log(f"Następne za {wait_time}s ({len(actives)} par){' ⚡FAST' if has_breakout else ''}")
         try: save_logs()
         except: pass
-        for _ in range(min_iv):
+        for _ in range(wait_time):
             if not gstate.running: break
             await asyncio.sleep(1)
 
@@ -1191,6 +1200,12 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/fast_entry/{enabled}")
+async def set_fast_entry(enabled: int, _=Depends(require_auth)):
+    gstate.fast_entry = bool(enabled)
+    save_config(); gstate.log(f"Fast Entry: {gstate.fast_entry}")
+    return {"ok": True, "fast_entry": gstate.fast_entry}
+
 @app.post("/api/be/{enabled}")
 async def set_be(enabled: int, _=Depends(require_auth)):
     gstate.be_enabled = bool(enabled)
@@ -1231,6 +1246,7 @@ def get_status(_=Depends(require_auth)):
             "be_enabled": gstate.be_enabled,
             "be_trigger_pct": gstate.be_trigger_pct,
             "be_sl_pct": gstate.be_sl_pct,
+            "fast_entry": gstate.fast_entry,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 

@@ -288,6 +288,7 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-fast" onclick="toggleFastEntry()">⚡ FAST OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-be" onclick="toggleBE()">⚖️ BE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
     <button class="btn btn-outline btn-sm" id="btn-hedge" onclick="toggleHedging()">⚡ HEDGE</button>
@@ -804,6 +805,16 @@ async function setMaxPositions(val){
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
   } catch {}
 }
+async function toggleFastEntry(){
+  const btn=document.getElementById('btn-fast');
+  const isOn=btn.classList.contains('btn-go');
+  const val=isOn?0:1;
+  try {
+    await apiFetch('/fast_entry/'+val,{method:'POST'});
+    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='⚡ FAST ON'; toast('⚡ Fast Entry ON','var(--cyan)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='⚡ FAST OFF'; toast('⚡ Fast Entry OFF','var(--text2)'); }
+  } catch {}
+}
 async function saveBEConfig(){
   const trigger=parseFloat(document.getElementById('be-trigger').value)||0.3;
   const sl=parseFloat(document.getElementById('be-sl').value)||0.1;
@@ -893,6 +904,8 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const fastBtn=document.getElementById('btn-fast');
+  if(fastBtn){ if(data.fast_entry){ fastBtn.classList.remove('btn-outline'); fastBtn.classList.add('btn-go'); fastBtn.textContent='⚡ FAST ON'; } else { fastBtn.classList.remove('btn-go'); fastBtn.classList.add('btn-outline'); fastBtn.textContent='⚡ FAST OFF'; } }
   const beBtn=document.getElementById('btn-be');
   const beSw=document.getElementById('be-sw');
   if(beBtn){ if(data.be_enabled){ beBtn.classList.remove('btn-outline'); beBtn.classList.add('btn-go'); beBtn.textContent='⚖️ BE ON'; if(beSw) beSw.classList.add('on'); } else { beBtn.classList.remove('btn-go'); beBtn.classList.add('btn-outline'); beBtn.textContent='⚖️ BE OFF'; if(beSw) beSw.classList.remove('on'); } }
