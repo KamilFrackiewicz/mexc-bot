@@ -3,53 +3,18 @@
   "api_secret": "242d4e0a0c8547c680d9c002ce2f6c30",
   "pairs": [
     {
-      "symbol": "XRP_USDT",
-      "enabled": true,
-      "interval": "Min5",
-      "direction": "BOTH",
-      "ema_filter_enabled": false,
-      "ema_window": 10,
-      "ma200_enabled": true,
-      "ma200_tf": "Min60",
-      "pyramid_levels": [
-        {
-          "enabled": true,
-          "amount_usd": 1.0,
-          "offset_pct": 0.0
-        },
-        {
-          "enabled": false,
-          "amount_usd": 5.0,
-          "offset_pct": 0.4
-        },
-        {
-          "enabled": false,
-          "amount_usd": 10.0,
-          "offset_pct": 0.4
-        },
-        {
-          "enabled": false,
-          "amount_usd": 20.0,
-          "offset_pct": 0.4
-        }
-      ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
-    },
-    {
       "symbol": "BTC_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -68,23 +33,23 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "ETH_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -103,23 +68,23 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "SOL_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -138,23 +103,23 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "SUI_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -173,23 +138,58 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "XRP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "TRX_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -208,23 +208,23 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "DOGE_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -243,23 +243,23 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     },
     {
       "symbol": "BNB_USDT",
       "enabled": true,
-      "interval": "Min5",
+      "interval": "Min15",
       "direction": "BOTH",
       "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
-      "ma200_tf": "Min60",
+      "ma200_tf": "Min15",
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 1.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -278,15 +278,645 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 6,
-      "tp_pct": 1.0,
-      "sl_pct": 0.5
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "HYPE_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ADA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "LINK_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "LTC_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "AVAX_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ONDO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "UNI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "TAO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ARB_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "GALA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ATOM_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "DOT_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ALGO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "JUP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "KAITO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "PENGU_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "WLFI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "BCH_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "ema_filter_enabled": false,
+      "ema_window": 10,
+      "ma200_enabled": true,
+      "ma200_tf": "Min15",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 5.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 10.0,
+          "offset_pct": 0.4
+        },
+        {
+          "enabled": false,
+          "amount_usd": 20.0,
+          "offset_pct": 0.4
+        }
+      ],
+      "leverage": 12,
+      "tp_pct": 3.0,
+      "sl_pct": 2.0
     }
   ],
   "signals_only": false,
   "max_positions": 1,
   "margin_mode": 2,
-  "tp_sl_enabled": false,
-  "hedging_enabled": true,
-  "free_entries": true
+  "tp_sl_enabled": true,
+  "hedging_enabled": false,
+  "free_entries": false
 }

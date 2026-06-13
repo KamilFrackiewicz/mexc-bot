@@ -1,0 +1,1185 @@
+{
+  "api_key": "mx0vgl6vJiDoOP5SZi",
+  "api_secret": "242d4e0a0c8547c680d9c002ce2f6c30",
+  "pairs": [
+    {
+      "symbol": "BTC_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ETH_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "SOL_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "SUI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "XRP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "TRX_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "DOGE_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "BNB_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "HYPE_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ADA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "LINK_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "LTC_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "AVAX_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ONDO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "UNI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "TAO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ARB_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "GALA_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ATOM_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "DOT_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "ALGO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "JUP_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "KAITO_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "PENGU_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "WLFI_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    },
+    {
+      "symbol": "BCH_USDT",
+      "enabled": true,
+      "interval": "Min15",
+      "direction": "BOTH",
+      "entry_timing": "CLOSE",
+      "bb_period": 20,
+      "bb_std": 2.0,
+      "bb_proximity": 0.0,
+      "bb_breakout_pct": 0.4,
+      "stoch_period": 14,
+      "stoch_smooth_k": 3,
+      "stoch_smooth_d": 3,
+      "stoch_overbought": 80,
+      "stoch_oversold": 20,
+      "stoch_window": 5,
+      "ma200_enabled": false,
+      "ma200_tf": "Min60",
+      "pyramid_levels": [
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.0
+        },
+        {
+          "enabled": true,
+          "amount_usd": 2.0,
+          "offset_pct": 0.5
+        },
+        {
+          "enabled": true,
+          "amount_usd": 4.0,
+          "offset_pct": 1.0
+        },
+        {
+          "enabled": false,
+          "amount_usd": 33.0,
+          "offset_pct": 1.0
+        }
+      ],
+      "leverage": 11,
+      "tp_mode": "FROM_AVG",
+      "tp_pct": 0.5,
+      "sl_pct": 2.0
+    }
+  ],
+  "signals_only": false,
+  "max_positions": 1,
+  "margin_mode": 2,
+  "tp_sl_enabled": true,
+  "hedging_enabled": false,
+  "be_enabled": false,
+  "be_trigger_pct": 1.0,
+  "be_sl_pct": 0.8,
+  "fast_entry": true
+}
