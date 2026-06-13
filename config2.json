@@ -5,9 +5,9 @@
     {
       "symbol": "XRP_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -33,16 +33,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "BTC_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -68,16 +68,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "ETH_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -103,16 +103,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "SOL_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -138,16 +138,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "SUI_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -173,16 +173,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "TRX_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -208,16 +208,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "DOGE_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -243,16 +243,16 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     },
     {
       "symbol": "BNB_USDT",
       "enabled": true,
-      "interval": "Min1",
+      "interval": "Min5",
       "direction": "BOTH",
-      "ema_filter_enabled": true,
+      "ema_filter_enabled": false,
       "ema_window": 10,
       "ma200_enabled": true,
       "ma200_tf": "Min60",
@@ -278,15 +278,15 @@
           "offset_pct": 0.4
         }
       ],
-      "leverage": 10,
+      "leverage": 6,
       "tp_pct": 1.0,
       "sl_pct": 0.5
     }
   ],
   "signals_only": false,
-  "max_positions": 2,
+  "max_positions": 1,
   "margin_mode": 2,
-  "tp_sl_enabled": true,
-  "hedging_enabled": false,
-  "free_entries": false
+  "tp_sl_enabled": false,
+  "hedging_enabled": true,
+  "free_entries": true
 }

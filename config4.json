@@ -12,7 +12,7 @@
       "pyramid_levels": [
         {
           "enabled": true,
-          "amount_usd": 5.0,
+          "amount_usd": 2.0,
           "offset_pct": 0.0
         },
         {
@@ -31,17 +31,17 @@
           "offset_pct": 0.5
         }
       ],
-      "leverage": 21,
-      "tp_pct": 0.5,
-      "sl_pct": 0.3
+      "leverage": 5,
+      "tp_pct": 0.6,
+      "sl_pct": 0.6
     }
   ],
   "signals_only": false,
   "max_positions": 1,
   "margin_mode": 2,
-  "tp_sl_enabled": true,
-  "hedging_enabled": false,
+  "tp_sl_enabled": false,
+  "hedging_enabled": true,
   "be_enabled": true,
-  "be_trigger_pct": 0.2,
+  "be_trigger_pct": 0.3,
   "be_sl_pct": 0.1
 }

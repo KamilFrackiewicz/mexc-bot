@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trading 46ent Bot</title>
+<title>BB Reverse Bot — 46ent</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;600;800&display=swap');
 :root {
   --bg:#07090e;--s1:#0c1018;--s2:#111826;--s3:#16202e;
   --b1:#1a2840;--b2:#243550;
-  --cyan:#00ddff;--cyan2:rgba(0,221,255,.1);
+  --cyan:#ff9500;--cyan2:rgba(255,149,0,.1);
   --green:#00ff9d;--green2:rgba(0,255,157,.1);
   --red:#ff3355;--red2:rgba(255,51,85,.1);
   --yellow:#ffcc00;--yellow2:rgba(255,204,0,.1);
@@ -255,8 +255,8 @@ input[type=password]{letter-spacing:.1em;}
 <!-- ══ LOGIN SCREEN ══ -->
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
-    <div class="login-logo">▣ Trading 46ent Bot</div>
-    <div class="login-sub">MULTI-PARA v3 — ZALOGUJ SIĘ</div>
+    <div class="login-logo" style="color:#ff9500">▣ BB Reverse</div>
+    <div class="login-sub">BREAKOUT MOMENTUM STRATEGY</div>
     <div class="login-err" id="login-err">Nieprawidłowe hasło</div>
     <div class="field">
       <label>Hasło</label>
@@ -271,12 +271,11 @@ input[type=password]{letter-spacing:.1em;}
 <div id="app">
 
 <header>
-  <div class="logo">▣ Trading 46ent Bot<span class="logo-tag">MULTI-PARA v3</span></div>
+  <div class="logo" style="color:#ff9500">▣ BB Reverse<span class="logo-tag" style="color:#ff9500">BREAKOUT+STOCHRSI</span></div>
   <div class="hdr-r">
     <div class="pill off" id="status-pill"><div class="pip" id="pip"></div><span id="status-txt">ZATRZYMANY</span></div>
     <a href="/squeeze" class="btn btn-outline btn-sm" style="text-decoration:none;color:var(--green)">▣ Squeeze</a>
     <a href="/orb" class="btn btn-outline btn-sm" style="text-decoration:none;color:var(--purple)">▣ ORB</a>
-    <a href="/bbrev" class="btn btn-outline btn-sm" style="text-decoration:none;color:#ff9500">▣ BBRev</a>
     <a href="/docs" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none">📖 DOCS</a>
     <button class="btn btn-outline btn-sm" onclick="showModal('add-pair-modal')">+ DODAJ PARĘ</button>
     <button class="btn btn-outline btn-sm" onclick="showModal('pw-modal')">🔒 HASŁO</button>
@@ -480,8 +479,8 @@ input[type=password]{letter-spacing:.1em;}
 <div class="toast" id="toast"></div>
 
 <script>
-const API = '/api';
-let TOKEN = localStorage.getItem('mexc_token') || '';
+const API = '/bbrev/api';
+let TOKEN = localStorage.getItem('bbrev_token') || '';
 let pairs = {}; // symbol -> config
 const pyrEnabled = {def:[true,true,false]};
 
@@ -495,7 +494,7 @@ async function doLogin() {
     if(r.ok){
       const d = await r.json();
       TOKEN = d.token;
-      localStorage.setItem('mexc_token', TOKEN);
+      localStorage.setItem('bbrev_token', TOKEN);
       showApp();
     } else {
       document.getElementById('login-err').classList.add('show');
@@ -505,7 +504,7 @@ async function doLogin() {
 
 async function doLogout() {
   // NIE zatrzymujemy bota - tylko kasujemy token w przeglądarce
-  localStorage.removeItem('mexc_token');
+  localStorage.removeItem('bbrev_token');
   TOKEN = '';
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
