@@ -864,6 +864,7 @@ def _check_pyramid_continuation(client, ps, price):
             exec_price = float(pos.get("openAvgPrice", price))
             ps.pyramid_entries.append(PyramidEntry(exec_price, new_vol, ps.pyramid_side))
             ps.log(f"Dokladka {len(ps.pyramid_entries)}/{len(active)} wykryta @ {exec_price} | Vol:{new_vol}", "SUCCESS")
+            ps.be_activated = False  # Reset BE - przelicz od nowej sredniej
             tg(f"📌 <b>{ps.symbol}</b> Dokładka {len(ps.pyramid_entries)}/{len(active)}\n"
                f"Cena: {exec_price} | Vol: {new_vol}\n"
                f"TP: {ps.current_tp}")
