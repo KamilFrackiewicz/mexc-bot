@@ -140,6 +140,7 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
     <a href="/tiktak" class="tt">▣ TikTak MACD</a>
     <a href="/squeeze" style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#39ff14;text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;">▣ Squeeze</a>
     <a href="/orb" style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#a78bfa;text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;">▣ ORB</a>
+    <a href="/bbrev" style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#ff9500;text-decoration:none;padding:6px 14px;border:1px solid var(--b1);border-radius:3px;">▣ BBRev</a>
     <a href="/docs" class="active">📖 Dokumentacja</a>
   </div>
 </header>
@@ -153,6 +154,7 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
     <a href="/tiktak" class="btn btn-orange">▣ Bot TikTak MACD</a>
     <a href="/squeeze" class="btn" style="background:#39ff14;color:#000;box-shadow:0 0 20px rgba(57,255,20,.3);">▣ Bot Squeeze</a>
     <a href="/orb" class="btn" style="background:#a78bfa;color:#000;box-shadow:0 0 20px rgba(167,139,250,.3);">▣ Bot ORB</a>
+    <a href="/bbrev" class="btn" style="background:#ff9500;color:#000;box-shadow:0 0 20px rgba(255,149,0,.3);">▣ Bot BB Reverse</a>
   </div>
 </div>
 
@@ -300,6 +302,26 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
         <div class="param"><div class="param-name" style="color:#a78bfa">SL %</div><div class="param-desc">Procent straty od ceny wejścia</div><div class="param-val">Domyślnie: 0.5%</div></div>
         <div class="param"><div class="param-name" style="color:#a78bfa">RESET ORB</div><div class="param-desc">Przycisk ręcznego resetu poziomów ORB dla pary</div><div class="param-val">Automatyczny reset co dzień</div></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- BB REVERSE -->
+<div class="section">
+  <div class="section-title">Strategia BB Reverse — Momentum Breakout</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">BB Reverse — Odwrócona strategia Bollinger Bands</div>
+      <span class="card-tag" style="background:rgba(255,149,0,.1);color:#ff9500;border:1px solid rgba(255,149,0,.3);">STRATEGIA 5</span>
+    </div>
+    <div class="card-body">
+      <p>Odwrócona wersja strategii BB+StochRSI. Zamiast grać na powrót ceny do środka wstęgi (mean reversion), strategia gra na <strong>kontynuację ruchu</strong> po wybiciu (momentum/breakout).</p>
+      <div class="rule-list">
+        <div class="rule long"><div class="rule-icon">▲</div><div class="rule-text"><strong>LONG:</strong> Wybicie <strong>górnej</strong> BB + crossover K powyżej D na Stoch RSI (K w strefie wykupienia)</div></div>
+        <div class="rule short"><div class="rule-icon">▼</div><div class="rule-text"><strong>SHORT:</strong> Wybicie <strong>dolnej</strong> BB + crossunder K poniżej D na Stoch RSI (K w strefie wyprzedania)</div></div>
+        <div class="rule info"><div class="rule-icon">📌</div><div class="rule-text"><strong>Dokładki:</strong> Wchodzą gdy cena idzie ZA pozycją (w kierunku zysku) — odwrotnie niż w BB klasycznym</div></div>
+      </div>
+      <div class="tip-box"><span>💡</span><p>Strategia działa najlepiej w silnych trendach. Identyczne parametry jak BB klasyczny — możesz porównać wyniki obu strategii na tych samych parach.</p></div>
     </div>
   </div>
 </div>
@@ -472,7 +494,15 @@ footer{text-align:center;padding:40px;border-top:1px solid var(--b1);
         </div>
         <div class="btn-doc">
           <div class="btn-doc-name c">⚖️ BE ON/OFF</div>
-          <div class="btn-doc-desc">Break Even — gdy pozycja osiągnie ustawiony % zysku (domyślnie 0.3%), bot automatycznie przesuwa SL na cenę wejścia + bufor (domyślnie 0.1%). Eliminuje sytuację gdzie otwarta pozycja na plusie kończy się stratą. Konfigurowane w sekcji Break Even w panelu bocznym.</div>
+          <div class="btn-doc-desc">Break Even — gdy pozycja osiągnie ustawiony % zysku od <strong>średniej ceny wejść</strong> (domyślnie 0.3%), bot przesuwa SL na średnią ± bufor (domyślnie 0.1%). LONG: SL poniżej średniej. SHORT: SL powyżej średniej. Eliminuje straty na pozycjach które były na plusie.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name c">⚡ FAST ON/OFF</div>
+          <div class="btn-doc-desc">Fast Entry — gdy włączony, po wykryciu wybicia BB bot sprawdza crossover Stoch co <strong>60 sekund</strong> zamiast co 15 minut. Eliminuje opóźnienie wejścia gdy wybicie i crossover są na tej samej świecy.</div>
+        </div>
+        <div class="btn-doc">
+          <div class="btn-doc-name c">🧮 Kalkulator TP/SL</div>
+          <div class="btn-doc-desc">Panel w sidebarze pokazujący realny zysk przy TP i stratę przy SL biorąc pod uwagę wszystkie dokładki, ich offsety, dźwignię i kwoty. Aktualizuje się automatycznie po zmianie ustawień.</div>
         </div>
         <div class="btn-doc">
           <div class="btn-doc-name y">⚡ HEDGE</div>
