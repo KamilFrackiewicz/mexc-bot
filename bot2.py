@@ -177,7 +177,12 @@ def calc_macd(closes, fast=12, slow=26, signal=9):
 
 def calc_ma200(closes, period=200):
     if len(closes) < period: return None
-    return float(np.mean(closes[-period:]))
+    # EMA200 zamiast SMA200
+    k = 2.0 / (period + 1)
+    ema = float(np.mean(closes[:period]))
+    for price in closes[period:]:
+        ema = price * k + ema * (1 - k)
+    return ema
 
 # ─── PER-PAIR STATE ───────────────────────────────────────────────────────────
 class PyramidEntry:
