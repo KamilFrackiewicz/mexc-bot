@@ -195,13 +195,21 @@ input:focus,select:focus{border-color:var(--purple);}
     <div class="pb">
       <div class="sec">Interwał świecy ORB</div>
       <div class="f2">
-        <div class="field"><label>Świeca ORB</label>
+        <div class="field"><label>Świeca ORB (H/L)</label>
           <select id="def-interval">
             <option value="Min1">1 min</option>
             <option value="Min5" selected>5 min</option>
             <option value="Min15">15 min</option>
           </select>
         </div>
+        <div class="field"><label>Świeca wejścia</label>
+          <select id="def-entry-interval">
+            <option value="Min1" selected>1 min</option>
+            <option value="Min5">5 min</option>
+          </select>
+        </div>
+      </div>
+      <div class="f2">
         <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
       </div>
 
@@ -414,6 +422,7 @@ function buildCfg(sym, dir='BOTH'){
   return {
     symbol:sym, enabled:true,
     interval: document.getElementById('def-interval').value,
+    entry_interval: document.getElementById('def-entry-interval').value,
     direction:dir,
     ma200_enabled: document.getElementById('def-ma200-en').value==='1',
     ma200_tf: document.getElementById('def-ma200-tf').value,
@@ -496,6 +505,8 @@ async function saveAndApply(){
     pairs: Object.values(pairs).map(p=>({
       ...p,
       interval: document.getElementById('def-interval').value,
+      entry_interval: document.getElementById('def-entry-interval').value,
+    entry_interval: document.getElementById('def-entry-interval').value,
       leverage: parseInt(document.getElementById('def-leverage').value),
       ma200_enabled: document.getElementById('def-ma200-sw').classList.contains('on'),
       ma200_tf: document.getElementById('def-ma200-tf').value,
@@ -528,6 +539,7 @@ async function loadConfig(){
       const p=d.pairs[0];
       if(p){
         document.getElementById('def-interval').value=p.interval||'Min5';
+        if(p.entry_interval) document.getElementById('def-entry-interval').value=p.entry_interval;
         document.getElementById('def-leverage').value=p.leverage||10;
         document.getElementById('def-tp').value=p.tp_pct||1.0;
         document.getElementById('def-sl').value=p.sl_pct||0.5;

@@ -229,7 +229,7 @@ class PyramidEntry:
 class PairState:
     def __init__(self, symbol):
         self.symbol = symbol; self.enabled = True
-        self.interval = "Min5"; self.direction = "BOTH"
+        self.interval = "Min5"; self.entry_interval = "Min1"; self.direction = "BOTH"
         self.ma200_enabled = False; self.ma200_tf = "Hour4"
         self.pyramid_levels = [
             {"enabled": True,  "amount_usd": 5.0,  "offset_pct": 0.0},
@@ -300,7 +300,7 @@ class PairState:
     def to_dict(self):
         return {
             "symbol": self.symbol, "enabled": self.enabled,
-            "interval": self.interval, "direction": self.direction,
+            "interval": self.interval, "entry_interval": self.entry_interval, "direction": self.direction,
             "ma200_enabled": self.ma200_enabled, "ma200_tf": self.ma200_tf,
             "pyramid_levels": self.pyramid_levels,
             "leverage": self.leverage,
@@ -356,7 +356,7 @@ def save_config():
         data = {"api_key": gstate.api_key, "api_secret": gstate.api_secret, "pairs": []}
         for ps in gstate.pairs.values():
             data["pairs"].append({k: getattr(ps, k) for k in [
-                "symbol","enabled","interval","direction",
+                "symbol","enabled","interval","entry_interval","direction",
                 "ma200_enabled","ma200_tf","pyramid_levels",
                 "leverage","tp_pct","sl_pct"
             ]})
@@ -390,7 +390,7 @@ def load_config():
             sym = pd.get("symbol")
             if not sym: continue
             ps = gstate.get_or_create(sym)
-            for k in ["enabled","interval","direction",
+            for k in ["enabled","interval","entry_interval","direction",
                       "ma200_enabled","ma200_tf","pyramid_levels",
                       "leverage","tp_pct","sl_pct"]:
                 if k in pd: setattr(ps, k, pd[k])
@@ -481,8 +481,8 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             ps.log("Poza oknem tradingowym (max 2h po otwarciu)")
             return
 
-        # Pobierz aktualne dane
-        kdata  = client.get_klines_full(ps.symbol, ps.interval, 5)
+        # Pobierz aktualne dane na entry_interval (do wykrywania breakoutu)
+        kdata  = client.get_klines_full(ps.symbol, ps.entry_interval, 5)
         closes = [float(x) for x in kdata.get("close", [])]
         highs  = [float(x) for x in kdata.get("high",  [])]
         lows   = [float(x) for x in kdata.get("low",   [])]
@@ -806,7 +806,7 @@ class ChangePwReq(BaseModel): old_password: str; new_password: str
 class PyramidLevelIn(BaseModel): enabled: bool = True; amount_usd: float = 5.0; offset_pct: float = 0.0
 class PairConfig(BaseModel):
     symbol: str; enabled: bool = True
-    interval: str = "Min5"; direction: str = "BOTH"
+    interval: str = "Min5"; entry_interval: str = "Min1"; direction: str = "BOTH"
     ma200_enabled: bool = False; ma200_tf: str = "Hour4"
     pyramid_levels: List[PyramidLevelIn] = []
     leverage: int = 10; tp_pct: float = 1.0; sl_pct: float = 0.5
@@ -837,7 +837,7 @@ def set_config(cfg: GlobalConfig, _=Depends(require_auth)):
         if sym not in configured: del gstate.pairs[sym]
     for pc in cfg.pairs:
         ps = gstate.get_or_create(pc.symbol)
-        for k in ["enabled","interval","direction","ma200_enabled","ma200_tf",
+        for k in ["enabled","interval","entry_interval","direction","ma200_enabled","ma200_tf",
                   "leverage","tp_pct","sl_pct"]:
             setattr(ps, k, getattr(pc, k))
         if pc.pyramid_levels:
