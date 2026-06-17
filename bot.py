@@ -412,6 +412,7 @@ class GlobalState:
         self.be_trigger_pct = 0.3
         self.be_sl_pct = 0.1
         self.fast_entry = False
+        self.live_stoch = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -452,6 +453,7 @@ def save_config():
         data["be_trigger_pct"] = gstate.be_trigger_pct
         data["be_sl_pct"] = gstate.be_sl_pct
         data["fast_entry"] = gstate.fast_entry
+        data["live_stoch"] = gstate.live_stoch
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -472,6 +474,7 @@ def load_config():
         gstate.be_trigger_pct = data.get("be_trigger_pct", 0.3)
         gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
         gstate.fast_entry = data.get("fast_entry", False)
+        gstate.live_stoch = data.get("live_stoch", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -548,6 +551,18 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             closes[-(i+1)] > (upper + breakout_margin - dev * ps.bb_proximity)
             for i in range(3) if len(closes) > i
         )
+
+        # Gdy live_stoch - pobierz biezace dane (niezamknieta swieca)
+        if gstate.live_stoch and ps.bb_breakout_side is not None:
+            live_kdata = client.get_klines_full(ps.symbol, ps.interval, 3)
+            live_closes = [float(x) for x in live_kdata.get("close", [])]
+            live_highs  = [float(x) for x in live_kdata.get("high",  [])]
+            live_lows   = [float(x) for x in live_kdata.get("low",   [])]
+            if len(live_closes) >= 1:
+                closes[-1] = live_closes[-1]
+                highs[-1]  = live_highs[-1]
+                lows[-1]   = live_lows[-1]
+                ps.log(f"LiveStoch: biezaca cena {live_closes[-1]}")
 
         # Stochastic K & D
         k_series = calc_stoch_k_series(closes, highs, lows,
@@ -1206,6 +1221,12 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/live_stoch/{enabled}")
+async def set_live_stoch(enabled: int, _=Depends(require_auth)):
+    gstate.live_stoch = bool(enabled)
+    save_config(); gstate.log(f"Live Stoch: {gstate.live_stoch}")
+    return {"ok": True, "live_stoch": gstate.live_stoch}
+
 @app.post("/api/fast_entry/{enabled}")
 async def set_fast_entry(enabled: int, _=Depends(require_auth)):
     gstate.fast_entry = bool(enabled)
@@ -1253,6 +1274,7 @@ def get_status(_=Depends(require_auth)):
             "be_trigger_pct": gstate.be_trigger_pct,
             "be_sl_pct": gstate.be_sl_pct,
             "fast_entry": gstate.fast_entry,
+            "live_stoch": gstate.live_stoch,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
