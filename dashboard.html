@@ -289,6 +289,7 @@ input[type=password]{letter-spacing:.1em;}
     <button class="btn btn-go"   id="btn-start" onclick="startBot()">START</button>
     <button class="btn btn-stop" id="btn-stop"  onclick="stopBot()" disabled>STOP</button>
     <button class="btn btn-outline btn-sm" id="btn-signals" onclick="toggleSignalsOnly()">📡 SYGNAŁY</button>
+    <button class="btn btn-outline btn-sm" id="btn-live" onclick="toggleLiveStoch()">🔴 LIVE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-fast" onclick="toggleFastEntry()">⚡ FAST OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-be" onclick="toggleBE()">⚖️ BE OFF</button>
     <button class="btn btn-outline btn-sm" id="btn-tpsl" onclick="toggleTpSl()">🛡️ TP/SL ON</button>
@@ -816,6 +817,16 @@ async function setMaxPositions(val){
     toast(`Maks. pozycji: ${val}`,'var(--cyan)');
   } catch {}
 }
+async function toggleLiveStoch(){
+  const btn=document.getElementById('btn-live');
+  const isOn=btn.classList.contains('btn-go');
+  const val=isOn?0:1;
+  try {
+    await apiFetch('/live_stoch/'+val,{method:'POST'});
+    if(val){ btn.classList.remove('btn-outline'); btn.classList.add('btn-go'); btn.textContent='🔴 LIVE ON'; toast('🔴 Live Stoch ON','var(--red)'); }
+    else { btn.classList.remove('btn-go'); btn.classList.add('btn-outline'); btn.textContent='🔴 LIVE OFF'; toast('🔴 Live Stoch OFF','var(--text2)'); }
+  } catch {}
+}
 async function toggleFastEntry(){
   const btn=document.getElementById('btn-fast');
   const isOn=btn.classList.contains('btn-go');
@@ -921,6 +932,8 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const liveBtn=document.getElementById('btn-live');
+  if(liveBtn){ if(data.live_stoch){ liveBtn.classList.remove('btn-outline'); liveBtn.classList.add('btn-go'); liveBtn.textContent='🔴 LIVE ON'; } else { liveBtn.classList.remove('btn-go'); liveBtn.classList.add('btn-outline'); liveBtn.textContent='🔴 LIVE OFF'; } }
   const fastBtn=document.getElementById('btn-fast');
   if(fastBtn){ if(data.fast_entry){ fastBtn.classList.remove('btn-outline'); fastBtn.classList.add('btn-go'); fastBtn.textContent='⚡ FAST ON'; } else { fastBtn.classList.remove('btn-go'); fastBtn.classList.add('btn-outline'); fastBtn.textContent='⚡ FAST OFF'; } }
   const beBtn=document.getElementById('btn-be');
