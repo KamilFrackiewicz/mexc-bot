@@ -634,10 +634,11 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         # Sygnał
         signal = "WAIT"
         # ODWROCONA strategia: wybicie gory = LONG, wybicie dolu = SHORT
+        # MA200: LONG gdy cena powyzej MA200, SHORT gdy cena ponizej MA200
         long_ok  = (k_cross_over  and k_now < ps.stoch_oversold
-                    and ma200_ok_short and ps.direction in ("SHORT", "BOTH"))
-        short_ok = (k_cross_under and k_now > ps.stoch_overbought
                     and ma200_ok_long  and ps.direction in ("LONG",  "BOTH"))
+        short_ok = (k_cross_under and k_now > ps.stoch_overbought
+                    and ma200_ok_short and ps.direction in ("SHORT", "BOTH"))
 
         if long_ok:   signal = "LONG"
         elif short_ok: signal = "SHORT"
