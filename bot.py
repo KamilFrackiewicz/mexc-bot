@@ -625,12 +625,14 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # MA200 filter
         ma200_ok_long = ma200_ok_short = True
+        if ps.ma200_enabled and not ps.last_ma200:
+            ps.log("Brak danych MA200 - pomijam sygnal", "WARN"); return
         if ps.ma200_enabled:
             ma_data   = client.get_klines_full(ps.symbol, ps.ma200_tf, 210)
             ma_closes = [float(x) for x in ma_data.get("close", [])]
             ma200     = calc_ma200(ma_closes, 200)
             ps.last_ma200      = round(ma200, 4) if ma200 else None
-            if ma200:
+            if ma200 and ma200 > 0:
                 ma200_ok_long  = price > ma200
                 ma200_ok_short = price < ma200
         else:

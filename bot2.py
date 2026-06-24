@@ -483,7 +483,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
             ma_closes = [float(x) for x in ma_data.get("close", [])]
             ma200     = calc_ma200(ma_closes)
             ps.last_ma200 = round(ma200, 4) if ma200 else None
-            if ma200:
+            if ma200 and ma200 > 0:
                 ma200_ok_long  = price > ma200
                 ma200_ok_short = price < ma200
         else:
