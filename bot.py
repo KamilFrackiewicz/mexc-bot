@@ -413,6 +413,10 @@ class GlobalState:
         self.be_sl_pct = 0.1
         self.fast_entry = False
         self.live_stoch = False
+        self.vol_filter = False
+        self.vol_filter_mult = 1.5
+        self.bb_width_filter = False
+        self.bb_width_min = 0.5
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -454,6 +458,10 @@ def save_config():
         data["be_sl_pct"] = gstate.be_sl_pct
         data["fast_entry"] = gstate.fast_entry
         data["live_stoch"] = gstate.live_stoch
+        data["vol_filter"] = gstate.vol_filter
+        data["vol_filter_mult"] = gstate.vol_filter_mult
+        data["bb_width_filter"] = gstate.bb_width_filter
+        data["bb_width_min"] = gstate.bb_width_min
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -475,6 +483,10 @@ def load_config():
         gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
         gstate.fast_entry = data.get("fast_entry", False)
         gstate.live_stoch = data.get("live_stoch", False)
+        gstate.vol_filter = data.get("vol_filter", False)
+        gstate.vol_filter_mult = data.get("vol_filter_mult", 1.5)
+        gstate.bb_width_filter = data.get("bb_width_filter", False)
+        gstate.bb_width_min = data.get("bb_width_min", 0.5)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -542,6 +554,22 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Bliskość BB (TradingView: close < lowerBB + dev*proximity)
         breakout_margin = upper * ps.bb_breakout_pct / 100
+
+        # Filtry sygnalow (opcjonalne, domyslnie OFF)
+        filters_ok = True
+        filter_block = []
+        if gstate.bb_width_filter and mid:
+            bb_width_pct = (upper - lower) / mid * 100
+            if bb_width_pct < gstate.bb_width_min:
+                filters_ok = False
+                filter_block.append("BB waskie %.2f%%" % bb_width_pct)
+        if gstate.vol_filter:
+            vols = [float(x) for x in kdata.get("vol", [])]
+            if len(vols) >= 21:
+                avg_vol = float(np.mean(vols[-21:-1]))
+                if vols[-1] < avg_vol * gstate.vol_filter_mult:
+                    filters_ok = False
+                    filter_block.append("wolumen niski")
         # Sprawdz czy cena wybiła BB w ostatnich 3 świecach
         near_lower = any(
             closes[-(i+1)] < (lower - breakout_margin + dev * ps.bb_proximity)
@@ -595,12 +623,14 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         iv_seconds = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,"Min60":3600,"Hour4":14400}.get(ps.interval, 300)
 
         # Zapamiętaj wybicie BB (timestamp pierwszej swieci wybicia)
-        if near_lower and ps.bb_breakout_side != "LONG":
+        if near_lower and filters_ok and ps.bb_breakout_side != "LONG":
             ps.bb_breakout_candle = last_ts
             ps.bb_breakout_side = "LONG"
-        if near_upper and ps.bb_breakout_side != "SHORT":
+        if near_upper and filters_ok and ps.bb_breakout_side != "SHORT":
             ps.bb_breakout_candle = last_ts
             ps.bb_breakout_side = "SHORT"
+        if (near_lower or near_upper) and not filters_ok and ps.bb_breakout_side is None:
+            ps.log("Wybicie BB zablokowane: " + ", ".join(filter_block))
 
         # Reset wybicia jesli za stare (okno w swiecach)
         window = ps.stoch_window
@@ -1225,6 +1255,25 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/vol_filter/{enabled}")
+async def set_vol_filter(enabled: int, _=Depends(require_auth)):
+    gstate.vol_filter = bool(enabled)
+    save_config(); gstate.log(f"Filtr wolumenu: {gstate.vol_filter}")
+    return {"ok": True, "vol_filter": gstate.vol_filter}
+
+@app.post("/api/bb_width_filter/{enabled}")
+async def set_bb_width_filter(enabled: int, _=Depends(require_auth)):
+    gstate.bb_width_filter = bool(enabled)
+    save_config(); gstate.log(f"Filtr szerokosci BB: {gstate.bb_width_filter}")
+    return {"ok": True, "bb_width_filter": gstate.bb_width_filter}
+
+@app.post("/api/filters_config")
+async def set_filters_config(vol_mult: float, width_min: float, _=Depends(require_auth)):
+    gstate.vol_filter_mult = vol_mult
+    gstate.bb_width_min = width_min
+    save_config(); gstate.log(f"Filtry config: vol_mult={vol_mult} width_min={width_min}%")
+    return {"ok": True}
+
 @app.post("/api/live_stoch/{enabled}")
 async def set_live_stoch(enabled: int, _=Depends(require_auth)):
     gstate.live_stoch = bool(enabled)
@@ -1279,6 +1328,10 @@ def get_status(_=Depends(require_auth)):
             "be_sl_pct": gstate.be_sl_pct,
             "fast_entry": gstate.fast_entry,
             "live_stoch": gstate.live_stoch,
+            "vol_filter": gstate.vol_filter,
+            "vol_filter_mult": gstate.vol_filter_mult,
+            "bb_width_filter": gstate.bb_width_filter,
+            "bb_width_min": gstate.bb_width_min,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
