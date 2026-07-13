@@ -421,6 +421,18 @@ input[type=password]{letter-spacing:.1em;}
       <div class="field"><label>Min szerokość BB (% ceny)</label>
         <input type="number" id="width-min" value="0.5" min="0" step="0.1">
       </div>
+      <div class="sw-row">
+        <span class="sw-lbl">Filtr RSI</span>
+        <button class="sw" id="rsi-filter-sw" onclick="toggleRsiFilter()"></button>
+      </div>
+      <div class="f2">
+        <div class="field"><label>RSI OS (LONG poniżej)</label>
+          <input type="number" id="rsi-os" value="20" min="0" max="50" step="1">
+        </div>
+        <div class="field"><label>RSI OB (SHORT powyżej)</label>
+          <input type="number" id="rsi-ob" value="80" min="50" max="100" step="1">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -842,6 +854,21 @@ async function saveFiltersConfig(){
   const widthMin=parseFloat(document.getElementById('width-min').value)||0.5;
   try { await apiFetch(`/filters_config?vol_mult=${volMult}&width_min=${widthMin}`,{method:'POST'}); } catch {}
 }
+async function saveRsiConfig(){
+  const os=parseFloat(document.getElementById('rsi-os').value)||20;
+  const ob=parseFloat(document.getElementById('rsi-ob').value)||80;
+  try { await apiFetch(`/rsi_config?oversold=${os}&overbought=${ob}`,{method:'POST'}); } catch {}
+}
+async function toggleRsiFilter(){
+  const sw=document.getElementById('rsi-filter-sw');
+  const val=sw.classList.contains('on')?0:1;
+  try {
+    await saveRsiConfig();
+    await apiFetch('/rsi_filter/'+val,{method:'POST'});
+    if(val){ sw.classList.add('on'); toast('📈 Filtr RSI ON','var(--green)'); }
+    else { sw.classList.remove('on'); toast('📈 Filtr RSI OFF','var(--text2)'); }
+  } catch {}
+}
 async function toggleVolFilter(){
   const sw=document.getElementById('vol-filter-sw');
   const val=sw.classList.contains('on')?0:1;
@@ -896,6 +923,10 @@ document.addEventListener('DOMContentLoaded', function(){
   const widthMinEl=document.getElementById('width-min');
   if(volMultEl) volMultEl.addEventListener('change', saveFiltersConfig);
   if(widthMinEl) widthMinEl.addEventListener('change', saveFiltersConfig);
+  const rsiOsEl=document.getElementById('rsi-os');
+  const rsiObEl=document.getElementById('rsi-ob');
+  if(rsiOsEl) rsiOsEl.addEventListener('change', saveRsiConfig);
+  if(rsiObEl) rsiObEl.addEventListener('change', saveRsiConfig);
   // Kalkulator - aktualizuj przy zmianie ustawien
   const calcFields = ['def-leverage','def-tp','def-sl','def-pamt-0','def-pamt-1','def-pamt-2','def-pamt-3','def-poff-1','def-poff-2','def-poff-3','be-trigger','be-sl'];
   calcFields.forEach(id => {
@@ -981,6 +1012,10 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const rsiSw=document.getElementById('rsi-filter-sw');
+  if(rsiSw){ if(data.rsi_filter) rsiSw.classList.add('on'); else rsiSw.classList.remove('on'); }
+  if(data.rsi_oversold!==undefined && document.getElementById('rsi-os')) document.getElementById('rsi-os').value=data.rsi_oversold;
+  if(data.rsi_overbought!==undefined && document.getElementById('rsi-ob')) document.getElementById('rsi-ob').value=data.rsi_overbought;
   const volSw=document.getElementById('vol-filter-sw');
   if(volSw){ if(data.vol_filter) volSw.classList.add('on'); else volSw.classList.remove('on'); }
   const widthSw=document.getElementById('width-filter-sw');

@@ -417,6 +417,9 @@ class GlobalState:
         self.vol_filter_mult = 1.5
         self.bb_width_filter = False
         self.bb_width_min = 0.5
+        self.rsi_filter = False
+        self.rsi_oversold = 20.0
+        self.rsi_overbought = 80.0
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -462,6 +465,9 @@ def save_config():
         data["vol_filter_mult"] = gstate.vol_filter_mult
         data["bb_width_filter"] = gstate.bb_width_filter
         data["bb_width_min"] = gstate.bb_width_min
+        data["rsi_filter"] = gstate.rsi_filter
+        data["rsi_oversold"] = gstate.rsi_oversold
+        data["rsi_overbought"] = gstate.rsi_overbought
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -487,6 +493,9 @@ def load_config():
         gstate.vol_filter_mult = data.get("vol_filter_mult", 1.5)
         gstate.bb_width_filter = data.get("bb_width_filter", False)
         gstate.bb_width_min = data.get("bb_width_min", 0.5)
+        gstate.rsi_filter = data.get("rsi_filter", False)
+        gstate.rsi_oversold = data.get("rsi_oversold", 20.0)
+        gstate.rsi_overbought = data.get("rsi_overbought", 80.0)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -605,17 +614,30 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         ps.last_stoch_k = round(k_now, 2)
         ps.last_stoch_d = round(d_now, 2)
 
+        # Filtr RSI (opcjonalny) - RSI < oversold dla LONG, RSI > overbought dla SHORT
+        rsi_ok_long = rsi_ok_short = True
+        ps.last_rsi = None
+        if gstate.rsi_filter:
+            rsi_series = calc_rsi_series(closes, 14)
+            if rsi_series:
+                rsi_now = rsi_series[-1]
+                ps.last_rsi = round(rsi_now, 1)
+                rsi_ok_long  = rsi_now < gstate.rsi_oversold
+                rsi_ok_short = rsi_now > gstate.rsi_overbought
+            else:
+                rsi_ok_long = rsi_ok_short = False
+
         # Crossover / Crossunder - tylko biezaca swieca z minimalnym przekroczeniem 0.5pkt
         candle_idx = len(closes) - 1
         cross_min = 0.5
         k_cross_over_now  = (len(k_series) >= 2 and len(d_series) >= 2 and
                              k_series[-2] <= d_series[-2] and
                              k_series[-1] > d_series[-1] + cross_min and
-                             k_now < ps.stoch_oversold)
+                             k_now < ps.stoch_oversold and rsi_ok_long)
         k_cross_under_now = (len(k_series) >= 2 and len(d_series) >= 2 and
                              k_series[-2] >= d_series[-2] and
                              k_series[-1] < d_series[-1] - cross_min and
-                             k_now > ps.stoch_overbought)
+                             k_now > ps.stoch_overbought and rsi_ok_short)
 
         # Pobierz timestamp ostatniej swieci
         kdata_times = kdata.get("time", [])
@@ -690,9 +712,10 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         div = (" 📈DivBull" if ps.divergence_bull else "") + \
               (" 📉DivBear" if ps.divergence_bear else "")
         ma  = f" MA:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
+        rsi_str = f" RSI:{ps.last_rsi}" if gstate.rsi_filter and getattr(ps, 'last_rsi', None) is not None else ""
         ps.log(f"P:{price} BB:[{round(lower,2)}-{round(upper,2)}] bm:{round(breakout_margin,3)} K:{round(k_now,1)} D:{round(d_now,1)} "
                f"xO:{k_cross_over} xU:{k_cross_under} "
-               f"nL:{near_lower} nU:{near_upper}{ma}{div} -> {signal}")
+               f"nL:{near_lower} nU:{near_upper}{ma}{rsi_str}{div} -> {signal}")
 
         # Piramida
         if signal in ("LONG","SHORT") and not ps.pyramid_active:
@@ -1255,6 +1278,19 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/rsi_filter/{enabled}")
+async def set_rsi_filter(enabled: int, _=Depends(require_auth)):
+    gstate.rsi_filter = bool(enabled)
+    save_config(); gstate.log(f"Filtr RSI: {gstate.rsi_filter}")
+    return {"ok": True, "rsi_filter": gstate.rsi_filter}
+
+@app.post("/api/rsi_config")
+async def set_rsi_config(oversold: float, overbought: float, _=Depends(require_auth)):
+    gstate.rsi_oversold = oversold
+    gstate.rsi_overbought = overbought
+    save_config(); gstate.log(f"RSI config: OS={oversold} OB={overbought}")
+    return {"ok": True}
+
 @app.post("/api/vol_filter/{enabled}")
 async def set_vol_filter(enabled: int, _=Depends(require_auth)):
     gstate.vol_filter = bool(enabled)
@@ -1332,6 +1368,9 @@ def get_status(_=Depends(require_auth)):
             "vol_filter_mult": gstate.vol_filter_mult,
             "bb_width_filter": gstate.bb_width_filter,
             "bb_width_min": gstate.bb_width_min,
+            "rsi_filter": gstate.rsi_filter,
+            "rsi_oversold": gstate.rsi_oversold,
+            "rsi_overbought": gstate.rsi_overbought,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
