@@ -408,6 +408,10 @@ input[type=password]{letter-spacing:.1em;}
     <div class="ph">🎛️ Filtry sygnałów</div>
     <div class="pb">
       <div class="sw-row">
+        <span class="sw-lbl">Tryb Stoch RSI (zamiast Stochastic)</span>
+        <button class="sw" id="srsi-sw" onclick="toggleStochRsiMode()"></button>
+      </div>
+      <div class="sw-row">
         <span class="sw-lbl">Filtr wolumenu</span>
         <button class="sw" id="vol-filter-sw" onclick="toggleVolFilter()"></button>
       </div>
@@ -859,6 +863,15 @@ async function saveRsiConfig(){
   const ob=parseFloat(document.getElementById('rsi-ob').value)||80;
   try { await apiFetch(`/rsi_config?oversold=${os}&overbought=${ob}`,{method:'POST'}); } catch {}
 }
+async function toggleStochRsiMode(){
+  const sw=document.getElementById('srsi-sw');
+  const val=sw.classList.contains('on')?0:1;
+  try {
+    await apiFetch('/stoch_rsi_mode/'+val,{method:'POST'});
+    if(val){ sw.classList.add('on'); toast('📊 Tryb Stoch RSI ON','var(--green)'); }
+    else { sw.classList.remove('on'); toast('📊 Tryb Stochastic (klasyczny)','var(--text2)'); }
+  } catch {}
+}
 async function toggleRsiFilter(){
   const sw=document.getElementById('rsi-filter-sw');
   const val=sw.classList.contains('on')?0:1;
@@ -1012,6 +1025,8 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  const srsiSw=document.getElementById('srsi-sw');
+  if(srsiSw){ if(data.stoch_rsi_mode) srsiSw.classList.add('on'); else srsiSw.classList.remove('on'); }
   const rsiSw=document.getElementById('rsi-filter-sw');
   if(rsiSw){ if(data.rsi_filter) rsiSw.classList.add('on'); else rsiSw.classList.remove('on'); }
   if(data.rsi_oversold!==undefined && document.getElementById('rsi-os')) document.getElementById('rsi-os').value=data.rsi_oversold;

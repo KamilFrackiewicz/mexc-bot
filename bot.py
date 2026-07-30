@@ -236,6 +236,18 @@ def calc_stoch_k_series(closes, highs, lows, stoch_period=14, smooth_k=3):
         smooth.append(float(np.mean(raw[i - smooth_k + 1:i + 1])))
     return smooth
 
+def calc_stoch_rsi_k_series(closes, rsi_period=14, stoch_period=14, smooth_k=3):
+    """TradingView ta.stochrsi: stochastyka liczona na wartosciach RSI (nie na cenie)"""
+    rsi = calc_rsi_series(closes, rsi_period)
+    if len(rsi) < stoch_period + smooth_k: return []
+    raw = []
+    for i in range(stoch_period - 1, len(rsi)):
+        w = rsi[i - stoch_period + 1:i + 1]
+        h, l = max(w), min(w)
+        raw.append(50.0 if h == l else 100 * (rsi[i] - l) / (h - l))
+    return [float(np.mean(raw[i - smooth_k + 1:i + 1]))
+            for i in range(smooth_k - 1, len(raw))]
+
 def calc_stoch_d_series(k_series, smooth_d=3):
     if len(k_series) < smooth_d: return []
     return [float(np.mean(k_series[i - smooth_d + 1:i + 1]))
@@ -420,6 +432,7 @@ class GlobalState:
         self.rsi_filter = False
         self.rsi_oversold = 20.0
         self.rsi_overbought = 80.0
+        self.stoch_rsi_mode = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -468,6 +481,7 @@ def save_config():
         data["rsi_filter"] = gstate.rsi_filter
         data["rsi_oversold"] = gstate.rsi_oversold
         data["rsi_overbought"] = gstate.rsi_overbought
+        data["stoch_rsi_mode"] = gstate.stoch_rsi_mode
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -496,6 +510,7 @@ def load_config():
         gstate.rsi_filter = data.get("rsi_filter", False)
         gstate.rsi_oversold = data.get("rsi_oversold", 20.0)
         gstate.rsi_overbought = data.get("rsi_overbought", 80.0)
+        gstate.stoch_rsi_mode = data.get("stoch_rsi_mode", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -602,7 +617,11 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                 ps.log(f"LiveStoch: biezaca cena {live_closes[-1]}")
 
         # Stochastic K & D
-        k_series = calc_stoch_k_series(closes, highs, lows,
+        if gstate.stoch_rsi_mode:
+            k_series = calc_stoch_rsi_k_series(closes, 14,
+                                        ps.stoch_period, ps.stoch_smooth_k)
+        else:
+            k_series = calc_stoch_k_series(closes, highs, lows,
                                         ps.stoch_period, ps.stoch_smooth_k)
         d_series = calc_stoch_d_series(k_series, ps.stoch_smooth_d)
 
@@ -713,7 +732,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
               (" 📉DivBear" if ps.divergence_bear else "")
         ma  = f" MA:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
         rsi_str = f" RSI:{ps.last_rsi}" if gstate.rsi_filter and getattr(ps, 'last_rsi', None) is not None else ""
-        ps.log(f"P:{price} BB:[{lower:.10g}-{upper:.10g}] bm:{breakout_margin:.10g} K:{round(k_now,1)} D:{round(d_now,1)} "
+        ps.log(f"P:{price} BB:[{lower:.10g}-{upper:.10g}] bm:{breakout_margin:.10g} {'SRSI' if gstate.stoch_rsi_mode else 'STOCH'} K:{round(k_now,1)} D:{round(d_now,1)} "
                f"xO:{k_cross_over} xU:{k_cross_under} "
                f"nL:{near_lower} nU:{near_upper}{ma}{rsi_str}{div} -> {signal}")
 
@@ -1280,6 +1299,12 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/stoch_rsi_mode/{enabled}")
+async def set_stoch_rsi_mode(enabled: int, _=Depends(require_auth)):
+    gstate.stoch_rsi_mode = bool(enabled)
+    save_config(); gstate.log(f"Tryb Stoch RSI: {gstate.stoch_rsi_mode}")
+    return {"ok": True, "stoch_rsi_mode": gstate.stoch_rsi_mode}
+
 @app.post("/api/rsi_filter/{enabled}")
 async def set_rsi_filter(enabled: int, _=Depends(require_auth)):
     gstate.rsi_filter = bool(enabled)
@@ -1373,6 +1398,7 @@ def get_status(_=Depends(require_auth)):
             "rsi_filter": gstate.rsi_filter,
             "rsi_oversold": gstate.rsi_oversold,
             "rsi_overbought": gstate.rsi_overbought,
+            "stoch_rsi_mode": gstate.stoch_rsi_mode,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
