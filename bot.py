@@ -889,10 +889,12 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                     price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
                     sl_result = client._post("/api/v1/private/stoporder/place", {
                         "positionId": pos_id, "symbol": ps.symbol, "vol": hold_vol,
-                        "lossTrend": 1, "profitTrend": 1, "stopLossPrice": round(sl_price, price_prec)
+                        "lossTrend": 1, "profitTrend": 1,
+                        "stopLossPrice": round(sl_price, price_prec),
+                        "takeProfitPrice": round(tp_price, price_prec)
                     })
                     if sl_result.get("success"):
-                        ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
+                        ps.log(f"SL:{round(sl_price,price_prec)} TP:{round(tp_price,price_prec)} ustawione w MEXC")
                     else:
                         ps.log(f"Blad SL/TP MEXC: {sl_result.get('message')} — bot monitoruje", "WARN")
                 else:
@@ -1069,10 +1071,7 @@ async def pyramid_monitor_loop():
                             except Exception as e:
                                 ps.log(f"BE SL blad: {e}", "WARN")
 
-                    # Gdy brak BE i brak dokladek - TP/SL z MEXC zamyka precyzyjniej
-                    _act_lvls = [l for l in ps.pyramid_levels if l.get("enabled", True)]
-                    _mexc_handles = (not gstate.be_enabled) and len(_act_lvls) <= 1
-                    if gstate.tp_sl_enabled and not _mexc_handles and ps.current_tp and ps.current_sl and ps.pyramid_side:
+                    if gstate.tp_sl_enabled and ps.current_tp and ps.current_sl and ps.pyramid_side:
                         tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG"
                                   else price <= ps.current_tp)
                         sl_hit = (price <= ps.current_sl if ps.pyramid_side == "LONG"
