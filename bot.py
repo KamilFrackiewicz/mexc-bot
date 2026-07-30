@@ -556,9 +556,9 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         # Bollinger Bands
         upper, mid, lower = bollinger_bands(closes, ps.bb_period, ps.bb_std)
         if upper is None: ps.log("Błąd BB", "WARN"); return
-        ps.last_bb_upper = round(upper, 4)
-        ps.last_bb_lower = round(lower, 4)
-        ps.last_bb_mid   = round(mid,   4)
+        ps.last_bb_upper = round(upper, 10)
+        ps.last_bb_lower = round(lower, 10)
+        ps.last_bb_mid   = round(mid,   10)
         dev = upper - mid   # = std_dev * stdev
 
         # Bliskość BB (TradingView: close < lowerBB + dev*proximity)
@@ -713,7 +713,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
               (" 📉DivBear" if ps.divergence_bear else "")
         ma  = f" MA:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
         rsi_str = f" RSI:{ps.last_rsi}" if gstate.rsi_filter and getattr(ps, 'last_rsi', None) is not None else ""
-        ps.log(f"P:{price} BB:[{round(lower,2)}-{round(upper,2)}] bm:{round(breakout_margin,3)} K:{round(k_now,1)} D:{round(d_now,1)} "
+        ps.log(f"P:{price} BB:[{lower:.10g}-{upper:.10g}] bm:{breakout_margin:.10g} K:{round(k_now,1)} D:{round(d_now,1)} "
                f"xO:{k_cross_over} xU:{k_cross_under} "
                f"nL:{near_lower} nU:{near_upper}{ma}{rsi_str}{div} -> {signal}")
 
