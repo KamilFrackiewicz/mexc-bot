@@ -1069,7 +1069,10 @@ async def pyramid_monitor_loop():
                             except Exception as e:
                                 ps.log(f"BE SL blad: {e}", "WARN")
 
-                    if gstate.tp_sl_enabled and ps.current_tp and ps.current_sl and ps.pyramid_side:
+                    # Gdy brak BE i brak dokladek - TP/SL z MEXC zamyka precyzyjniej
+                    _act_lvls = [l for l in ps.pyramid_levels if l.get("enabled", True)]
+                    _mexc_handles = (not gstate.be_enabled) and len(_act_lvls) <= 1
+                    if gstate.tp_sl_enabled and not _mexc_handles and ps.current_tp and ps.current_sl and ps.pyramid_side:
                         tp_hit = (price >= ps.current_tp if ps.pyramid_side == "LONG"
                                   else price <= ps.current_tp)
                         sl_hit = (price <= ps.current_sl if ps.pyramid_side == "LONG"
