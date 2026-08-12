@@ -317,7 +317,8 @@ input[type=password]{letter-spacing:.1em;}
         <div class="field"><label>Interwał</label>
           <select id="def-interval">
             <option value="Min1">1 min</option><option value="Min5" selected>5 min</option>
-            <option value="Min15">15 min</option><option value="Min60">1 godz</option><option value="Hour4">4 godz</option>
+            <option value="Min15">15 min</option><option value="Min30">30 min</option>
+            <option value="Min60">1 godz</option><option value="Hour4">4 godz</option>
           </select>
         </div>
         <div class="field"><label>Dźwignia</label><input type="number" id="def-leverage" value="10" min="1" max="100"></div>
@@ -406,6 +407,27 @@ input[type=password]{letter-spacing:.1em;}
     <div class="ph">🧮 Kalkulator TP/SL</div>
     <div class="pb" id="calc-box">
       <div style="font-family:var(--mono);font-size:.62rem;color:var(--text2)">Zapisz konfigurację aby zobaczyć wyliczenia</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ph">📐 ATR — SL i TP</div>
+    <div class="pb">
+      <div class="sw-row">
+        <span class="sw-lbl">SL/TP z ATR</span>
+        <button class="sw" id="atr-sw" onclick="toggleAtrEnabled()"></button>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Mnożnik ATR (SL)</label>
+          <input type="number" id="atr-sl-mult" value="1.5" min="0.1" step="0.1">
+        </div>
+        <div class="field"><label>Limit SL % (max)</label>
+          <input type="number" id="atr-sl-cap" value="5.0" min="0.1" step="0.1">
+        </div>
+      </div>
+      <div class="field"><label>RR (TP = SL × RR)</label>
+        <input type="number" id="atr-rr" value="2.0" min="0.1" step="0.1">
+      </div>
     </div>
   </div>
 
@@ -712,6 +734,26 @@ function toggleCard(sym){
 }
 
 // ── API ──
+async function saveAtrConfig(){
+  const g=id=>parseFloat(document.getElementById(id).value);
+  try { await apiFetch(`/atr_config?sl_mult=${g('atr-sl-mult')||1.5}&sl_cap=${g('atr-sl-cap')||5}&rr=${g('atr-rr')||2}`,{method:'POST'}); } catch {}
+}
+async function toggleAtrEnabled(){
+  const sw=document.getElementById('atr-sw');
+  const val=sw.classList.contains('on')?0:1;
+  try {
+    await saveAtrConfig();
+    await apiFetch('/atr_enabled/'+val,{method:'POST'});
+    if(val){ sw.classList.add('on'); toast('📐 ATR SL/TP ON','var(--green)'); }
+    else { sw.classList.remove('on'); toast('📐 ATR OFF — stałe %','var(--text2)'); }
+  } catch {}
+}
+document.addEventListener('DOMContentLoaded', function(){
+  ['atr-sl-mult','atr-sl-cap','atr-rr'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.addEventListener('change', saveAtrConfig);
+  });
+});
 async function saveAndApply(){
   const cfg = {
     api_key: document.getElementById('api_key').value.trim(),
@@ -922,6 +964,12 @@ function applyStatus(data){
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
   const fastBtn=document.getElementById('btn-fast');
   if(fastBtn){ if(data.fast_entry){ fastBtn.classList.remove('btn-outline'); fastBtn.classList.add('btn-go'); fastBtn.textContent='⚡ FAST ON'; } else { fastBtn.classList.remove('btn-go'); fastBtn.classList.add('btn-outline'); fastBtn.textContent='⚡ FAST OFF'; } }
+  const atrSw=document.getElementById('atr-sw');
+  if(atrSw){ if(data.atr_enabled) atrSw.classList.add('on'); else atrSw.classList.remove('on'); }
+  [['atr-sl-mult','atr_sl_mult'],['atr-sl-cap','atr_sl_cap'],['atr-rr','atr_rr']].forEach(([id,f])=>{
+    const e=document.getElementById(id);
+    if(e && data[f]!==undefined) e.value=data[f];
+  });
   const beBtn=document.getElementById('btn-be');
   const beSw=document.getElementById('be-sw');
   if(beBtn){ if(data.be_enabled){ beBtn.classList.remove('btn-outline'); beBtn.classList.add('btn-go'); beBtn.textContent='⚖️ BE ON'; if(beSw) beSw.classList.add('on'); } else { beBtn.classList.remove('btn-go'); beBtn.classList.add('btn-outline'); beBtn.textContent='⚖️ BE OFF'; if(beSw) beSw.classList.remove('on'); } }
@@ -946,8 +994,8 @@ function applyStatus(data){
     const sym=ps.symbol;
     if(pairs[sym]===undefined && !document.getElementById(`card-${sym}`)) return;
     if(!document.getElementById(`card-${sym}`)){ pairs[sym]=ps; renderCard(sym); }
-    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
-    const ivMap2={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Hour1:'1h',Hour4:'4h'};
+    const ivMap={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Min60:'1h',Hour4:'4h'};
+    const ivMap2={Min1:'1m',Min5:'5m',Min15:'15m',Min30:'30m',Min60:'1h',Hour4:'4h'};
     const lvls = ps.pyramid_levels || [];
     const activeLvls = lvls.filter(l=>l.enabled);
     const pyrInfo = activeLvls.map((l,i) => i===0 ? `${l.amount_usd}$` : `+${l.amount_usd}$(${l.offset_pct}%)`).join(' ');

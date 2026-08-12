@@ -245,6 +245,33 @@ def calc_ma200(closes, period=200):
     if len(closes) < period: return None
     return float(np.mean(closes[-period:]))
 
+def calc_atr(highs, lows, closes, period=14):
+    """ATR wg Wildera"""
+    n = len(closes)
+    if n < period + 1: return None
+    trs = []
+    for i in range(1, n):
+        trs.append(max(highs[i] - lows[i],
+                       abs(highs[i] - closes[i-1]),
+                       abs(lows[i]  - closes[i-1])))
+    if len(trs) < period: return None
+    atr = float(np.mean(trs[:period]))
+    for tr in trs[period:]:
+        atr = (atr * (period - 1) + tr) / period
+    return atr
+
+def calc_stoch_rsi_k_series(closes, rsi_period=14, stoch_period=14, smooth_k=3):
+    """TradingView ta.stochrsi: stochastyka na wartosciach RSI"""
+    rsi = calc_rsi_series(closes, rsi_period)
+    if len(rsi) < stoch_period + smooth_k: return []
+    raw = []
+    for i in range(stoch_period - 1, len(rsi)):
+        w = rsi[i - stoch_period + 1:i + 1]
+        h, l = max(w), min(w)
+        raw.append(50.0 if h == l else 100 * (rsi[i] - l) / (h - l))
+    return [float(np.mean(raw[i - smooth_k + 1:i + 1]))
+            for i in range(smooth_k - 1, len(raw))]
+
 def calc_rsi_series(closes, period=14):
     arr = np.array(closes, dtype=float)
     if len(arr) < period + 1: return []
@@ -411,6 +438,10 @@ class GlobalState:
         self.be_enabled = False
         self.be_trigger_pct = 0.3
         self.be_sl_pct = 0.1
+        self.atr_sl_mult = 1.5
+        self.atr_sl_cap = 5.0
+        self.atr_rr = 2.0
+        self.atr_enabled = True
         self.fast_entry = False
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
@@ -451,6 +482,8 @@ def save_config():
         data["be_enabled"] = gstate.be_enabled
         data["be_trigger_pct"] = gstate.be_trigger_pct
         data["be_sl_pct"] = gstate.be_sl_pct
+        for _k in ("atr_sl_mult","atr_sl_cap","atr_rr","atr_enabled"):
+            data[_k] = getattr(gstate, _k)
         data["fast_entry"] = gstate.fast_entry
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
@@ -471,6 +504,10 @@ def load_config():
         gstate.be_enabled = data.get("be_enabled", False)
         gstate.be_trigger_pct = data.get("be_trigger_pct", 0.3)
         gstate.be_sl_pct = data.get("be_sl_pct", 0.1)
+        gstate.atr_sl_mult = data.get("atr_sl_mult", 1.5)
+        gstate.atr_sl_cap  = data.get("atr_sl_cap", 5.0)
+        gstate.atr_rr      = data.get("atr_rr", 2.0)
+        gstate.atr_enabled = data.get("atr_enabled", True)
         gstate.fast_entry = data.get("fast_entry", False)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
@@ -550,7 +587,14 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         )
 
         # Stochastic K & D
-        k_series = calc_stoch_k_series(closes, highs, lows,
+        # ATR dla SL/TP
+        try:
+            _atr = calc_atr(highs, lows, closes, 14)
+            ps.last_atr_pct = round(_atr / price * 100, 3) if _atr and price else None
+        except Exception:
+            ps.last_atr_pct = None
+        # Stoch RSI (ta.stochrsi) - stochastyka na wartosciach RSI
+        k_series = calc_stoch_rsi_k_series(closes, 14,
                                         ps.stoch_period, ps.stoch_smooth_k)
         d_series = calc_stoch_d_series(k_series, ps.stoch_smooth_d)
 
@@ -603,12 +647,9 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Crossover w oknie po wybiciu BB
         # ODWROCONA: crossover po wybiciu gory = LONG, crossunder po wybiciu dolu = SHORT
-        k_cross_over  = (k_cross_over_now and
-                         ps.bb_breakout_side == "SHORT" and
-                         ps.bb_breakout_candle is not None)
-        k_cross_under = (k_cross_under_now and
-                         ps.bb_breakout_side == "LONG" and
-                         ps.bb_breakout_candle is not None)
+        # Strategia EMA/StochRSI/ATR - bez warunku BB, samo skrzyzowanie Stoch RSI
+        k_cross_over  = k_cross_over_now
+        k_cross_under = k_cross_under_now
 
         # MA200 filter
         ma200_ok_long = ma200_ok_short = True
@@ -649,7 +690,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
         div = (" 📈DivBull" if ps.divergence_bull else "") + \
               (" 📉DivBear" if ps.divergence_bear else "")
         ma  = f" MA:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
-        ps.log(f"P:{price} BB:[{round(lower,2)}-{round(upper,2)}] bm:{round(breakout_margin,3)} K:{round(k_now,1)} D:{round(d_now,1)} "
+        ps.log(f"P:{price} BB:[{round(lower,2)}-{round(upper,2)}] bm:{round(breakout_margin,3)} SRSI K:{round(k_now,1)} D:{round(d_now,1)} ATR:{ps.last_atr_pct}% "
                f"xO:{k_cross_over} xU:{k_cross_under} "
                f"nL:{near_lower} nU:{near_upper}{ma}{div} -> {signal}")
 
@@ -760,6 +801,14 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         limit_order_ids = []
         last_dok_price  = exec_price
         last_dok_vol    = vol0
+        # ── ATR: SL = ATR% x mnoznik, TP = SL x RR ──
+        _atrp = getattr(ps, "last_atr_pct", None)
+        _sl_pct_use = ps.sl_pct
+        _tp_pct_use = ps.tp_pct
+        if gstate.atr_enabled and _atrp:
+            _sl_pct_use = min(_atrp * gstate.atr_sl_mult, gstate.atr_sl_cap)
+            _tp_pct_use = _sl_pct_use * gstate.atr_rr
+            ps.log(f"ATR:{_atrp}% -> SL:{round(_sl_pct_use,2)}% TP:{round(_tp_pct_use,2)}%")
 
         price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
 
@@ -796,7 +845,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
 
         # ── SL od ostatniej dokładki ──────────────────────────────────────────
         price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
-        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct, price_prec)
+        sl_price = _calc_sl(last_dok_price, side, _sl_pct_use, price_prec)
 
         # Oblicz srednia (wejscie + wszystkie dokładki)
         all_vols   = [vol0] + [max(1, round(l["amount_usd"] / (round(exec_price * (1 - l["offset_pct"]/100), 4) * contract_size / ps.leverage))) for l in active[1:]]
@@ -806,7 +855,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         avg_price  = sum(p*v for p,v in zip(all_prices, all_vols)) / total_vol if total_vol else exec_price
 
         # TP od wejscia 1 (bez dokładek)
-        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode, price_prec)
+        tp_price = _calc_tp(exec_price, exec_price, side, _tp_pct_use, ps.tp_mode, price_prec)
         ps.current_tp = tp_price
         ps.current_sl = sl_price
 
@@ -1220,6 +1269,18 @@ async def set_be(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(f"Break Even: {gstate.be_enabled}")
     return {"ok": True, "be_enabled": gstate.be_enabled}
 
+@app.post("/api/atr_enabled/{enabled}")
+async def set_atr_enabled(enabled: int, _=Depends(require_auth)):
+    gstate.atr_enabled = bool(enabled)
+    save_config(); gstate.log(f"ATR SL/TP: {gstate.atr_enabled}")
+    return {"ok": True, "atr_enabled": gstate.atr_enabled}
+
+@app.post("/api/atr_config")
+async def set_atr_config(sl_mult: float, sl_cap: float, rr: float, _=Depends(require_auth)):
+    gstate.atr_sl_mult = sl_mult; gstate.atr_sl_cap = sl_cap; gstate.atr_rr = rr
+    save_config(); gstate.log(f"ATR config: mult={sl_mult} cap={sl_cap} rr={rr}")
+    return {"ok": True}
+
 @app.post("/api/be_config")
 async def set_be_config(trigger: float, sl: float, _=Depends(require_auth)):
     gstate.be_trigger_pct = trigger
@@ -1254,6 +1315,8 @@ def get_status(_=Depends(require_auth)):
             "be_enabled": gstate.be_enabled,
             "be_trigger_pct": gstate.be_trigger_pct,
             "be_sl_pct": gstate.be_sl_pct,
+            "atr_sl_mult": gstate.atr_sl_mult, "atr_sl_cap": gstate.atr_sl_cap,
+            "atr_rr": gstate.atr_rr, "atr_enabled": gstate.atr_enabled,
             "fast_entry": gstate.fast_entry,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
