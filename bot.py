@@ -1016,8 +1016,10 @@ def _check_pyramid_continuation(client, ps, price):
                f"Cena: {exec_price} | Vol: {new_vol}\n"
                f"TP: {ps.current_tp}")
 
-            # Zaktualizuj TP od ostatniej dokładki
-            last_price = ps.pyramid_entries[-1].price
+            # Zaktualizuj TP od SREDNIEJ WAZONEJ wszystkich wejsc (nie od ostatniej dokladki)
+            _tv = sum(e.vol for e in ps.pyramid_entries)
+            last_price = (sum(e.price * e.vol for e in ps.pyramid_entries) / _tv
+                          if _tv else ps.pyramid_entries[-1].price)
             p_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
             ps.current_tp = _calc_tp(last_price, last_price,
                                      ps.pyramid_side, ps.tp_pct, ps.tp_mode, p_prec)
