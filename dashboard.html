@@ -429,6 +429,33 @@ input[type=password]{letter-spacing:.1em;}
         <span class="sw-lbl">Filtr RSI</span>
         <button class="sw" id="rsi-filter-sw" onclick="toggleRsiFilter()"></button>
       </div>
+      <div class="sec">ATR — adaptacyjne poziomy</div>
+      <div class="sw-row">
+        <span class="sw-lbl">ATR → dokładka</span>
+        <button class="sw" id="atr-dok-sw" onclick="toggleAtr('dok')"></button>
+      </div>
+      <div class="field"><label>Mnożnik ATR dokładki</label>
+        <input type="number" id="atr-dok-mult" value="2.0" min="0.1" step="0.1">
+      </div>
+      <div class="sw-row">
+        <span class="sw-lbl">ATR → SL</span>
+        <button class="sw" id="atr-sl-sw" onclick="toggleAtr('sl')"></button>
+      </div>
+      <div class="f2">
+        <div class="field"><label>Mnożnik ATR SL</label>
+          <input type="number" id="atr-sl-mult" value="1.5" min="0.1" step="0.1">
+        </div>
+        <div class="field"><label>Limit SL % (max)</label>
+          <input type="number" id="atr-sl-cap" value="5.0" min="0.1" step="0.1">
+        </div>
+      </div>
+      <div class="sw-row">
+        <span class="sw-lbl">ATR → TP (RR × SL)</span>
+        <button class="sw" id="atr-tp-sw" onclick="toggleAtr('tp')"></button>
+      </div>
+      <div class="field"><label>RR (TP = SL × RR)</label>
+        <input type="number" id="atr-rr" value="1.5" min="0.1" step="0.1">
+      </div>
       <div class="f2">
         <div class="field"><label>RSI OS (LONG poniżej)</label>
           <input type="number" id="rsi-os" value="20" min="0" max="50" step="1">
@@ -863,6 +890,20 @@ async function saveRsiConfig(){
   const ob=parseFloat(document.getElementById('rsi-ob').value)||80;
   try { await apiFetch(`/rsi_config?oversold=${os}&overbought=${ob}`,{method:'POST'}); } catch {}
 }
+async function saveAtrConfig(){
+  const g=id=>parseFloat(document.getElementById(id).value);
+  try { await apiFetch(`/atr_config?dok_mult=${g('atr-dok-mult')||2}&sl_mult=${g('atr-sl-mult')||1.5}&sl_cap=${g('atr-sl-cap')||5}&rr=${g('atr-rr')||1.5}`,{method:'POST'}); } catch {}
+}
+async function toggleAtr(kind){
+  const sw=document.getElementById('atr-'+kind+'-sw');
+  const val=sw.classList.contains('on')?0:1;
+  try {
+    await saveAtrConfig();
+    await apiFetch('/atr_mode/'+kind+'/'+val,{method:'POST'});
+    if(val){ sw.classList.add('on'); toast('📐 ATR '+kind.toUpperCase()+' ON','var(--green)'); }
+    else { sw.classList.remove('on'); toast('📐 ATR '+kind.toUpperCase()+' OFF','var(--text2)'); }
+  } catch {}
+}
 async function toggleStochRsiMode(){
   const sw=document.getElementById('srsi-sw');
   const val=sw.classList.contains('on')?0:1;
@@ -936,6 +977,10 @@ document.addEventListener('DOMContentLoaded', function(){
   const widthMinEl=document.getElementById('width-min');
   if(volMultEl) volMultEl.addEventListener('change', saveFiltersConfig);
   if(widthMinEl) widthMinEl.addEventListener('change', saveFiltersConfig);
+  ['atr-dok-mult','atr-sl-mult','atr-sl-cap','atr-rr'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e) e.addEventListener('change', saveAtrConfig);
+  });
   const rsiOsEl=document.getElementById('rsi-os');
   const rsiObEl=document.getElementById('rsi-ob');
   if(rsiOsEl) rsiOsEl.addEventListener('change', saveRsiConfig);
@@ -1025,6 +1070,14 @@ function applyStatus(data){
   renderGlobalLogs(data.global_logs);
   const marginBtn = document.getElementById('btn-margin');
   if(marginBtn) marginBtn.textContent = data.margin_mode===2 ? '🔓 CROSS' : '🔒 ISOLATED';
+  [['dok','atr_dok_mode'],['sl','atr_sl_mode'],['tp','atr_tp_mode']].forEach(([k,f])=>{
+    const s=document.getElementById('atr-'+k+'-sw');
+    if(s){ if(data[f]) s.classList.add('on'); else s.classList.remove('on'); }
+  });
+  [['atr-dok-mult','atr_dok_mult'],['atr-sl-mult','atr_sl_mult'],['atr-sl-cap','atr_sl_cap'],['atr-rr','atr_rr']].forEach(([id,f])=>{
+    const e=document.getElementById(id);
+    if(e && data[f]!==undefined) e.value=data[f];
+  });
   const srsiSw=document.getElementById('srsi-sw');
   if(srsiSw){ if(data.stoch_rsi_mode) srsiSw.classList.add('on'); else srsiSw.classList.remove('on'); }
   const rsiSw=document.getElementById('rsi-filter-sw');

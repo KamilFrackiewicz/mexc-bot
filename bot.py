@@ -253,6 +253,22 @@ def calc_stoch_d_series(k_series, smooth_d=3):
     return [float(np.mean(k_series[i - smooth_d + 1:i + 1]))
             for i in range(smooth_d - 1, len(k_series))]
 
+def calc_atr(highs, lows, closes, period=14):
+    """ATR wg Wildera: srednia z True Range"""
+    n = len(closes)
+    if n < period + 1: return None
+    trs = []
+    for i in range(1, n):
+        tr = max(highs[i] - lows[i],
+                 abs(highs[i] - closes[i-1]),
+                 abs(lows[i]  - closes[i-1]))
+        trs.append(tr)
+    if len(trs) < period: return None
+    atr = float(np.mean(trs[:period]))
+    for tr in trs[period:]:
+        atr = (atr * (period - 1) + tr) / period
+    return atr
+
 def calc_ma200(closes, period=200):
     if len(closes) < period: return None
     return float(np.mean(closes[-period:]))
@@ -433,6 +449,13 @@ class GlobalState:
         self.rsi_oversold = 20.0
         self.rsi_overbought = 80.0
         self.stoch_rsi_mode = False
+        self.atr_dok_mode = False
+        self.atr_dok_mult = 2.0
+        self.atr_sl_mode = False
+        self.atr_sl_mult = 1.5
+        self.atr_sl_cap = 5.0
+        self.atr_tp_mode = False
+        self.atr_rr = 1.5
         self.pairs: Dict[str, PairState] = {}
         self.global_logs: List[dict] = []
 
@@ -482,6 +505,9 @@ def save_config():
         data["rsi_oversold"] = gstate.rsi_oversold
         data["rsi_overbought"] = gstate.rsi_overbought
         data["stoch_rsi_mode"] = gstate.stoch_rsi_mode
+        for _k in ("atr_dok_mode","atr_dok_mult","atr_sl_mode","atr_sl_mult",
+                   "atr_sl_cap","atr_tp_mode","atr_rr"):
+            data[_k] = getattr(gstate, _k)
         json.dump(data, open(CONFIG_FILE, "w"), indent=2)
         logger.info("✅ Config saved")
     except Exception as e:
@@ -511,6 +537,13 @@ def load_config():
         gstate.rsi_oversold = data.get("rsi_oversold", 20.0)
         gstate.rsi_overbought = data.get("rsi_overbought", 80.0)
         gstate.stoch_rsi_mode = data.get("stoch_rsi_mode", False)
+        gstate.atr_dok_mode = data.get("atr_dok_mode", False)
+        gstate.atr_dok_mult = data.get("atr_dok_mult", 2.0)
+        gstate.atr_sl_mode  = data.get("atr_sl_mode", False)
+        gstate.atr_sl_mult  = data.get("atr_sl_mult", 1.5)
+        gstate.atr_sl_cap   = data.get("atr_sl_cap", 5.0)
+        gstate.atr_tp_mode  = data.get("atr_tp_mode", False)
+        gstate.atr_rr       = data.get("atr_rr", 1.5)
         for pd in data.get("pairs", []):
             sym = pd.get("symbol"); 
             if not sym: continue
@@ -615,6 +648,13 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
                 highs[-1]  = live_highs[-1]
                 lows[-1]   = live_lows[-1]
                 ps.log(f"LiveStoch: biezaca cena {live_closes[-1]}")
+
+        # ATR (dla trybow ATR)
+        try:
+            _atr = calc_atr(highs, lows, closes, 14)
+            ps.last_atr_pct = round(_atr / price * 100, 3) if _atr and price else None
+        except Exception:
+            ps.last_atr_pct = None
 
         # Stochastic K & D
         if gstate.stoch_rsi_mode:
@@ -843,15 +883,29 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         limit_order_ids = []
         last_dok_price  = exec_price
         last_dok_vol    = vol0
+        # ── Tryby ATR: podmien procenty przed wyliczeniem poziomow ──
+        _atrp = getattr(ps, "last_atr_pct", None)
+        _sl_pct_use = ps.sl_pct
+        _tp_pct_use = ps.tp_pct
+        if _atrp:
+            if gstate.atr_sl_mode:
+                _sl_pct_use = min(_atrp * gstate.atr_sl_mult, gstate.atr_sl_cap)
+            if gstate.atr_tp_mode:
+                _tp_pct_use = _sl_pct_use * gstate.atr_rr
+            if gstate.atr_dok_mode or gstate.atr_sl_mode or gstate.atr_tp_mode:
+                ps.log(f"ATR:{_atrp}% -> SL:{round(_sl_pct_use,2)}% TP:{round(_tp_pct_use,2)}%"
+                       + (f" DOK:{round(_atrp*gstate.atr_dok_mult,2)}%" if gstate.atr_dok_mode else ""))
 
         price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
 
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
-                dok_price = round(last_dok_price * (1 - dok_lvl["offset_pct"] / 100), price_precision)
+                _off = (_atrp * gstate.atr_dok_mult) if (gstate.atr_dok_mode and _atrp) else dok_lvl["offset_pct"]
+                dok_price = round(last_dok_price * (1 - _off / 100), price_precision)
                 dok_side  = 1  # Buy Long
             else:
-                dok_price = round(last_dok_price * (1 + dok_lvl["offset_pct"] / 100), price_precision)
+                _off = (_atrp * gstate.atr_dok_mult) if (gstate.atr_dok_mode and _atrp) else dok_lvl["offset_pct"]
+                dok_price = round(last_dok_price * (1 + _off / 100), price_precision)
                 dok_side  = 3  # Sell Short
 
             dok_vol = max(1, round(dok_lvl["amount_usd"] / (dok_price * contract_size / ps.leverage)))
@@ -879,7 +933,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
 
         # ── SL od ostatniej dokładki ──────────────────────────────────────────
         price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
-        sl_price = _calc_sl(last_dok_price, side, ps.sl_pct, price_prec)
+        sl_price = _calc_sl(last_dok_price, side, _sl_pct_use, price_prec)
 
         # Oblicz srednia (wejscie + wszystkie dokładki)
         all_vols   = [vol0] + [max(1, round(l["amount_usd"] / (round(exec_price * (1 - l["offset_pct"]/100), 4) * contract_size / ps.leverage))) for l in active[1:]]
@@ -889,7 +943,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         avg_price  = sum(p*v for p,v in zip(all_prices, all_vols)) / total_vol if total_vol else exec_price
 
         # TP od wejscia 1 (bez dokładek)
-        tp_price = _calc_tp(exec_price, exec_price, side, ps.tp_pct, ps.tp_mode, price_prec)
+        tp_price = _calc_tp(exec_price, exec_price, side, _tp_pct_use, ps.tp_mode, price_prec)
         ps.current_tp = tp_price
         ps.current_sl = sl_price
 
@@ -1299,6 +1353,22 @@ async def set_tp_sl(enabled: int, _=Depends(require_auth)):
     save_config(); gstate.log(mode); tg(mode)
     return {"ok": True, "tp_sl_enabled": gstate.tp_sl_enabled}
 
+@app.post("/api/atr_mode/{kind}/{enabled}")
+async def set_atr_mode(kind: str, enabled: int, _=Depends(require_auth)):
+    m = {"dok": "atr_dok_mode", "sl": "atr_sl_mode", "tp": "atr_tp_mode"}
+    if kind not in m: raise HTTPException(400, "zly tryb")
+    setattr(gstate, m[kind], bool(enabled))
+    save_config(); gstate.log(f"ATR {kind}: {bool(enabled)}")
+    return {"ok": True}
+
+@app.post("/api/atr_config")
+async def set_atr_config(dok_mult: float, sl_mult: float, sl_cap: float, rr: float,
+                         _=Depends(require_auth)):
+    gstate.atr_dok_mult = dok_mult; gstate.atr_sl_mult = sl_mult
+    gstate.atr_sl_cap = sl_cap; gstate.atr_rr = rr
+    save_config(); gstate.log(f"ATR config: dok={dok_mult} sl={sl_mult} cap={sl_cap} rr={rr}")
+    return {"ok": True}
+
 @app.post("/api/stoch_rsi_mode/{enabled}")
 async def set_stoch_rsi_mode(enabled: int, _=Depends(require_auth)):
     gstate.stoch_rsi_mode = bool(enabled)
@@ -1399,6 +1469,10 @@ def get_status(_=Depends(require_auth)):
             "rsi_oversold": gstate.rsi_oversold,
             "rsi_overbought": gstate.rsi_overbought,
             "stoch_rsi_mode": gstate.stoch_rsi_mode,
+            "atr_dok_mode": gstate.atr_dok_mode, "atr_dok_mult": gstate.atr_dok_mult,
+            "atr_sl_mode": gstate.atr_sl_mode, "atr_sl_mult": gstate.atr_sl_mult,
+            "atr_sl_cap": gstate.atr_sl_cap,
+            "atr_tp_mode": gstate.atr_tp_mode, "atr_rr": gstate.atr_rr,
             "pairs": [ps.to_dict() for ps in gstate.pairs.values()],
             "global_logs": gstate.global_logs[:20]}
 
