@@ -243,7 +243,12 @@ def calc_stoch_d_series(k_series, smooth_d=3):
 
 def calc_ma200(closes, period=200):
     if len(closes) < period: return None
-    return float(np.mean(closes[-period:]))
+    # EMA200 (nie SMA) - zgodnie z TradingView
+    k = 2.0 / (period + 1)
+    ema = float(np.mean(closes[:period]))
+    for price in closes[period:]:
+        ema = price * k + ema * (1 - k)
+    return ema
 
 def calc_atr(highs, lows, closes, period=14):
     """ATR wg Wildera"""
