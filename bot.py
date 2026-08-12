@@ -1022,6 +1022,16 @@ def _check_pyramid_continuation(client, ps, price):
             ps.current_tp = _calc_tp(last_price, last_price,
                                      ps.pyramid_side, ps.tp_pct, ps.tp_mode, p_prec)
             ps.log(f"TP zaktualizowany: {ps.current_tp}")
+            # Wyslij nowy TP na gielde (zeby nie zyl tylko w pamieci bota)
+            try:
+                _upd = client.update_position_tp_sl(ps.symbol, ps.pyramid_side,
+                                                    ps.current_tp, ps.current_sl,
+                                                    ps.leverage)
+                ps.log(f"TP w MEXC zaktualizowany: {ps.current_tp}" if _upd
+                       else "Nie udalo sie zaktualizowac TP w MEXC — monitor pilnuje", 
+                       "SUCCESS" if _upd else "WARN")
+            except Exception as _e:
+                ps.log(f"Blad aktualizacji TP w MEXC: {_e}", "WARN")
     except Exception as e:
         ps.log(f"check_continuation blad: {e}", "ERROR")
 
