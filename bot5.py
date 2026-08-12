@@ -689,7 +689,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         div = (" 📈DivBull" if ps.divergence_bull else "") + \
               (" 📉DivBear" if ps.divergence_bear else "")
-        ma  = f" MA:{round(ps.last_ma200,0) if ps.last_ma200 else 'off'}"
+        ma  = f" MA:{ps.last_ma200:.10g}" if ps.last_ma200 else " MA:off"
         ps.log(f"P:{price} BB:[{round(lower,2)}-{round(upper,2)}] bm:{round(breakout_margin,3)} SRSI K:{round(k_now,1)} D:{round(d_now,1)} ATR:{ps.last_atr_pct}% "
                f"xO:{k_cross_over} xU:{k_cross_under} "
                f"nL:{near_lower} nU:{near_upper}{ma}{div} -> {signal}")
@@ -874,7 +874,9 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                     price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "BCH_USDT": 2}.get(ps.symbol, 4)
                     sl_result = client._post("/api/v1/private/stoporder/place", {
                         "positionId": pos_id, "symbol": ps.symbol, "vol": hold_vol,
-                        "lossTrend": 1, "profitTrend": 1, "stopLossPrice": round(sl_price, price_prec)
+                        "lossTrend": 1, "profitTrend": 1,
+                        "stopLossPrice": round(sl_price, price_prec),
+                        "takeProfitPrice": round(tp_price, price_prec)
                     })
                     if sl_result.get("success"):
                         ps.log(f"SL:{sl_price} TP:{tp_price} ustawione w MEXC")
