@@ -865,7 +865,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ticker     = client.get_ticker(ps.symbol)
         exec_price = float(ticker.get("lastPrice", price))
 
-        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0, "TRX_USDT": 10.0, "LTC_USDT": 0.01, "AVAX_USDT": 0.1, "ONDO_USDT": 10.0, "UNI_USDT": 0.1, "TAO_USDT": 0.01, "XAU_USDT": 0.001, "ARB_USDT": 1.0, "GALA_USDT": 10.0, "ATOM_USDT": 0.1, "DOT_USDT": 0.1, "ALGO_USDT": 1.0, "JUP_USDT": 10.0, "KAITO_USDT": 1.0, "PENGU_USDT": 10.0, "WLFI_USDT": 1.0, "PEPE_USDT": 10000000, "FILECOIN_USDT": 0.01, "BCH_USDT": 0.01}.get(ps.symbol, 1.0)
+        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0, "TRX_USDT": 10.0, "LTC_USDT": 0.01, "AVAX_USDT": 0.1, "ONDO_USDT": 10.0, "UNI_USDT": 0.1, "TAO_USDT": 0.01, "XAU_USDT": 0.001, "ARB_USDT": 1.0, "GALA_USDT": 10.0, "ATOM_USDT": 0.1, "DOT_USDT": 0.1, "ALGO_USDT": 1.0, "JUP_USDT": 10.0, "KAITO_USDT": 1.0, "PENGU_USDT": 10.0, "WLFI_USDT": 1.0, "PEPE_USDT": 10000000, "CAKE_USDT": 1.0, "RENDER_USDT": 1.0, "ICP_USDT": 0.01, "WLD_USDT": 1.0, "MNT_USDT": 10.0, "ASTER_USDT": 1.0, "NEAR_USDT": 1.0, "SHIB_USDT": 1000.0, "FILECOIN_USDT": 0.01, "BCH_USDT": 0.01}.get(ps.symbol, 1.0)
 
         # ── Wejście 1 (market order) ──────────────────────────────────────────
         vol0 = max(1, round(lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)))
@@ -896,7 +896,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                 ps.log(f"ATR:{_atrp}% -> SL:{round(_sl_pct_use,2)}% TP:{round(_tp_pct_use,2)}%"
                        + (f" DOK:{round(_atrp*gstate.atr_dok_mult,2)}%" if gstate.atr_dok_mode else ""))
 
-        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+        price_precision = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
 
         for i, dok_lvl in enumerate(active[1:], start=1):
             if side == "LONG":
@@ -932,7 +932,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
         ps.pyramid_limit_order_ids = limit_order_ids
 
         # ── SL od ostatniej dokładki ──────────────────────────────────────────
-        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
         sl_price = _calc_sl(last_dok_price, side, _sl_pct_use, price_prec)
 
         # Oblicz srednia (wejscie + wszystkie dokładki)
@@ -959,7 +959,7 @@ def _open_pyramid_level(client, ps, side, price, level_idx):
                     pos_id = positions[0].get("positionId")
                     hold_vol = positions[0].get("holdVol", 0)
                     pos_type = positions[0].get("positionType", 1)
-                    price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+                    price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "BNB_USDT": 1, "XRP_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
                     sl_result = client._post("/api/v1/private/stoporder/place", {
                         "positionId": pos_id, "symbol": ps.symbol, "vol": hold_vol,
                         "lossTrend": 1, "profitTrend": 1,
@@ -1020,7 +1020,7 @@ def _check_pyramid_continuation(client, ps, price):
             _tv = sum(e.vol for e in ps.pyramid_entries)
             last_price = (sum(e.price * e.vol for e in ps.pyramid_entries) / _tv
                           if _tv else ps.pyramid_entries[-1].price)
-            p_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+            p_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
             ps.current_tp = _calc_tp(last_price, last_price,
                                      ps.pyramid_side, ps.tp_pct, ps.tp_mode, p_prec)
             ps.log(f"TP zaktualizowany: {ps.current_tp}")
@@ -1046,8 +1046,8 @@ def _open_hedge_level(client, ps, side, price):
     try:
         ticker = client.get_ticker(ps.symbol)
         exec_price = float(ticker.get("lastPrice", price))
-        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0, "TRX_USDT": 10.0, "LTC_USDT": 0.01, "AVAX_USDT": 0.1, "ONDO_USDT": 10.0, "UNI_USDT": 0.1, "TAO_USDT": 0.01, "XAU_USDT": 0.001, "ARB_USDT": 1.0, "GALA_USDT": 10.0, "ATOM_USDT": 0.1, "DOT_USDT": 0.1, "ALGO_USDT": 1.0, "JUP_USDT": 10.0, "KAITO_USDT": 1.0, "PENGU_USDT": 10.0, "WLFI_USDT": 1.0, "PEPE_USDT": 10000000, "FILECOIN_USDT": 0.01, "BCH_USDT": 0.01}.get(ps.symbol, 1.0)
-        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+        contract_size = {"BTC_USDT": 0.0001, "ETH_USDT": 0.01, "SOL_USDT": 0.1, "SUI_USDT": 1.0, "DOGE_USDT": 100.0, "ADA_USDT": 1.0, "LINK_USDT": 0.1, "HYPE_USDT": 0.1, "NAS100_USDT": 0.00001, "SP500_USDT": 0.0001, "BNB_USDT": 0.01, "XRP_USDT": 1.0, "TRX_USDT": 10.0, "LTC_USDT": 0.01, "AVAX_USDT": 0.1, "ONDO_USDT": 10.0, "UNI_USDT": 0.1, "TAO_USDT": 0.01, "XAU_USDT": 0.001, "ARB_USDT": 1.0, "GALA_USDT": 10.0, "ATOM_USDT": 0.1, "DOT_USDT": 0.1, "ALGO_USDT": 1.0, "JUP_USDT": 10.0, "KAITO_USDT": 1.0, "PENGU_USDT": 10.0, "WLFI_USDT": 1.0, "PEPE_USDT": 10000000, "CAKE_USDT": 1.0, "RENDER_USDT": 1.0, "ICP_USDT": 0.01, "WLD_USDT": 1.0, "MNT_USDT": 10.0, "ASTER_USDT": 1.0, "NEAR_USDT": 1.0, "SHIB_USDT": 1000.0, "FILECOIN_USDT": 0.01, "BCH_USDT": 0.01}.get(ps.symbol, 1.0)
+        price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
         vol0 = max(1, round(lvl["amount_usd"] / (exec_price * contract_size / ps.leverage)))
         result = client.place_order(ps.symbol, 1 if side == "LONG" else 3, vol0, ps.leverage, None, None)
         if not result.get("success", False):
@@ -1087,7 +1087,7 @@ def _check_hedge_continuation(client, ps, price):
             exec_price = float(pos.get("openAvgPrice", price))
             ps.hedge_entries.append(PyramidEntry(exec_price, new_vol, ps.hedge_side))
             ps.log(f"HEDGE Dokladka {len(ps.hedge_entries)}/{len(active)} @ {exec_price}", "SUCCESS")
-            price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
+            price_prec = {"BTC_USDT": 1, "ETH_USDT": 2, "SOL_USDT": 2, "SUI_USDT": 4, "DOGE_USDT": 5, "ADA_USDT": 4, "LINK_USDT": 3, "HYPE_USDT": 3, "NAS100_USDT": 0, "SP500_USDT": 2, "BNB_USDT": 1, "XRP_USDT": 4, "TRX_USDT": 5, "LTC_USDT": 2, "AVAX_USDT": 3, "ONDO_USDT": 4, "UNI_USDT": 3, "TAO_USDT": 2, "XAU_USDT": 2, "ARB_USDT": 5, "GALA_USDT": 6, "ATOM_USDT": 3, "DOT_USDT": 3, "ALGO_USDT": 4, "JUP_USDT": 4, "KAITO_USDT": 4, "PENGU_USDT": 6, "WLFI_USDT": 5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4, "BCH_USDT": 2}.get(ps.symbol, 4)
             last_price = ps.hedge_entries[-1].price
             ps.hedge_current_tp = _calc_tp(last_price, last_price, ps.hedge_side, ps.tp_pct, ps.tp_mode, price_prec)
             ps.log(f"HEDGE TP zaktualizowany: {ps.hedge_current_tp}")
@@ -1137,7 +1137,7 @@ async def pyramid_monitor_loop():
                         be_sl = avg_price * (1 + gstate.be_sl_pct / 100) if ps.pyramid_side == "LONG" else avg_price * (1 - gstate.be_sl_pct / 100)
                         be_triggered = (price >= be_trigger if ps.pyramid_side == "LONG" else price <= be_trigger)
                         if be_triggered:
-                            prec = {"BTC_USDT":1,"ETH_USDT":2,"SOL_USDT":2,"SUI_USDT":4,"DOGE_USDT":5,"ADA_USDT":4,"LINK_USDT":3,"HYPE_USDT":3,"NAS100_USDT":0,"SP500_USDT":2,"BNB_USDT":1,"XRP_USDT":4,"TRX_USDT":5,"LTC_USDT":2,"AVAX_USDT":3,"ONDO_USDT":4,"UNI_USDT":3,"TAO_USDT":2,"XAU_USDT":2,"ARB_USDT":5,"GALA_USDT":6,"ATOM_USDT":3,"DOT_USDT":3,"ALGO_USDT":4,"JUP_USDT":4,"KAITO_USDT":4,"PENGU_USDT":6,"WLFI_USDT":5, "PEPE_USDT": 10, "FILECOIN_USDT": 4,"BCH_USDT":2}.get(ps.symbol, 4)
+                            prec = {"BTC_USDT":1,"ETH_USDT":2,"SOL_USDT":2,"SUI_USDT":4,"DOGE_USDT":5,"ADA_USDT":4,"LINK_USDT":3,"HYPE_USDT":3,"NAS100_USDT":0,"SP500_USDT":2,"BNB_USDT":1,"XRP_USDT":4,"TRX_USDT":5,"LTC_USDT":2,"AVAX_USDT":3,"ONDO_USDT":4,"UNI_USDT":3,"TAO_USDT":2,"XAU_USDT":2,"ARB_USDT":5,"GALA_USDT":6,"ATOM_USDT":3,"DOT_USDT":3,"ALGO_USDT":4,"JUP_USDT":4,"KAITO_USDT":4,"PENGU_USDT":6,"WLFI_USDT":5, "PEPE_USDT": 10, "CAKE_USDT": 4, "RENDER_USDT": 3, "ICP_USDT": 3, "WLD_USDT": 4, "MNT_USDT": 4, "ASTER_USDT": 4, "NEAR_USDT": 3, "SHIB_USDT": 9, "FILECOIN_USDT": 4,"BCH_USDT":2}.get(ps.symbol, 4)
                             be_sl = round(be_sl, prec)
                             ps.current_sl = be_sl
                             ps.be_activated = True
