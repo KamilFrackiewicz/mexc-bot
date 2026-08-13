@@ -411,6 +411,9 @@ input[type=password]{letter-spacing:.1em;}
         <span class="sw-lbl">Tryb Stoch RSI (zamiast Stochastic)</span>
         <button class="sw" id="srsi-sw" onclick="toggleStochRsiMode()"></button>
       </div>
+      <div class="field"><label>Próg przecięcia Stoch (pkt)</label>
+        <input type="number" id="cross-min" value="0.5" min="0" step="0.1">
+      </div>
       <div class="sw-row">
         <span class="sw-lbl">Filtr wolumenu</span>
         <button class="sw" id="vol-filter-sw" onclick="toggleVolFilter()"></button>
@@ -923,6 +926,11 @@ async function toggleRsiFilter(){
     else { sw.classList.remove('on'); toast('📈 Filtr RSI OFF','var(--text2)'); }
   } catch {}
 }
+async function saveCrossMin(){
+  const v=parseFloat(document.getElementById('cross-min').value);
+  if(isNaN(v)) return;
+  try { await apiFetch('/cross_min?value='+v,{method:'POST'}); toast('Próg przecięcia: '+v+' pkt','var(--cyan)'); } catch {}
+}
 async function toggleVolFilter(){
   const sw=document.getElementById('vol-filter-sw');
   const val=sw.classList.contains('on')?0:1;
@@ -973,6 +981,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const beSl=document.getElementById('be-sl');
   if(beTrigger) beTrigger.addEventListener('change', saveBEConfig);
   if(beSl) beSl.addEventListener('change', saveBEConfig);
+  const cmInput=document.getElementById('cross-min');
+  if(cmInput) cmInput.addEventListener('change', saveCrossMin);
   const volMultEl=document.getElementById('vol-mult');
   const widthMinEl=document.getElementById('width-min');
   if(volMultEl) volMultEl.addEventListener('change', saveFiltersConfig);
@@ -1084,6 +1094,8 @@ function applyStatus(data){
   if(rsiSw){ if(data.rsi_filter) rsiSw.classList.add('on'); else rsiSw.classList.remove('on'); }
   if(data.rsi_oversold!==undefined && document.getElementById('rsi-os')) document.getElementById('rsi-os').value=data.rsi_oversold;
   if(data.rsi_overbought!==undefined && document.getElementById('rsi-ob')) document.getElementById('rsi-ob').value=data.rsi_overbought;
+  const cmEl=document.getElementById('cross-min');
+  if(cmEl && data.cross_min!==undefined) cmEl.value=data.cross_min;
   const volSw=document.getElementById('vol-filter-sw');
   if(volSw){ if(data.vol_filter) volSw.classList.add('on'); else volSw.classList.remove('on'); }
   const widthSw=document.getElementById('width-filter-sw');

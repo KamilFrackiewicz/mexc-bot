@@ -449,6 +449,7 @@ class GlobalState:
         self.rsi_oversold = 20.0
         self.rsi_overbought = 80.0
         self.stoch_rsi_mode = False
+        self.cross_min = 0.5
         self.atr_dok_mode = False
         self.atr_dok_mult = 2.0
         self.atr_sl_mode = False
@@ -505,6 +506,7 @@ def save_config():
         data["rsi_oversold"] = gstate.rsi_oversold
         data["rsi_overbought"] = gstate.rsi_overbought
         data["stoch_rsi_mode"] = gstate.stoch_rsi_mode
+        data["cross_min"] = gstate.cross_min
         for _k in ("atr_dok_mode","atr_dok_mult","atr_sl_mode","atr_sl_mult",
                    "atr_sl_cap","atr_tp_mode","atr_rr"):
             data[_k] = getattr(gstate, _k)
@@ -537,6 +539,7 @@ def load_config():
         gstate.rsi_oversold = data.get("rsi_oversold", 20.0)
         gstate.rsi_overbought = data.get("rsi_overbought", 80.0)
         gstate.stoch_rsi_mode = data.get("stoch_rsi_mode", False)
+        gstate.cross_min = data.get("cross_min", 0.5)
         gstate.atr_dok_mode = data.get("atr_dok_mode", False)
         gstate.atr_dok_mult = data.get("atr_dok_mult", 2.0)
         gstate.atr_sl_mode  = data.get("atr_sl_mode", False)
@@ -688,7 +691,7 @@ def run_pair_strategy(client: MEXCClient, ps: PairState):
 
         # Crossover / Crossunder - tylko biezaca swieca z minimalnym przekroczeniem 0.5pkt
         candle_idx = len(closes) - 1
-        cross_min = 0.5
+        cross_min = gstate.cross_min
         k_cross_over_now  = (len(k_series) >= 2 and len(d_series) >= 2 and
                              k_series[-2] <= d_series[-2] and
                              k_series[-1] > d_series[-1] + cross_min and
@@ -1381,6 +1384,12 @@ async def set_atr_config(dok_mult: float, sl_mult: float, sl_cap: float, rr: flo
     save_config(); gstate.log(f"ATR config: dok={dok_mult} sl={sl_mult} cap={sl_cap} rr={rr}")
     return {"ok": True}
 
+@app.post("/api/cross_min")
+async def set_cross_min(value: float, _=Depends(require_auth)):
+    gstate.cross_min = value
+    save_config(); gstate.log(f"Prog przeciecia Stoch: {value} pkt")
+    return {"ok": True, "cross_min": gstate.cross_min}
+
 @app.post("/api/stoch_rsi_mode/{enabled}")
 async def set_stoch_rsi_mode(enabled: int, _=Depends(require_auth)):
     gstate.stoch_rsi_mode = bool(enabled)
@@ -1481,6 +1490,7 @@ def get_status(_=Depends(require_auth)):
             "rsi_oversold": gstate.rsi_oversold,
             "rsi_overbought": gstate.rsi_overbought,
             "stoch_rsi_mode": gstate.stoch_rsi_mode,
+            "cross_min": gstate.cross_min,
             "atr_dok_mode": gstate.atr_dok_mode, "atr_dok_mult": gstate.atr_dok_mult,
             "atr_sl_mode": gstate.atr_sl_mode, "atr_sl_mult": gstate.atr_sl_mult,
             "atr_sl_cap": gstate.atr_sl_cap,
