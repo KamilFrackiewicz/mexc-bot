@@ -202,13 +202,24 @@ class MEXCClient:
             if not active:
                 logger.info(f"Brak aktywnych zlecen TP/SL dla {symbol}")
                 return False
-            o = active[0]
-            order_id = o.get("orderId")
-            body = {"orderId": order_id, "symbol": symbol}
+            # change_price nie dziala (code 1001) - anuluj stare i zloz nowe
+            positions = self.get_positions(symbol)
+            if not positions:
+                logger.info(f"Brak pozycji {symbol} - pomijam aktualizacje TP")
+                return False
+            pos = positions[0]
+            pos_id   = pos.get("positionId")
+            hold_vol = pos.get("holdVol", 0)
+            try:
+                self._post("/api/v1/private/stoporder/cancel_all", {"symbol": symbol})
+            except Exception as e:
+                logger.warning(f"cancel_all stoporder: {e}")
+            body = {"positionId": pos_id, "symbol": symbol, "vol": hold_vol,
+                    "lossTrend": 1, "profitTrend": 1}
+            if sl: body["stopLossPrice"]   = sl
             if tp: body["takeProfitPrice"] = tp
-            if sl: body["stopLossPrice"] = sl
-            r = self._post("/api/v1/private/stoporder/change_price", body)
-            logger.info(f"change_price response: {r}")
+            r = self._post("/api/v1/private/stoporder/place", body)
+            logger.info(f"stoporder/place (update) response: {r}")
             return r.get("success", False)
         except Exception as e:
             logger.error(f"update_position_tp_sl error: {e}")
