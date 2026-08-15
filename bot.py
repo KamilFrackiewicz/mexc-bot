@@ -6,6 +6,7 @@ Multi-para, zapis konfiguracji, system logowania
 
 import hmac, hashlib, time, requests, numpy as np, asyncio, logging, json, os
 from typing import Optional, List, Dict
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -461,6 +462,7 @@ class GlobalState:
         self.rsi_overbought = 80.0
         self.stoch_rsi_mode = False
         self.cross_min = 0.5
+        self.kline_cache = {}
         self.atr_dok_mode = False
         self.atr_dok_mult = 2.0
         self.atr_sl_mode = False
@@ -604,11 +606,24 @@ load_logs()
 
 def run_pair_strategy(client: MEXCClient, ps: PairState):
     try:
-        kdata  = client.get_klines_full(ps.symbol, ps.interval, 500)
+        kdata  = (gstate.kline_cache or {}).get(ps.symbol)
+        if not kdata:
+            kdata = client.get_klines_full(ps.symbol, ps.interval, 500)
         closes = [float(x) for x in kdata.get("close", [])]
         highs  = [float(x) for x in kdata.get("high",  [])]
         lows   = [float(x) for x in kdata.get("low",   [])]
 
+        # ── Odetnij ostatnia swiece jesli jeszcze sie nie zamknela ──
+        _iv_sec = {"Min1":60,"Min5":300,"Min15":900,"Min30":1800,
+                   "Min60":3600,"Hour4":14400}.get(ps.interval, 900)
+        _times = kdata.get("time", [])
+        if _times:
+            _lt = int(_times[-1])
+            _lt = _lt // 1000 if _lt > 9999999999 else _lt
+            if int(time.time()) < _lt + _iv_sec:
+                closes = closes[:-1]; highs = highs[:-1]; lows = lows[:-1]
+                for _k in ("close", "high", "low", "time", "vol", "open"):
+                    if kdata.get(_k): kdata[_k] = kdata[_k][:-1]
         if len(closes) < 250: ps.log("Za mało danych", "WARN"); return
 
         price = closes[-1]
@@ -1255,17 +1270,34 @@ async def bot_loop():
         if not actives:
             gstate.log("Brak aktywnych par", "WARN")
         else:
+            # Rownolegle pobranie danych (same zapytania HTTP)
+            _t0 = time.time()
+            def _prefetch(ps):
+                try:
+                    return ps.symbol, client.get_klines_full(ps.symbol, ps.interval, 500)
+                except Exception:
+                    return ps.symbol, None
+            try:
+                with ThreadPoolExecutor(max_workers=8) as _ex:
+                    _cache = dict(_ex.map(_prefetch, actives))
+            except Exception as e:
+                gstate.log(f"Prefetch blad: {e}", "WARN"); _cache = {}
+            gstate.kline_cache = _cache
+            # Decyzje i zlecenia sekwencyjnie (limit slotow)
             for ps in actives:
                 run_pair_strategy(client, ps)
-                await asyncio.sleep(0.5)
+            gstate.kline_cache = {}
+            gstate.log(f"Cykl: {round(time.time()-_t0,1)}s ({len(actives)} par)")
+
         min_iv = min((iv_map.get(ps.interval,300) for ps in actives), default=300)
-        # Fast Entry — gdy jest aktywne wybicie BB sprawdzaj co 60s
-        has_breakout = gstate.fast_entry and any(
-            ps.bb_breakout_side is not None and not ps.pyramid_active
-            for ps in actives
-        )
-        wait_time = 60 if has_breakout else min_iv
-        gstate.log(f"Następne za {wait_time}s ({len(actives)} par){' ⚡FAST' if has_breakout else ''}")
+        # Sen do najblizszego zamkniecia swiecy + 1s
+        try:
+            _now = time.time()
+            wait_time = int(min_iv - (_now % min_iv)) + 1
+            if wait_time < 3: wait_time += min_iv
+        except Exception:
+            wait_time = 60
+        gstate.log(f"Nastepne zamkniecie swiecy za {wait_time}s")
         try: save_logs()
         except: pass
         for _ in range(wait_time):
