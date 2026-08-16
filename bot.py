@@ -1224,6 +1224,17 @@ async def pyramid_monitor_loop():
                     current = [p for p in all_pos if p.get("symbol") == ps.symbol]
                     if not current and ps.pyramid_active:
                         ps.log("Pozycja zamknieta (MEXC TP/SL) - resetuje piramide", "SUCCESS")
+                        # Powiadomienie TG — rozpoznaj TP/SL po odleglosci od poziomow
+                        try:
+                            _p = ps.last_price or 0
+                            if ps.current_tp and ps.current_sl and _p:
+                                _res = "TP" if abs(_p - ps.current_tp) <= abs(_p - ps.current_sl) else "SL"
+                            else:
+                                _res = "TP/SL"
+                            tg(f"{'✅' if _res=='TP' else '❌'} <b>{ps.symbol}</b> {_res} osiągnięty\n"
+                               f"Cena: {_p}\nTP: {ps.current_tp} | SL: {ps.current_sl}")
+                        except Exception as _e:
+                            ps.log(f"TG powiadomienie blad: {_e}", "WARN")
                         try: client._post("/api/v1/private/order/cancel_all", {"symbol": ps.symbol})
                         except: pass
                         ps.reset_pyramid()
